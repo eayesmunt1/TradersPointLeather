@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Traders Point Leather — Handcrafted in Indiana</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0d0b;
+    --bg-warm: #1a1613;
+    --tan: #c4a882;
+    --tan-light: #d4bc9e;
+    --cream: #e8ddd0;
+    --white: #f5f0ea;
+    --brown: #8b6f4e;
+    --navy: #1e2a3a;
+    --accent: #b8860b;
+    --text-muted: #7a6e62;
+  }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--bg);
+  color: var(--cream);
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1.25rem 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to bottom, rgba(15,13,11,0.95), transparent);
+  transition: background 0.4s;
+}
+nav.scrolled { background: rgba(15,13,11,0.97); backdrop-filter: blur(10px); }
+.nav-brand-link { display: flex; align-items: center; text-decoration: none; }
+.nav-logo { height: 40px; width: auto; opacity: 0.85; transition: opacity 0.3s; }
+.nav-brand-link:hover .nav-logo { opacity: 1; }
+.nav-links { display: flex; gap: 2.5rem; align-items: center; }
+.nav-links a {
+  color: var(--cream);
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 400;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+.nav-links a:hover { opacity: 1; }
+.nav-links .cta-nav {
+  background: var(--tan);
+  color: var(--bg);
+  padding: 0.6rem 1.5rem;
+  font-weight: 500;
+  opacity: 1;
+  transition: background 0.3s;
+}
+.nav-links .cta-nav:hover { background: var(--tan-light); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  padding: 2rem;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(196,168,130,0.06) 0%, transparent 70%),
+    radial-gradient(circle at 20% 80%, rgba(139,111,78,0.04) 0%, transparent 50%);
+}
+.hero-compass {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  animation: fadeUp 1s 0.3s forwards;
+}
+.hero-compass svg { width: 100%; height: 100%; }
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  line-height: 1.05;
+  color: var(--white);
+  opacity: 0;
+  animation: fadeUp 1s 0.5s forwards;
+}
+.hero-tagline {
+  font-size: 0.85rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 1.5rem;
+  font-weight: 400;
+  opacity: 0;
+  animation: fadeUp 1s 0.7s forwards;
+}
+.hero-divider {
+  width: 60px;
+  height: 1px;
+  background: var(--tan);
+  margin: 2rem auto;
+  opacity: 0;
+  animation: fadeUp 1s 0.8s forwards;
+}
+.hero-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  color: var(--tan-light);
+  font-style: italic;
+  max-width: 500px;
+  line-height: 1.6;
+  opacity: 0;
+  animation: fadeUp 1s 0.9s forwards;
+}
+.hero-cta {
+  margin-top: 2.5rem;
+  opacity: 0;
+  animation: fadeUp 1s 1.1s forwards;
+}
+.hero-cta a {
+  display: inline-block;
+  padding: 1rem 3rem;
+  background: transparent;
+  border: 1px solid var(--tan);
+  color: var(--tan);
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 500;
+  transition: all 0.4s;
+}
+.hero-cta a:hover {
+  background: var(--tan);
+  color: var(--bg);
+}
+.scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  animation: fadeUp 1s 1.4s forwards;
+}
+.scroll-hint span {
+  display: block;
+  width: 1px;
+  height: 40px;
+  background: var(--tan);
+  margin: 0 auto;
+  animation: scrollPulse 2s infinite;
+}
+
+/* ── PHILOSOPHY SECTION ── */
+.philosophy {
+  padding: 8rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+.section-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+.philosophy h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.3;
+  margin-bottom: 2rem;
+}
+.philosophy p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: var(--tan-light);
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+/* ── PILLARS ── */
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(196,168,130,0.1);
+  margin: 4rem 0;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.pillar {
+  background: var(--bg);
+  padding: 4rem 2.5rem;
+  text-align: center;
+  transition: background 0.4s;
+}
+.pillar:hover { background: var(--bg-warm); }
+.pillar-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  color: rgba(196,168,130,0.15);
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+.pillar h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  color: var(--tan);
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+.pillar p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+/* ── GALLERY ── */
+.gallery-section {
+  padding: 6rem 0;
+  position: relative;
+}
+.gallery-section .section-label { text-align: center; }
+.gallery-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: var(--white);
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+.gallery-item {
+  aspect-ratio: 1;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease, filter 0.6s;
+  filter: saturate(0.85);
+}
+.gallery-item:hover img {
+  transform: scale(1.08);
+  filter: saturate(1);
+}
+.gallery-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(15,13,11,0.2);
+  transition: opacity 0.4s;
+}
+.gallery-item:hover::after { opacity: 0; }
+
+/* ── PRODUCTS ── */
+.products {
+  padding: 8rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.products .section-label { text-align: center; }
+.products h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: var(--white);
+  text-align: center;
+  margin-bottom: 4rem;
+}
+.product-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+.product-card {
+  background: var(--bg-warm);
+  border: 1px solid rgba(196,168,130,0.08);
+  overflow: hidden;
+  transition: border-color 0.4s;
+}
+.product-card:hover { border-color: rgba(196,168,130,0.25); }
+.product-card-img {
+  aspect-ratio: 4/3;
+  overflow: hidden;
+}
+.product-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s;
+}
+.product-card:hover .product-card-img img { transform: scale(1.05); }
+.product-card-body {
+  padding: 2rem;
+}
+.product-card-body h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+.product-card-body p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+.product-card-body a {
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--tan);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
+}
+.product-card-body a:hover { border-bottom-color: var(--tan); }
+
+/* ── BANNER CTA ── */
+.banner-cta {
+  padding: 8rem 2rem;
+  text-align: center;
+  position: relative;
+  background: var(--bg-warm);
+  border-top: 1px solid rgba(196,168,130,0.08);
+  border-bottom: 1px solid rgba(196,168,130,0.08);
+}
+.banner-cta h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+.banner-cta p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  color: var(--tan-light);
+  font-style: italic;
+  margin-bottom: 2.5rem;
+}
+.btn-shop {
+  display: inline-block;
+  padding: 1.1rem 3.5rem;
+  background: var(--tan);
+  color: var(--bg);
+  text-decoration: none;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 600;
+  transition: all 0.4s;
+}
+.btn-shop:hover { background: var(--tan-light); transform: translateY(-2px); }
+
+/* ── FOOTER ── */
+footer {
+  padding: 4rem 2rem 2rem;
+  text-align: center;
+  border-top: 1px solid rgba(196,168,130,0.06);
+}
+.footer-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--tan);
+  margin-bottom: 0.5rem;
+}
+.footer-loc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+}
+.footer-links { display: flex; justify-content: center; gap: 2rem; margin-bottom: 2rem; }
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  transition: color 0.3s;
+}
+.footer-links a:hover { color: var(--tan); }
+.footer-copy {
+  font-size: 0.7rem;
+  color: rgba(196,168,130,0.25);
+  letter-spacing: 0.1em;
+}
+
+/* ── GRAIN OVERLAY ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 0.8; transform: scaleY(1.3); transform-origin: top; }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s, transform 0.8s;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { gap: 1.5rem; }
+  .nav-links a:not(.cta-nav) { display: none; }
+  .pillars { grid-template-columns: 1fr; }
+  .pillar { padding: 3rem 2rem; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .product-cards { grid-template-columns: 1fr; }
+  .footer-links { flex-direction: column; gap: 1rem; }
+}
+</style>
+
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-brand-link">
+    <img src="logo.png" alt="Traders Point Leather" class="nav-logo">
+  </a>
+  <div class="nav-links">
+    <a href="#craft">Our Craft</a>
+    <a href="#products">Products</a>
+    <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener" class="cta-nav">Shop on Etsy</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-compass">
+    <img src="logo.png" alt="Traders Point Leather logo" style="width:100%;height:100%;object-fit:contain;">
+  </div>
+  <h1>Traders Point<br>Leather</h1>
+  <p class="hero-tagline">Simple &middot; Sturdy &middot; Elegant</p>
+  <div class="hero-divider"></div>
+  <p class="hero-sub">Handcrafted leather goods made with care in Indiana. Built to last a lifetime.</p>
+  <div class="hero-cta">
+    <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Visit the Shop</a>
+  </div>
+  <div class="scroll-hint"><span></span></div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section class="philosophy reveal" id="craft">
+  <p class="section-label">Our Philosophy</p>
+  <h2>Every stitch tells a story of precision, quality, and pride.</h2>
+  <p>At Traders Point Leather, we're obsessed with getting the details right. Each wallet, belt, and accessory is carefully cut, precisely stitched with heavy-duty bonded nylon thread, and finished one piece at a time using premium full-grain leather. No shortcuts. No cheap materials. Just quality craftsmanship from central Indiana.</p>
+</section>
+
+<!-- PILLARS -->
+<div class="pillars reveal">
+  <div class="pillar">
+    <div class="pillar-num">01</div>
+    <h3>Full-Grain Leather</h3>
+    <p>We use only the top layer of the hide — the strongest and most beautiful. It develops a rich patina over years of use, getting better with age.</p>
+  </div>
+  <div class="pillar">
+    <div class="pillar-num">02</div>
+    <h3>Precision Stitched</h3>
+    <p>Every seam is stitched with bonded nylon thread — the same material used in heavy-duty industrial applications. Clean, consistent, and incredibly strong.</p>
+  </div>
+  <div class="pillar">
+    <div class="pillar-num">03</div>
+    <h3>Made in Indiana</h3>
+    <p>Designed, cut, and assembled in our Indiana workshop. Every piece gets personal attention to make sure it's right before it ships.</p>
+  </div>
+</div>
+
+<!-- GALLERY -->
+<section class="gallery-section reveal">
+  <p class="section-label">The Details</p>
+  <h2>Built by Hand, Made to Last</h2>
+  <div class="gallery-grid">
+    <div class="gallery-item"><img src="IMG_6786.jpeg" alt="Leather stitching detail" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_7076.jpeg" alt="Close-up of leather wallet colors" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_8015.jpeg" alt="Wallet open with cards" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_6991.jpeg" alt="Tan leather belt coiled" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_8011.jpeg" alt="Brown leather stamped detail" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_7080.jpeg" alt="Wallet interior detail" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_6452.jpeg" alt="Packaging with twine" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_7465.jpeg" alt="Wallet edge profile" loading="lazy"></div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="products reveal" id="products">
+  <p class="section-label">What We Make</p>
+  <h2>Everyday Carry, Elevated</h2>
+  <div class="product-cards">
+    <div class="product-card">
+      <div class="product-card-img">
+        <img src="IMG_8020.jpeg" alt="Traders Point Leather Wallet in navy" loading="lazy">
+      </div>
+      <div class="product-card-body">
+        <h3>The Bifold Wallet</h3>
+        <p>Six card slots and a center cash pocket. Full-grain leather, precision-stitched with bonded nylon thread. Available in multiple colors.</p>
+        <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Shop Wallets →</a>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-card-img">
+        <img src="IMG_6991.jpeg" alt="Traders Point Leather Belt" loading="lazy">
+      </div>
+      <div class="product-card-body">
+        <h3>The Leather Belt</h3>
+        <p>Solid brass hardware on a single piece of thick full-grain leather. No layers, no filler. This belt will outlast everything else in your closet.</p>
+        <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Shop Belts →</a>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-card-img">
+        <img src="IMG_6451.jpeg" alt="Traders Point Leather packaging" loading="lazy">
+      </div>
+      <div class="product-card-body">
+        <h3>Gift-Ready</h3>
+        <p>Every order ships in our branded box, wrapped in tissue and tied with natural twine. Ready to give — or to keep for yourself.</p>
+        <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Browse All →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BANNER CTA -->
+<section class="banner-cta reveal">
+  <h2>Find Your Piece</h2>
+  <p>Handmade. One at a time. Shipped from Indiana to your door.</p>
+  <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener" class="btn-shop">Shop on Etsy</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <img src="logo.png" alt="Traders Point Leather" style="height:50px;width:auto;margin-bottom:1rem;opacity:0.6;">
+  <div class="footer-brand">Traders Point Leather</div>
+  <div class="footer-loc">Handcrafted in Indiana</div>
+  <div class="footer-links">
+    <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Etsy Shop</a>
+    <a href="https://traderspointleather.com" target="_blank" rel="noopener">TradersPointLeather.com</a>
+  </div>
+  <p class="footer-copy">&copy; 2026 Traders Point Leather. All rights reserved.</p>
+</footer>
+
+<script>
+  // Nav scroll effect
+  window.addEventListener('scroll', () => {
+    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
