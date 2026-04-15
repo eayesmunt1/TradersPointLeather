@@ -253,17 +253,19 @@ nav.scrolled { background: rgba(15,13,11,0.97); backdrop-filter: blur(10px); }
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 280px;
   gap: 4px;
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 2rem;
 }
 .gallery-item {
-  aspect-ratio: 1;
   overflow: hidden;
   position: relative;
   cursor: pointer;
 }
+.gallery-item.wide     { grid-column: span 2; }
+.gallery-item.featured { grid-column: span 2; grid-row: span 2; }
 .gallery-item img {
   width: 100%;
   height: 100%;
@@ -459,7 +461,7 @@ body::after {
   .nav-links a:not(.cta-nav) { display: none; }
   .pillars { grid-template-columns: 1fr; }
   .pillar { padding: 3rem 2rem; }
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 200px; }
   .product-cards { grid-template-columns: 1fr; }
   .footer-links { flex-direction: column; gap: 1rem; }
 }
@@ -523,14 +525,26 @@ body::after {
   <p class="section-label">The Details</p>
   <h2>Built by Hand, Made to Last</h2>
   <div class="gallery-grid">
-    <div class="gallery-item"><img src="IMG_6786.jpeg" alt="Leather stitching detail" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_7076.jpeg" alt="Close-up of leather wallet colors" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_8015.jpeg" alt="Wallet open with cards" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_6991.jpeg" alt="Tan leather belt coiled" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_8011.jpeg" alt="Brown leather stamped detail" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_7080.jpeg" alt="Wallet interior detail" loading="lazy"></div>
+    <!-- Rows 1–2: featured hero left + 4 fills right -->
+    <div class="gallery-item featured"><img src="IMG_7379.jpg"  alt="Leather goods hero shot" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_7373.jpg"  alt="Leather detail" loading="lazy"></div>
     <div class="gallery-item"><img src="IMG_6452.jpeg" alt="Packaging with twine" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_7076.jpeg" alt="Wallet color options" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_7080.jpeg" alt="Wallet interior detail" loading="lazy"></div>
+    <!-- Row 3: wide panoramic left + 2 regular right -->
+    <div class="gallery-item wide"><img src="IMG_6039.JPG"  alt="Full leather spread" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_7117.jpg"  alt="Leather product detail" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_7374.jpg"  alt="Stitching close-up" loading="lazy"></div>
+    <!-- Rows 4–5: 2 regular left + featured hero right + 2 fills -->
+    <div class="gallery-item"><img src="IMG_7383.jpg"  alt="Leather texture" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_7384.jpg"  alt="Finished edge detail" loading="lazy"></div>
+    <div class="gallery-item featured"><img src="IMG_7868.jpg"  alt="Leather showcase" loading="lazy"></div>
     <div class="gallery-item"><img src="IMG_7465.jpeg" alt="Wallet edge profile" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_7862.PNG"  alt="Leather goods flat lay" loading="lazy"></div>
+    <!-- Row 6: wide left + 2 regular right -->
+    <div class="gallery-item wide"><img src="IMG_0168.jpeg" alt="Leather collection" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_5640.PNG"  alt="Leather craft detail" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_8015.jpeg" alt="Wallet open with cards" loading="lazy"></div>
   </div>
 </section>
 
