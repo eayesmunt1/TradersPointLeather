@@ -38,50 +38,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ── NAV ── */
-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  background: linear-gradient(to bottom, rgba(15,13,11,0.97) 0%, rgba(15,13,11,0.97) 60%, transparent 100%);
-  transition: background 0.4s;
-}
-nav.scrolled { background: rgba(15,13,11,0.97); backdrop-filter: blur(10px); }
-.nav-inner {
-  padding: max(1.25rem, env(safe-area-inset-top)) 2.5rem 1.25rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.nav-brand-link { display: flex; align-items: center; text-decoration: none; }
-.nav-logo { height: 100px; width: auto; opacity: 0.85; transition: opacity 0.3s; }
-.nav-brand-link:hover .nav-logo { opacity: 1; }
-.nav-links { display: flex; gap: 2.5rem; align-items: center; }
-.nav-links a {
-  color: var(--cream);
-  text-decoration: none;
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 400;
-  opacity: 0.7;
-  transition: opacity 0.3s;
-}
-.nav-links a:hover { opacity: 1; }
-.nav-links .cta-nav {
-  background: var(--tan);
-  color: var(--bg);
-  padding: 0.6rem 1.5rem;
-  font-weight: 500;
-  opacity: 1;
-  transition: background 0.3s;
-}
-.nav-links .cta-nav:hover { background: var(--tan-light); }
-.nav-links .cta-nav:focus-visible {
-  outline: 2px solid var(--tan-light);
-  outline-offset: 3px;
-}
-
 /* ── HERO ── */
 .hero {
   min-height: 100vh;
@@ -444,17 +400,6 @@ footer {
   letter-spacing: 0.1em;
 }
 
-/* Status bar cover — sits above everything, blocks content from showing
-   behind the clock/battery icons on iOS with viewport-fit=cover */
-#status-bar-cover {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: env(safe-area-inset-top);
-  background: var(--bg);
-  z-index: 101;
-  pointer-events: none;
-}
-
 
 body::after {
   content: '';
@@ -490,11 +435,7 @@ body::after {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
-  .nav-inner { padding: max(1rem, env(safe-area-inset-top)) 1.5rem 1rem; }
-  .nav-logo { height: 36px; }
-  .nav-links { gap: 1.5rem; }
-  .nav-links a:not(.cta-nav) { display: none; }
-  .hero { padding-top: max(6rem, calc(4rem + env(safe-area-inset-top))); justify-content: flex-start; padding-bottom: 4rem; }
+  .hero { padding-top: 3rem; justify-content: flex-start; padding-bottom: 4rem; }
   .hero-logo { width: 90px; height: 90px; margin-bottom: 1.5rem; }
   .pillars { grid-template-columns: 1fr; }
   .pillar { padding: 3rem 2rem; }
@@ -510,22 +451,6 @@ body::after {
 
 </head>
 <body>
-
-<div id="status-bar-cover"></div>
-
-<!-- NAV -->
-<nav id="nav">
-  <div class="nav-inner">
-    <a href="#" class="nav-brand-link">
-      <img src="logo.png" alt="Traders Point Leather" class="nav-logo">
-    </a>
-    <div class="nav-links">
-      <a href="#craft">Our Craft</a>
-      <a href="#products">Products</a>
-      <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener" class="cta-nav">Shop on Etsy</a>
-    </div>
-  </div>
-</nav>
 
 <!-- HERO -->
 <section class="hero">
@@ -646,11 +571,6 @@ body::after {
 </footer>
 
 <script>
-  // Nav scroll effect
-  window.addEventListener('scroll', () => {
-    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
-  });
-
   // Reveal on scroll
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
