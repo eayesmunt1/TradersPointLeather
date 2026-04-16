@@ -444,7 +444,18 @@ footer {
   letter-spacing: 0.1em;
 }
 
-/* ── GRAIN OVERLAY ── */
+/* Status bar cover — sits above everything, blocks content from showing
+   behind the clock/battery icons on iOS with viewport-fit=cover */
+#status-bar-cover {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: env(safe-area-inset-top);
+  background: var(--bg);
+  z-index: 101;
+  pointer-events: none;
+}
+
+
 body::after {
   content: '';
   position: fixed;
@@ -499,6 +510,8 @@ body::after {
 
 </head>
 <body>
+
+<div id="status-bar-cover"></div>
 
 <!-- NAV -->
 <nav id="nav">
