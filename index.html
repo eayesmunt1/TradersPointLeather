@@ -3,15 +3,93 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Traders Point Leather — Handcrafted in Indiana</title>
 <meta name="description" content="Handcrafted leather wallets and belts made one at a time in Indiana. Full-grain leather, precision-stitched with bonded nylon thread. Simple, sturdy, elegant.">
-<link rel="icon" type="image/png" href="logo.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Traders Point Leather — Handcrafted in Indiana">
 <meta property="og:description" content="Full-grain leather wallets and belts, handcrafted one at a time in Indiana. Built to last a lifetime.">
 <meta property="og:image" content="https://traderspointleather.com/IMG_7868.jpg">
 <meta property="og:url" content="https://traderspointleather.com">
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Traders Point Leather",
+    "url": "https://traderspointleather.com",
+    "logo": "https://traderspointleather.com/logo.png",
+    "description": "Handcrafted leather wallets and belts made one at a time in Indiana. Full-grain leather, precision-stitched with bonded nylon thread.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressRegion": "IN",
+      "addressCountry": "US"
+    },
+    "sameAs": [
+      "https://www.etsy.com/shop/TradersPointLeather"
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Traders Point Leather Products",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@type": "Product",
+          "name": "Bifold Wallet",
+          "description": "Six card slots and a center cash pocket. Full-grain leather, precision-stitched with bonded nylon thread. Available in multiple colors.",
+          "image": [
+            "https://traderspointleather.com/IMG_8020.jpeg",
+            "https://traderspointleather.com/IMG_7117.jpg",
+            "https://traderspointleather.com/IMG_8015.jpeg",
+            "https://traderspointleather.com/IMG_7383.jpg"
+          ],
+          "brand": { "@type": "Brand", "name": "Traders Point Leather" },
+          "material": "Full-grain leather",
+          "offers": {
+            "@type": "Offer",
+            "url": "https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4401934583&section_id=58176763",
+            "price": "95.00",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "seller": { "@type": "Organization", "name": "Traders Point Leather" }
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "item": {
+          "@type": "Product",
+          "name": "Leather Belt",
+          "description": "Solid brass hardware on a single piece of thick full-grain leather. No layers, no filler. Built to last.",
+          "image": [
+            "https://traderspointleather.com/IMG_6991.jpeg",
+            "https://traderspointleather.com/IMG_0168.jpeg"
+          ],
+          "brand": { "@type": "Brand", "name": "Traders Point Leather" },
+          "material": "Full-grain leather",
+          "offers": {
+            "@type": "Offer",
+            "url": "https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4419228681&section_id=58173348",
+            "price": "60.00",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "seller": { "@type": "Organization", "name": "Traders Point Leather" }
+          }
+        }
+      }
+    ]
+  }
+]
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -36,48 +114,6 @@ body {
   background: var(--bg);
   color: var(--cream);
   overflow-x: hidden;
-}
-
-/* ── NAV ── */
-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 1.25rem 2.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(to bottom, rgba(15,13,11,0.95), transparent);
-  transition: background 0.4s;
-}
-nav.scrolled { background: rgba(15,13,11,0.97); backdrop-filter: blur(10px); }
-.nav-brand-link { display: flex; align-items: center; text-decoration: none; }
-.nav-logo { height: 100px; width: auto; opacity: 0.85; transition: opacity 0.3s; }
-.nav-brand-link:hover .nav-logo { opacity: 1; }
-.nav-links { display: flex; gap: 2.5rem; align-items: center; }
-.nav-links a {
-  color: var(--cream);
-  text-decoration: none;
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 400;
-  opacity: 0.7;
-  transition: opacity 0.3s;
-}
-.nav-links a:hover { opacity: 1; }
-.nav-links .cta-nav {
-  background: var(--tan);
-  color: var(--bg);
-  padding: 0.6rem 1.5rem;
-  font-weight: 500;
-  opacity: 1;
-  transition: background 0.3s;
-}
-.nav-links .cta-nav:hover { background: var(--tan-light); }
-.nav-links .cta-nav:focus-visible {
-  outline: 2px solid var(--tan-light);
-  outline-offset: 3px;
 }
 
 /* ── HERO ── */
@@ -436,13 +472,28 @@ footer {
   transition: color 0.3s;
 }
 .footer-links a:hover { color: var(--tan); }
+.footer-retail {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(196,168,130,0.08);
+  margin-bottom: 2rem;
+}
+.footer-retail a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.footer-retail a:hover { color: var(--tan); }
 .footer-copy {
   font-size: 0.7rem;
   color: rgba(196,168,130,0.25);
   letter-spacing: 0.1em;
 }
 
-/* ── GRAIN OVERLAY ── */
+
 body::after {
   content: '';
   position: fixed;
@@ -477,15 +528,15 @@ body::after {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
-  nav { padding: 1rem 1.5rem; }
-  .nav-logo { height: 36px; }
-  .nav-links { gap: 1.5rem; }
-  .nav-links a:not(.cta-nav) { display: none; }
-  .hero { padding-top: 5rem; justify-content: flex-start; padding-bottom: 4rem; }
-  .hero-logo { width: 90px; height: 90px; }
+  .hero { padding-top: 3rem; justify-content: flex-start; padding-bottom: 4rem; }
+  .hero-logo { width: 90px; height: 90px; margin-bottom: 1.5rem; }
   .pillars { grid-template-columns: 1fr; }
   .pillar { padding: 3rem 2rem; }
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 200px; gap: 8px; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 180px; gap: 6px; }
+  .gallery-item.wide,
+  .gallery-item.featured,
+  .gallery-item.full { grid-column: span 1 !important; grid-row: span 1 !important; }
+  .hero h1 { font-size: 1.9rem; letter-spacing: 0.1em; }
   .product-cards { grid-template-columns: 1fr; }
   .footer-links { flex-direction: column; gap: 1rem; }
 }
@@ -494,22 +545,10 @@ body::after {
 </head>
 <body>
 
-<!-- NAV -->
-<nav id="nav">
-  <a href="#" class="nav-brand-link">
-    <img src="logo.png" alt="Traders Point Leather" class="nav-logo">
-  </a>
-  <div class="nav-links">
-    <a href="#craft">Our Craft</a>
-    <a href="#products">Products</a>
-    <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener" class="cta-nav">Shop on Etsy</a>
-  </div>
-</nav>
-
 <!-- HERO -->
 <section class="hero">
   <div class="hero-logo">
-    <img src="logo.png" alt="Traders Point Leather compass logo">
+    <img src="logo.png" alt="Traders Point Leather compass logo" width="140" height="140">
   </div>
   <h1>Traders Point<br>Leather</h1>
   <p class="hero-tagline">Simple &middot; Sturdy &middot; Elegant</p>
@@ -524,16 +563,16 @@ body::after {
 <!-- PHILOSOPHY -->
 <section class="philosophy reveal" id="craft">
   <p class="section-label">Our Philosophy</p>
-  <h2>Every stitch tells a story of precision, quality, and pride.</h2>
-  <p>At Traders Point Leather, we're obsessed with getting the details right. Each wallet, belt, and accessory is carefully cut, precisely stitched with heavy-duty bonded nylon thread, and finished one piece at a time using premium full-grain leather. No shortcuts. No cheap materials. Just quality craftsmanship from central Indiana.</p>
+  <h2>Every stitch tells a story of precision, quality, and craftsmanship.</h2>
+  <p>At Traders Point Leather, we're obsessed with getting the details right. Each piece is carefully cut from quality leathers — including Horween and Wickett &amp; Craig — precisely stitched with heavy-duty bonded nylon thread, and hand-burnished to a smooth, polished edge finish. No shortcuts. No cheap materials. Just exceptional craftsmanship from central Indiana.</p>
 </section>
 
 <!-- PILLARS -->
 <div class="pillars reveal">
   <div class="pillar">
     <div class="pillar-num">01</div>
-    <h3>Full-Grain Leather</h3>
-    <p>We use only the top layer of the hide — the strongest and most beautiful. It develops a rich patina over years of use, getting better with age.</p>
+    <h3>Premium Leather</h3>
+    <p>We source quality full-grain leathers — including Horween and Wickett &amp; Craig — the strongest and most beautiful cuts available. Each hide develops a rich patina over years of use, getting better with age.</p>
   </div>
   <div class="pillar">
     <div class="pillar-num">02</div>
@@ -552,23 +591,18 @@ body::after {
   <p class="section-label">The Details</p>
   <h2>Crafted with Care, Made to Last</h2>
   <div class="gallery-grid">
-    <!-- Row 1: wide left + 2 regular -->
-    <div class="gallery-item wide"><img src="IMG_6039.JPG"  alt="Full leather spread" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_7373.jpg"  alt="Leather detail" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_7076.jpeg" alt="Wallet color options" loading="lazy"></div>
-    <!-- Row 2: 4 regular -->
-    <div class="gallery-item"><img src="IMG_7117.jpg"  alt="Leather product detail" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_7374.jpg"  alt="Stitching close-up" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_7383.jpg"  alt="Leather texture" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_7384.jpg"  alt="Finished edge detail" loading="lazy"></div>
-    <!-- Rows 3–4: 2 regular + featured right + 2 fills -->
-    <div class="gallery-item"><img src="IMG_7465.jpeg" alt="Wallet edge profile" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_7862.PNG"  alt="Leather goods flat lay" loading="lazy"></div>
-    <div class="gallery-item featured"><img src="IMG_7868.jpg"  alt="Leather showcase" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_8015.jpeg" alt="Wallet open with cards" loading="lazy"></div>
-    <div class="gallery-item"><img src="IMG_0168.jpeg" alt="Leather collection" loading="lazy"></div>
-    <!-- Row 5: full-width closing shot -->
-    <div class="gallery-item full"><img src="IMG_6991.jpeg" alt="Leather belt detail" loading="lazy"></div>
+    <div class="gallery-item"><img src="IMG_7465.jpeg" alt="Navy wallet edge profile" loading="lazy" width="800" height="533"></div>
+    <div class="gallery-item"><img src="IMG_7076.jpeg" alt="Wallet color options" loading="lazy" width="800" height="533"></div>
+    <div class="gallery-item"><img src="IMG_0168.jpeg" alt="Leather collection" loading="lazy" width="800" height="600"></div>
+    <div class="gallery-item"><img src="IMG_6991.jpeg" alt="Leather belt" loading="lazy" width="533" height="800"></div>
+    <div class="gallery-item"><img src="IMG_7117.jpg"  alt="Navy wallet edge" loading="lazy" width="800" height="533"></div>
+    <div class="gallery-item"><img src="IMG_7374.jpg"  alt="Blue key fob" loading="lazy" width="800" height="533"></div>
+    <div class="gallery-item"><img src="IMG_7383.jpg"  alt="Wallet interior" loading="lazy" width="800" height="533"></div>
+    <div class="gallery-item"><img src="IMG_7384.jpg"  alt="Finished edge detail" loading="lazy" width="800" height="533"></div>
+    <div class="gallery-item"><img src="IMG_7373.jpg"  alt="Leather detail" loading="lazy" width="800" height="533"></div>
+    <div class="gallery-item"><img src="IMG_7862.jpg"  alt="Leather goods flat lay" loading="lazy" width="800" height="533"></div>
+    <div class="gallery-item"><img src="IMG_7868.jpg"  alt="Leather showcase" loading="lazy" width="800" height="533"></div>
+    <div class="gallery-item"><img src="IMG_8015.jpeg" alt="Wallet open with cards" loading="lazy" width="800" height="533"></div>
   </div>
 </section>
 
@@ -579,27 +613,27 @@ body::after {
   <div class="product-cards">
     <div class="product-card">
       <div class="product-card-img">
-        <img src="IMG_8020.jpeg" alt="Traders Point Leather Wallet in navy" loading="lazy">
+        <img src="IMG_8020.jpeg" alt="Traders Point Leather Wallet in navy" loading="lazy" width="900" height="600">
       </div>
       <div class="product-card-body">
-        <h3>The Bifold Wallet</h3>
+        <h3>Bifold Wallets</h3>
         <p>Six card slots and a center cash pocket. Full-grain leather, precision-stitched with bonded nylon thread. Available in multiple colors.</p>
-        <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Shop Wallets →</a>
+        <a href="https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4401934583&section_id=58176763" target="_blank" rel="noopener">Shop Wallets →</a>
       </div>
     </div>
     <div class="product-card">
       <div class="product-card-img">
-        <img src="IMG_5640.PNG" alt="Traders Point Leather Belt" loading="lazy">
+        <img src="IMG_5640.jpg" alt="Traders Point Leather Belt" loading="lazy" width="600" height="900">
       </div>
       <div class="product-card-body">
-        <h3>The Leather Belt</h3>
+        <h3>Leather Belts</h3>
         <p>Solid brass hardware on a single piece of thick full-grain leather. No layers, no filler. This belt will outlast everything else in your closet.</p>
-        <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Shop Belts →</a>
+        <a href="https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4419228681&section_id=58173348" target="_blank" rel="noopener">Shop Belts →</a>
       </div>
     </div>
     <div class="product-card">
       <div class="product-card-img">
-        <img src="IMG_6451.jpeg" alt="Traders Point Leather packaging" loading="lazy">
+        <img src="IMG_6451.jpeg" alt="Traders Point Leather packaging" loading="lazy" width="600" height="900">
       </div>
       <div class="product-card-body">
         <h3>Gift-Ready</h3>
@@ -619,22 +653,20 @@ body::after {
 
 <!-- FOOTER -->
 <footer>
-  <img src="logo.png" alt="Traders Point Leather" style="height:100px;width:auto;margin-bottom:1rem;opacity:0.6;">
+  <img src="logo.png" alt="Traders Point Leather" width="100" height="100" style="height:100px;width:auto;margin-bottom:1rem;opacity:0.6;">
   <div class="footer-brand">Traders Point Leather</div>
   <div class="footer-loc">Handcrafted in Indiana</div>
   <div class="footer-links">
     <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Etsy Shop</a>
     <a href="https://traderspointleather.com" target="_blank" rel="noopener">TradersPointLeather.com</a>
   </div>
+  <div class="footer-retail">
+    Also find us at <a href="https://share.google/BLPigFiZgOuPkRNSm" target="_blank" rel="noopener"><strong>Village Mercantile</strong></a> &middot; Zionsville, IN
+  </div>
   <p class="footer-copy">&copy; 2026 Traders Point Leather. All rights reserved.</p>
 </footer>
 
 <script>
-  // Nav scroll effect
-  window.addEventListener('scroll', () => {
-    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
-  });
-
   // Reveal on scroll
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
