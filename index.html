@@ -540,47 +540,8 @@ body::after {
   .product-cards { grid-template-columns: 1fr; }
   .footer-links { flex-direction: column; gap: 1rem; }
 }
-
-/* ── EMAIL POPUP ── */
-#email-popup-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.65);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-}
-#email-popup-overlay.active { display: flex; }
-#email-popup-inner {
-  position: relative;
-  max-width: 420px;
-  width: 100%;
-  animation: popupFadeUp 0.35s ease;
-}
-#email-popup-close {
-  position: absolute;
-  top: 10px;
-  right: 14px;
-  z-index: 10;
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.7);
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 4px 8px;
-  transition: color 0.2s;
-}
-#email-popup-close:hover { color: #fff; }
-@keyframes popupFadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
 </style>
 
-<script src="https://f.convertkit.com/ckjs/ck.5.js"></script>
 </head>
 <body>
 
@@ -712,55 +673,7 @@ body::after {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
   }, { threshold: 0.15 });
   reveals.forEach(el => observer.observe(el));
-
-  // Email popup — show once per session when user scrolls past 75%
-  (function() {
-    if (sessionStorage.getItem('emailPopupSeen')) return;
-    var shown = false;
-    window.addEventListener('scroll', function() {
-      if (shown) return;
-      var scrolled = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
-      if (scrolled >= 0.75) {
-        shown = true;
-        sessionStorage.setItem('emailPopupSeen', '1');
-        document.getElementById('email-popup-overlay').classList.add('active');
-      }
-    });
-    document.getElementById('email-popup-close').addEventListener('click', function() {
-      document.getElementById('email-popup-overlay').classList.remove('active');
-    });
-    document.getElementById('email-popup-overlay').addEventListener('click', function(e) {
-      if (e.target === this) this.classList.remove('active');
-    });
-  })();
 </script>
-
-<!-- EMAIL POPUP -->
-<div id="email-popup-overlay">
-  <div id="email-popup-inner">
-    <button id="email-popup-close" aria-label="Close">&times;</button>
-    <form action="https://app.kit.com/forms/9361358/subscriptions" style="border-radius:0px;" class="seva-form formkit-form" method="post" data-sv-form="9361358" data-uid="6d72ade644" data-format="inline" data-version="5" data-options="{&quot;settings&quot;:{&quot;after_subscribe&quot;:{&quot;action&quot;:&quot;message&quot;,&quot;success_message&quot;:&quot;You&apos;re on the list.&quot;,&quot;redirect_url&quot;:&quot;&quot;},&quot;modal&quot;:{&quot;trigger&quot;:&quot;timer&quot;,&quot;timer&quot;:99999},&quot;slide_in&quot;:{&quot;display_in&quot;:&quot;bottom_right&quot;,&quot;trigger&quot;:&quot;timer&quot;,&quot;timer&quot;:99999}},&quot;version&quot;:&quot;5&quot;}" min-width="400 500 600 700 800">
-      <div data-style="full" style="--border-radius:0px;">
-        <div style="background-image:url('https://embed.filekitcdn.com/e/f3b6DYVZ3haReNNe39cyPX/7PvHnV4YkYsmpzR1YHr7Xx');" class="formkit-background"></div>
-        <div class="formkit-container" style="--bg-color:#2E2E2E;--bg-color-07:#2E2E2E12;--bg-color-83:#2E2E2ED4;">
-          <div class="formkit-header" style="color:rgb(255,255,255);font-weight:700;" data-element="header"><h2>Get notified when limited releases drop.</h2></div>
-          <div class="formkit-content" style="color:rgb(255,255,255);" data-element="content">Drop your email and we&rsquo;ll reach out when new pieces are available.</div>
-          <ul class="formkit-alert formkit-alert-error" data-element="errors" data-group="alert"></ul>
-          <div data-element="fields" style="color:rgb(255,255,255);" class="seva-fields formkit-fields">
-            <div class="formkit-field">
-              <input class="formkit-input" name="email_address" style="color:rgb(110,110,110);font-weight:400;background-color:rgb(27,27,27);border-radius:4px;" aria-label="Email Address" placeholder="Email Address" required="" type="email">
-            </div>
-            <button data-element="submit" class="formkit-submit formkit-submit" style="color:rgb(255,255,255);background-color:rgb(196,168,130);border-radius:4px;font-weight:700;">
-              <div class="formkit-spinner"><div></div><div></div><div></div></div>
-              <span>Notify Me</span>
-            </button>
-          </div>
-          <div class="formkit-disclaimer" style="color:rgb(203,203,203);" data-element="disclaimer">We respect your privacy. Unsubscribe at any time.</div>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
 
 </body>
 </html>
