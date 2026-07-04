@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8" /><title>Shop</title></head>
+<body>
+  <ul id="listings"></ul>
+  <script>
+    fetch("/.netlify/functions/listings")
+      .then((r) => r.json())
+      .then((data) => {
+        const el = document.getElementById("listings");
+        if (!Array.isArray(data)) { el.textContent = JSON.stringify(data); return; }
+        el.innerHTML = data.map((n) => `<li>${n}</li>`).join("");
+      })
+      .catch((e) => { document.getElementById("listings").textContent = String(e); });
+  </script>
+</body>
+</html>
