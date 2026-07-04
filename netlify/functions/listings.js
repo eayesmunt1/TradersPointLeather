@@ -1,5 +1,6 @@
 export async function handler() {
   const KEY = process.env.etsy_key;
+  const keyDebug = KEY ? `"${KEY.slice(0, 4)}…${KEY.slice(-4)}" (length ${KEY.length})` : "undefined";
   const H = { "x-api-key": KEY };
 
   try {
@@ -11,7 +12,7 @@ export async function handler() {
 
     const shopId = s.results?.[0]?.shop_id;
     if (!shopId) {
-      return { statusCode: 502, body: JSON.stringify({ error: "shop_id not resolved", raw: s }) };
+      return { statusCode: 502, body: JSON.stringify({ error: "shop_id not resolved", etsy_key: keyDebug, raw: s }) };
     }
 
     // Active listings (key-only, no OAuth)
