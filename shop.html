@@ -1,17 +1,41 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8" /><title>Shop</title></head>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shop</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background: #fff; color: #222; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 0.4rem 0; border-bottom: 1px solid #eee; }
+    .error { background: #fff3f3; border: 1px solid #f99; border-radius: 6px; padding: 1rem; margin-top: 1rem; }
+    .error h2 { margin: 0 0 0.5rem; font-size: 1rem; color: #c00; }
+    pre { margin: 0; white-space: pre-wrap; word-break: break-all; font-size: 0.85rem; }
+    #status { color: #888; font-size: 0.9rem; margin-bottom: 1rem; }
+  </style>
+</head>
 <body>
+  <p id="status">Loading…</p>
   <ul id="listings"></ul>
   <script>
     fetch("/.netlify/functions/listings")
       .then((r) => r.json())
       .then((data) => {
+        const status = document.getElementById("status");
         const el = document.getElementById("listings");
-        if (!Array.isArray(data)) { el.textContent = JSON.stringify(data); return; }
-        el.innerHTML = data.map((n) => `<li>${n}</li>`).join("");
+        if (Array.isArray(data)) {
+          status.textContent = data.length + " listing(s) found";
+          el.innerHTML = data.map((n) => `<li>${n}</li>`).join("");
+        } else {
+          status.textContent = "Error from function";
+          el.innerHTML = `<div class="error"><h2>Error</h2><pre>${JSON.stringify(data, null, 2)}</pre></div>`;
+        }
       })
-      .catch((e) => { document.getElementById("listings").textContent = String(e); });
+      .catch((e) => {
+        document.getElementById("status").textContent = "Network error";
+        document.getElementById("listings").innerHTML =
+          `<div class="error"><h2>Fetch failed</h2><pre>${e}</pre></div>`;
+      });
   </script>
 </body>
 </html>
