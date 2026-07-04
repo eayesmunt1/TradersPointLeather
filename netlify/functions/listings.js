@@ -1,5 +1,5 @@
 export async function handler() {
-  const KEY = process.env.ETSY_KEY;
+  const KEY = process.env.etsy_key;
   const H = { "x-api-key": KEY };
 
   try {
