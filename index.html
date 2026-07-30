@@ -400,6 +400,9 @@ body {
     grid-template-columns: 400px minmax(0, 1fr);
     gap: 4.5rem;
   }
+  /* "The Process" label is redundant beside the philosophy copy; keep it only
+     on mobile, where the video stands alone above the text. */
+  .craft-media .section-label { display: none; }
   .philosophy { text-align: left; }
   .philosophy p:not(.section-label) { margin: 0; }
 }
