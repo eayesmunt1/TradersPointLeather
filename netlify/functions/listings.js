@@ -1,6 +1,6 @@
 export async function handler() {
   const KEY = process.env.etsy_key;
-  const keyDebug = KEY ? `"${KEY.slice(0, 4)}…${KEY.slice(-4)}" (length ${KEY.length})` : "undefined";
+  const keyDebug = KEY ? `set (length ${KEY.length})` : "MISSING — env var not loaded";
   const H = { "x-api-key": KEY };
 
   try {
