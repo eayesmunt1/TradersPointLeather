@@ -367,6 +367,9 @@ body {
   object-fit: cover;
   transition: transform 0.6s ease;
 }
+/* Portrait photos in a landscape cell: bias the crop upward so the wallet's
+   fold and stitched edge stay in frame instead of a slice through the middle. */
+.gallery-item img.crop-upper { object-position: center 20%; }
 .gallery-item:hover img {
   transform: scale(1.08);
 }
@@ -700,8 +703,8 @@ body::after {
     <div class="gallery-item"><img src="IMG_6991.jpg" alt="Leather belt" loading="lazy" width="533" height="800"></div>
     <div class="gallery-item"><img src="IMG_7374.jpg"  alt="Blue key fob" loading="lazy" width="800" height="533"></div>
     <div class="gallery-item"><img src="IMG_7383.jpg"  alt="Wallet interior" loading="lazy" width="800" height="533"></div>
-    <div class="gallery-item"><img src="IMG_7862.jpg"  alt="Leather goods flat lay" loading="lazy" width="800" height="533"></div>
-    <div class="gallery-item"><img src="IMG_8015.jpeg" alt="Wallet open with cards" loading="lazy" width="800" height="533"></div>
+    <div class="gallery-item"><img src="IMG_2301.jpeg" class="crop-upper" alt="Hand-dyed green marbled vertical bifold wallet" loading="lazy" width="800" height="1200"></div>
+    <div class="gallery-item"><img src="IMG_2302.jpeg" class="crop-upper" alt="Navy bifold wallet open, showing marbled interior and stamped logo" loading="lazy" width="800" height="1200"></div>
   </div>
 </section>
 
@@ -712,7 +715,7 @@ body::after {
   <div class="product-cards">
     <div class="product-card">
       <div class="product-card-img">
-        <img src="IMG_8020.jpeg" alt="Traders Point Leather Wallet in navy" loading="lazy" width="900" height="600">
+        <img src="IMG_2045.jpeg" alt="Brown classic bifold wallet in hand" loading="lazy" width="800" height="1200">
       </div>
       <div class="product-card-body">
         <h3>Bifold Wallets</h3>
