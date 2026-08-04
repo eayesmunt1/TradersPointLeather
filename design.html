@@ -567,6 +567,7 @@ const GEO = {
   pocketDepth: 28,  // 0.1473 of a 190.5 panel, from the fitted trace
   innerStitchTop: 89,     // 0.147 of the height
   innerStitchBottom: 324, // 0.930
+  stitchOverhang: 4,      // how far the outer run runs past the spine edge
 };
 
 /* The top edge of a card pocket: one long, gentle bowl so a card can be
@@ -613,14 +614,20 @@ function panelPath(x, y, w, h, r, side) {
 
 /* A panel's perimeter stitching covers three sides only — top, outer edge and
    bottom. The spine edge is stitched separately and only over the height of
-   the pocket assembly, which is what the reference shows. */
-function panelStitchOuter(x, y, w, h, r, side) {
+   the pocket assembly, which is what the reference shows.
+
+   `oh` runs both open ends past the panel's spine edge, so the first and last
+   stitch of each run straddle that edge and land on the suede rather than
+   stopping short inside the panel. */
+function panelStitchOuter(x, y, w, h, r, side, oh) {
   if (side === 'left') {
-    return `M${x + w},${y} H${x + r} A${r},${r} 0 0 0 ${x},${y + r}`
-         + ` V${y + h - r} A${r},${r} 0 0 0 ${x + r},${y + h} H${x + w}`;
+    const end = x + w + oh;
+    return `M${end},${y} H${x + r} A${r},${r} 0 0 0 ${x},${y + r}`
+         + ` V${y + h - r} A${r},${r} 0 0 0 ${x + r},${y + h} H${end}`;
   }
-  return `M${x},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}`
-       + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${x}`;
+  const end = x - oh;
+  return `M${end},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}`
+       + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${end}`;
 }
 
 function pocketPath(x0, x1, y, bottom) {
@@ -727,7 +734,8 @@ function bifoldOpen() {
            spanning only the pocket assembly rather than the full height. -->
       <path class="stitch" ${STITCH} stroke="var(--c-thread)"
             d="${panelStitchOuter(p.x0 + i, y + i, pw - i * 2, h - i * 2,
-                                  Math.max(g.radius - 4, 2), p.side)}"/>
+                                  Math.max(g.radius - 4, 2), p.side,
+                                  i + g.stitchOverhang)}"/>
       <path class="stitch" ${STITCH} stroke="var(--c-thread)"
             d="M${p.side === 'left' ? p.x1 - i : p.x0 + i},${g.innerStitchTop}`
             + ` V${g.innerStitchBottom}"/>
