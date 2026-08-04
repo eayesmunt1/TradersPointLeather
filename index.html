@@ -11,13 +11,25 @@
   gtag('js', new Date());
   gtag('config', 'G-85D0D5YL87');
 </script>
-<!-- Microsoft Clarity -->
+<!-- Microsoft Clarity — deferred until the page finishes loading so it never
+     competes with the video player for bandwidth during startup. The 3s cap
+     ensures short sessions still get recorded on slow connections. -->
 <script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "xu1ikt3qv4");
+    (function () {
+        var started = false;
+        function loadClarity() {
+            if (started) return;
+            started = true;
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "xu1ikt3qv4");
+        }
+        if (document.readyState === 'complete') loadClarity();
+        else window.addEventListener('load', loadClarity);
+        setTimeout(loadClarity, 3000);
+    })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Traders Point Leather — Handcrafted in Indiana</title>
@@ -29,7 +41,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Traders Point Leather — Handcrafted in Indiana">
-<meta property="og:description" content="Full-grain leather wallets and belts, handcrafted one at a time in Indiana. Built to last a lifetime.">
+<meta property="og:description" content="Full-grain leather wallets and belts, handcrafted one at a time in Indiana. Built to outlast the phone in your pocket.">
 <meta property="og:image" content="https://traderspointleather.com/IMG_7868.jpg">
 <meta property="og:url" content="https://traderspointleather.com">
 <script type="application/ld+json">
@@ -63,10 +75,11 @@
           "name": "Bifold Wallet",
           "description": "4 card slots and 2 pockets for extra cards and folded cash. Full-grain leather, precision-stitched with bonded nylon or polyester thread. Available in multiple colors.",
           "image": [
-            "https://traderspointleather.com/IMG_8020.jpeg",
+            "https://traderspointleather.com/IMG_2045.jpeg",
+            "https://traderspointleather.com/IMG_2302.jpeg",
             "https://traderspointleather.com/IMG_7117.jpg",
-            "https://traderspointleather.com/IMG_8015.jpeg",
-            "https://traderspointleather.com/IMG_7383.jpg"
+            "https://traderspointleather.com/IMG_7383.jpg",
+            "https://traderspointleather.com/IMG_0168.jpeg"
           ],
           "brand": { "@type": "Brand", "name": "Traders Point Leather" },
           "material": "Full-grain leather",
@@ -88,8 +101,8 @@
           "name": "Leather Belt",
           "description": "Solid brass hardware on a single piece of thick full-grain leather. No layers, no filler. Built to last.",
           "image": [
-            "https://traderspointleather.com/IMG_6991.jpeg",
-            "https://traderspointleather.com/IMG_0168.jpeg"
+            "https://traderspointleather.com/IMG_6991.jpg",
+            "https://traderspointleather.com/IMG_5640.jpg"
           ],
           "brand": { "@type": "Brand", "name": "Traders Point Leather" },
           "material": "Full-grain leather",
@@ -222,13 +235,25 @@ body {
   background: var(--tan);
   color: var(--bg);
 }
+/* Centred with left/right rather than translateX(-50%): the fadeUp animation
+   ends on transform: translateY(0), which with fill-mode forwards would
+   permanently clobber a centring transform on this element. */
 .scroll-hint {
   position: absolute;
   bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  text-align: center;
   opacity: 0;
   animation: fadeUp 1s 1.4s forwards;
+}
+.scroll-hint-text {
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.85rem;
+  white-space: nowrap;
 }
 .scroll-hint span {
   display: block;
@@ -239,11 +264,9 @@ body {
   animation: scrollPulse 2s infinite;
 }
 
-/* ── PHILOSOPHY SECTION ── */
+/* ── PHILOSOPHY TEXT (paired with the process video) ── */
 .philosophy {
-  padding: 8rem 2rem;
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: 650px;
   text-align: center;
   position: relative;
 }
@@ -262,7 +285,7 @@ body {
   line-height: 1.3;
   margin-bottom: 2rem;
 }
-.philosophy p {
+.philosophy p:not(.section-label) {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.2rem;
   line-height: 1.8;
@@ -357,6 +380,9 @@ body {
   object-fit: cover;
   transition: transform 0.6s ease;
 }
+/* Portrait photos in a landscape cell: bias the crop upward so the wallet's
+   fold and stitched edge stay in frame instead of a slice through the middle. */
+.gallery-item img.crop-upper { object-position: center 35%; }
 .gallery-item:hover img {
   transform: scale(1.08);
 }
@@ -369,19 +395,39 @@ body {
 }
 .gallery-item:hover::after { opacity: 0; }
 
-/* ── PROCESS VIDEO ── */
-.process-video {
-  padding: 4rem 2rem;
+/* ── CRAFT: process video + philosophy, side by side on desktop ── */
+.craft {
+  padding: 6rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
+}
+.craft-grid {
+  display: grid;
+  gap: 3.5rem;
+  align-items: center;
+  justify-items: center;
+}
+.craft-media {
+  width: 100%;
   text-align: center;
+}
+@media (min-width: 900px) {
+  .craft-grid {
+    grid-template-columns: 400px minmax(0, 1fr);
+    gap: 4.5rem;
+  }
+  /* "The Process" label is redundant beside the philosophy copy; keep it only
+     on mobile, where the video stands alone above the text. */
+  .craft-media .section-label { display: none; }
+  .philosophy { text-align: left; }
+  .philosophy p:not(.section-label) { margin: 0; }
 }
 .video-wrapper {
   position: relative;
-  padding-bottom: 177.78%; /* 9:16 vertical video */
+  width: 100%;
   max-width: 400px;
+  aspect-ratio: 9 / 16; /* vertical video */
   margin: 0 auto;
-  height: 0;
   overflow: hidden;
   border-radius: 8px;
 }
@@ -613,26 +659,31 @@ body::after {
   <h1>Traders Point<br>Leather</h1>
   <p class="hero-tagline">Simple &middot; Elegant &middot; Sturdy</p>
   <div class="hero-divider"></div>
-  <p class="hero-sub">Handcrafted leather goods made with care in Indiana. Built to last a lifetime.</p>
+  <p class="hero-sub">Handcrafted leather goods made with care in Indiana. Built to outlast the phone in your pocket.</p>
   <div class="hero-cta">
     <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Visit the Shop</a>
   </div>
-  <div class="scroll-hint"><span></span></div>
-</section>
-
-<!-- PROCESS VIDEO -->
-<section class="process-video reveal">
-  <p class="section-label">The Process</p>
-  <div class="video-wrapper">
-    <iframe src="https://player.vimeo.com/video/1212388477?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title="Traders Point Leather — Process"></iframe>
+  <div class="scroll-hint">
+    <p class="scroll-hint-text">Explore the craft</p>
+    <span></span>
   </div>
 </section>
 
-<!-- PHILOSOPHY -->
-<section class="philosophy reveal" id="craft">
-  <p class="section-label">Our Philosophy</p>
-  <h2>Every stitch tells a story of precision, quality, and craftsmanship.</h2>
-  <p>At Traders Point Leather, we care about getting the details right. Each piece is carefully cut from quality leathers — including Horween and Wickett &amp; Craig — precisely stitched with heavy-duty bonded nylon thread, and hand-burnished to a smooth, polished edge finish. Just leather, time and attention to detail.</p>
+<!-- PROCESS VIDEO + PHILOSOPHY -->
+<section class="craft reveal" id="craft">
+  <div class="craft-grid">
+    <div class="craft-media">
+      <p class="section-label">The Process</p>
+      <div class="video-wrapper">
+        <iframe src="https://player.vimeo.com/video/1214378807?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title="Traders Point Leather — Process"></iframe>
+      </div>
+    </div>
+    <div class="philosophy">
+      <p class="section-label">Our Philosophy</p>
+      <h2>Every stitch tells a story of precision, quality, and craftsmanship.</h2>
+      <p>At Traders Point Leather, we care about getting the details right. Each piece is carefully cut from quality leathers — including Horween and Wickett &amp; Craig — precisely stitched with heavy-duty bonded nylon thread, and hand-burnished to a smooth, polished edge finish. Just leather, time and attention to detail.</p>
+    </div>
+  </div>
 </section>
 
 <!-- PILLARS -->
@@ -663,13 +714,13 @@ body::after {
   <h2>Crafted with Care, Made to Last</h2>
   <div class="gallery-grid">
     <div class="gallery-item"><img src="IMG_7465.jpeg" alt="Navy wallet edge profile" loading="lazy" width="800" height="533"></div>
+    <div class="gallery-item"><img src="IMG_2301.jpeg" class="crop-upper" alt="Hand-dyed green marbled vertical bifold wallet" loading="lazy" width="800" height="1200"></div>
     <div class="gallery-item"><img src="IMG_7076.jpeg" alt="Wallet color options" loading="lazy" width="800" height="533"></div>
-    <div class="gallery-item"><img src="IMG_0168.jpeg" alt="Leather collection" loading="lazy" width="800" height="600"></div>
     <div class="gallery-item"><img src="IMG_6991.jpg" alt="Leather belt" loading="lazy" width="533" height="800"></div>
     <div class="gallery-item"><img src="IMG_7374.jpg"  alt="Blue key fob" loading="lazy" width="800" height="533"></div>
+    <div class="gallery-item"><img src="IMG_0168.jpeg" alt="Leather collection" loading="lazy" width="800" height="600"></div>
+    <div class="gallery-item"><img src="IMG_2302.jpeg" class="crop-upper" alt="Navy bifold wallet open, showing marbled interior and stamped logo" loading="lazy" width="800" height="1200"></div>
     <div class="gallery-item"><img src="IMG_7383.jpg"  alt="Wallet interior" loading="lazy" width="800" height="533"></div>
-    <div class="gallery-item"><img src="IMG_7862.jpg"  alt="Leather goods flat lay" loading="lazy" width="800" height="533"></div>
-    <div class="gallery-item"><img src="IMG_8015.jpeg" alt="Wallet open with cards" loading="lazy" width="800" height="533"></div>
   </div>
 </section>
 
@@ -680,7 +731,7 @@ body::after {
   <div class="product-cards">
     <div class="product-card">
       <div class="product-card-img">
-        <img src="IMG_8020.jpeg" alt="Traders Point Leather Wallet in navy" loading="lazy" width="900" height="600">
+        <img src="IMG_2045.jpeg" alt="Brown classic bifold wallet in hand" loading="lazy" width="800" height="1200">
       </div>
       <div class="product-card-body">
         <h3>Bifold Wallets</h3>
