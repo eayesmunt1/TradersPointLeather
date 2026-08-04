@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-85D0D5YL87"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-85D0D5YL87');
+</script>
+<!-- Microsoft Clarity -->
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "xu1ikt3qv4");
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<!-- Unlisted page: not linked from the site, not in sitemap.xml, and kept out of search. -->
+<meta name="robots" content="noindex, nofollow">
+<title>Design Your Wallet — Traders Point Leather</title>
+<meta name="description" content="Choose the leather for every layer of a Traders Point Leather bifold and see it come together.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0d0b;
+    --bg-warm: #1a1613;
+    --tan: #c4a882;
+    --tan-light: #d4bc9e;
+    --cream: #e8ddd0;
+    --white: #f5f0ea;
+    --brown: #8b6f4e;
+    --navy: #1e2a3a;
+    --accent: #b8860b;
+    --text-muted: #9a8e82;
+  }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--bg);
+  color: var(--cream);
+  overflow-x: hidden;
+}
+
+.section-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+/* ── PAGE HEADER ── */
+.page-head {
+  padding: 5rem 2rem 3rem;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.page-head .logo-mark { width: 72px; height: 72px; margin-bottom: 1.75rem; opacity: 0.85; }
+.page-head h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.9rem, 4.5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  color: var(--white);
+}
+.page-head .head-divider {
+  width: 60px;
+  height: 1px;
+  background: var(--tan);
+  margin: 2rem auto;
+}
+.page-head p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-style: italic;
+  color: var(--tan-light);
+  line-height: 1.6;
+}
+
+/* ── CONFIGURATOR LAYOUT ── */
+.configurator {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 2rem 5rem;
+  align-items: start;
+}
+
+/* ── PREVIEW ── */
+.preview-col { position: sticky; top: 2rem; }
+.preview-stage {
+  background: var(--bg-warm);
+  border: 1px solid rgba(196,168,130,0.08);
+  border-radius: 4px;
+  padding: 1.5rem;
+}
+.wallet-svg { width: 100%; height: auto; display: block; }
+/* Both views share one <svg>; only one is shown at a time. */
+.wallet-svg .view { opacity: 0; visibility: hidden; transition: opacity 0.45s ease; }
+.wallet-svg .view.is-active { opacity: 1; visibility: visible; }
+.wallet-svg .leather-fill { transition: fill 0.45s ease; }
+.wallet-svg .stitch { transition: stroke 0.45s ease; }
+
+.view-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 1px;
+  background: rgba(196,168,130,0.12);
+  border: 1px solid rgba(196,168,130,0.12);
+  width: fit-content;
+  margin: 1.5rem auto 0;
+}
+.view-toggle button {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.75rem;
+  background: var(--bg);
+  color: var(--text-muted);
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s, background 0.3s;
+}
+.view-toggle button:hover { color: var(--tan); }
+.view-toggle button[aria-pressed="true"] { background: var(--tan); color: var(--bg); }
+.view-toggle button:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 2px; z-index: 1; }
+
+/* ── OPTION GROUPS ── */
+.opt-group { margin-bottom: 2.75rem; }
+.opt-group > h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  color: var(--white);
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+.opt-group > .opt-help {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 1.1rem;
+}
+.swatch-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.swatch {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.9rem 0.55rem 0.55rem;
+  background: var(--bg-warm);
+  border: 1px solid rgba(196,168,130,0.12);
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  transition: border-color 0.3s, color 0.3s;
+}
+.swatch:hover { border-color: rgba(196,168,130,0.4); color: var(--cream); }
+.swatch-chip {
+  width: 26px;
+  height: 26px;
+  border-radius: 2px;
+  flex: none;
+  border: 1px solid rgba(245,240,234,0.18);
+  background-size: cover;
+  background-position: center;
+}
+/* Selection is a light ring plus a checkmark — never colour alone, since a
+   colour-only cue disappears on a dark chip against a near-black page. */
+.swatch[aria-checked="true"] {
+  border-color: var(--tan);
+  box-shadow: 0 0 0 1px var(--tan);
+  color: var(--white);
+}
+.swatch[aria-checked="true"]::after {
+  content: '✓';
+  font-size: 0.75rem;
+  color: var(--tan);
+  margin-left: 0.15rem;
+}
+.swatch:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 3px; }
+
+/* ── SPEC ── */
+.spec-section {
+  background: var(--bg-warm);
+  border-top: 1px solid rgba(196,168,130,0.08);
+  border-bottom: 1px solid rgba(196,168,130,0.08);
+  padding: 5rem 2rem;
+}
+.spec-inner { max-width: 720px; margin: 0 auto; text-align: center; }
+.spec-inner h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+.spec-inner > p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--tan-light);
+  margin-bottom: 2.5rem;
+}
+#spec-text {
+  width: 100%;
+  min-height: 260px;
+  background: var(--bg);
+  border: 1px solid rgba(196,168,130,0.18);
+  border-radius: 3px;
+  color: var(--cream);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.75;
+  padding: 1.5rem;
+  resize: vertical;
+  text-align: left;
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: auto;
+}
+#spec-text:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 2px; }
+.spec-actions { margin-top: 1.75rem; }
+.btn-shop {
+  display: inline-block;
+  padding: 1.1rem 3.5rem;
+  background: var(--tan);
+  color: var(--bg);
+  border: none;
+  text-decoration: none;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s;
+}
+.btn-shop:hover { background: var(--tan-light); transform: translateY(-2px); }
+.btn-shop:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 3px; }
+.copy-status {
+  display: block;
+  margin-top: 1.1rem;
+  min-height: 1.2em;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: var(--tan);
+}
+
+/* ── REAL PIECES ── */
+.real-pieces { padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; text-align: center; }
+.real-pieces .section-label { text-align: center; }
+.real-pieces h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  color: var(--white);
+  margin-bottom: 3rem;
+}
+.pieces-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.pieces-grid figure { margin: 0; }
+.pieces-grid .img-wrap { aspect-ratio: 4/3; overflow: hidden; }
+.pieces-grid img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+.pieces-grid figure:hover img { transform: scale(1.05); }
+.pieces-grid figcaption {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  padding-top: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ── FOOTER ── */
+footer { padding: 4rem 2rem 2rem; text-align: center; border-top: 1px solid rgba(196,168,130,0.06); }
+.footer-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--tan);
+  margin-bottom: 0.5rem;
+}
+.footer-loc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+}
+.footer-links { display: flex; justify-content: center; gap: 2rem; margin-bottom: 2rem; }
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  transition: color 0.3s;
+}
+.footer-links a:hover { color: var(--tan); }
+.footer-copy { font-size: 0.7rem; color: rgba(196,168,130,0.25); letter-spacing: 0.1em; }
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ── ANIMATIONS ── */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s, transform 0.8s; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .wallet-svg .view,
+  .wallet-svg .leather-fill,
+  .wallet-svg .stitch,
+  .pieces-grid img,
+  .btn-shop { transition: none; }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .page-head { padding: 3rem 1.5rem 2rem; }
+  .configurator {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 1rem 1.5rem 4rem;
+  }
+  /* Preview pins to the top of the viewport so the wallet stays in sight
+     while the options are scrolled underneath it. */
+  .preview-col {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+    padding: 0.75rem 1.5rem;
+    margin: 0 -1.5rem;
+  }
+  /* Options scroll underneath the pinned preview; fade them out so a
+     heading passing behind it dissolves instead of being cut mid-letter. */
+  .preview-col::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 26px;
+    background: linear-gradient(var(--bg), rgba(15,13,11,0));
+    pointer-events: none;
+  }
+  .preview-stage { padding: 1rem; }
+  .wallet-svg { max-height: 34vh; }
+  .view-toggle { margin-top: 1rem; }
+  .view-toggle button { padding: 0.6rem 1.35rem; }
+  .spec-section { padding: 3.5rem 1.5rem; }
+  #spec-text { font-size: 0.72rem; padding: 1rem; }
+  .btn-shop { width: 100%; padding: 1.1rem 1rem; }
+  .real-pieces { padding: 4rem 1.5rem; }
+  .pieces-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .footer-links { flex-direction: column; gap: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="page-head">
+  <img class="logo-mark" src="logo.png" alt="Traders Point Leather compass logo" width="72" height="72">
+  <h1>Design Your Wallet</h1>
+  <div class="head-divider"></div>
+  <p>The body and every pocket are cut separately, so each one can be its own leather. Choose yours, and we'll build it.</p>
+</header>
+
+<!-- CONFIGURATOR -->
+<div class="configurator">
+  <div class="preview-col">
+    <div class="preview-stage">
+      <svg id="wallet" class="wallet-svg" viewBox="0 0 540 400" role="img"
+           aria-labelledby="wallet-title wallet-desc">
+        <title id="wallet-title">Preview of your wallet</title>
+        <desc id="wallet-desc">A drawing of the bifold wallet that updates as you choose leathers.</desc>
+        <defs>
+          <!-- Populated at runtime: one <pattern> per leather that has a swatch photo. -->
+          <g id="tex-defs"></g>
+
+          <!-- Soft light across the top-left, the way pull-up leather catches it. -->
+          <radialGradient id="sheen" cx="32%" cy="18%" r="78%">
+            <stop offset="0%"   stop-color="#fff" stop-opacity="0.10"/>
+            <stop offset="45%"  stop-color="#fff" stop-opacity="0.02"/>
+            <stop offset="100%" stop-color="#000" stop-opacity="0.30"/>
+          </radialGradient>
+
+          <!-- Softens the shadow each pocket casts on the layer behind it. -->
+          <filter id="edgeShadow" x="-15%" y="-60%" width="130%" height="260%">
+            <feGaussianBlur stdDeviation="3.2"/>
+          </filter>
+
+          <!-- Rounding of the spine fold. -->
+          <linearGradient id="foldShade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stop-color="#000" stop-opacity="0.30"/>
+            <stop offset="45%"  stop-color="#000" stop-opacity="0"/>
+            <stop offset="55%"  stop-color="#000" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#000" stop-opacity="0.30"/>
+          </linearGradient>
+
+          <!-- Fine grain so a flat colour still reads as leather before the
+               swatch photos land. Kept subtle; photos will sit on top of it. -->
+          <filter id="grain" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.62" numOctaves="4" seed="7" result="n"/>
+            <feColorMatrix in="n" type="saturate" values="0"/>
+          </filter>
+
+          <filter id="softShadow" x="-30%" y="-30%" width="160%" height="180%">
+            <feGaussianBlur stdDeviation="9"/>
+          </filter>
+        </defs>
+
+        <!-- Both views are drawn here at runtime by buildWallet(). -->
+        <g id="view-closed" class="view is-active"></g>
+        <g id="view-open" class="view"></g>
+      </svg>
+
+      <div class="view-toggle" role="group" aria-label="Wallet view">
+        <button type="button" id="btn-closed" aria-pressed="true">Closed</button>
+        <button type="button" id="btn-open" aria-pressed="false">Open</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option groups are generated from the config block in the script below. -->
+  <div class="options-col" id="options"></div>
+</div>
+
+<!-- SPEC -->
+<section class="spec-section reveal">
+  <div class="spec-inner">
+    <p class="section-label">Your Build</p>
+    <h2>The Spec</h2>
+    <p>Copy this and send it over with your order — it's everything we need to cut your wallet.</p>
+    <label for="spec-text" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">Your wallet specification</label>
+    <textarea id="spec-text" readonly spellcheck="false"></textarea>
+    <div class="spec-actions">
+      <button type="button" class="btn-shop" id="copy-btn">Copy the Spec</button>
+      <span class="copy-status" id="copy-status" role="status" aria-live="polite"></span>
+    </div>
+  </div>
+</section>
+
+<!-- REAL PIECES -->
+<section class="real-pieces reveal">
+  <p class="section-label">The Real Thing</p>
+  <h2>Pieces We've Built</h2>
+  <div class="pieces-grid">
+    <figure>
+      <div class="img-wrap"><img src="IMG_7862.jpg" alt="Open bifold wallet built from four different leathers" loading="lazy" width="800" height="533"></div>
+      <figcaption>Four leathers in one wallet — the build this page is for.</figcaption>
+    </figure>
+    <figure>
+      <div class="img-wrap"><img src="IMG_7383.jpg" alt="Open bifold wallet showing four card slots and the centre cash pocket" loading="lazy" width="800" height="533"></div>
+      <figcaption>Four card slots, wave-cut for easy access, plus the centre pocket.</figcaption>
+    </figure>
+    <figure>
+      <div class="img-wrap"><img src="IMG_8020.jpeg" alt="Closed bifold wallet with contrast stitching" loading="lazy" width="900" height="600"></div>
+      <figcaption>Closed, with contrast stitching and hand-burnished edges.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <img src="logo.png" alt="Traders Point Leather" width="100" height="100" style="height:100px;width:auto;margin-bottom:1rem;opacity:0.6;">
+  <div class="footer-brand">Traders Point Leather</div>
+  <div class="footer-loc">Handcrafted in Indiana</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Etsy Shop</a>
+    <a href="mailto:eyesmunt@icloud.com">Contact</a>
+  </div>
+  <p class="footer-copy">&copy; 2026 Traders Point Leather. All rights reserved.</p>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════
+   EDIT ME — leathers and threads
+   ─────────────────────────────────────────────────────────────────────
+   Everything on this page is generated from these two lists. Add, remove
+   or rename entries freely; nothing else needs to change.
+
+     id     short code used in the build code. Keep it lowercase, no spaces.
+     name   what customers see.
+     line   the tannery / leather line, shown in the spec.
+     hex    the flat colour, used until a swatch photo exists.
+     shade  a darker version of hex, used for shadows and the burnished
+            edge. Hand-picked rather than calculated, because a single
+            darkening rule looks wrong across both whiskey and ink blue.
+     tex    OPTIONAL. Filename of a square, tileable swatch photo, e.g.
+            'leather-whiskey.jpg'. When present it replaces the flat hex
+            in the preview. Leave it off and the hex is used.
+   ══════════════════════════════════════════════════════════════════════ */
+const LEATHERS = [
+  { id: 'whiskey', name: 'Whiskey',         line: 'Horween Cavalier', hex: '#704d29', shade: '#412c18',
+    tex: 'leather-whiskey.jpg' },
+  { id: 'redbus',  name: 'London Bus Red',  line: 'Horween Cavalier', hex: '#652124', shade: '#3b1315',
+    tex: 'leather-redbus.jpg' },
+  { id: 'ink',     name: 'Ink Blue',        line: 'Horween Cavalier', hex: '#122a42', shade: '#0a1826',
+    tex: 'leather-ink.jpg' },
+  { id: 'plum',    name: 'Plum',            line: 'Horween Cavalier', hex: '#3a292b', shade: '#211819',
+    tex: 'leather-plum.jpg' },
+  { id: 'carolina', name: 'Carolina Brown', line: 'Horween Cavalier', hex: '#4a3e39', shade: '#2b2421',
+    tex: 'leather-carolina.jpg' },
+];
+
+const THREADS = [
+  { id: 'cream', name: 'Natural Cream', hex: '#e8ddd0' },
+];
+
+/* The parts of the wallet a customer picks a leather for. `def` is the
+   default selection — it must be an id from LEATHERS above. */
+const TARGETS = [
+  { key: 'exterior',    code: 'EXT', label: 'Body',               def: 'whiskey',
+    help: 'The wallet body — outside, and the inside face it folds around. '
+        + 'There is no separate lining, so this is what shows behind the pockets.' },
+  { key: 'pocketUpper', code: 'PU',  label: 'Upper Card Pockets', def: 'ink',
+    help: 'The two pockets sitting higher on each side.' },
+  { key: 'pocketLower', code: 'PL',  label: 'Lower Card Pockets', def: 'redbus',
+    help: 'The two front pockets, closest to you.' },
+];
+
+/* ── Geometry ─────────────────────────────────────────────────────────
+   One function per wallet model, keyed by id in MODELS. Adding another
+   model means writing another function and adding one entry below — the
+   option groups and the spec don't change.
+   Drawn in a 540 × 400 viewBox. */
+const VIEWBOX = { w: 540, h: 400 };
+const GEO = {
+  closedX: 165, closedW: 210,
+  openX: 30, openW: 480,
+  top: 40, height: 300,
+  spineW: 48,       // the gap between the two sides when open
+  radius: 14,
+  stitchInset: 9,   // stitching always sits just inside an edge, never on it
+  pocketUpper: 132, // top edge of the upper pocket
+  pocketLower: 218, // top edge of the lower pocket
+};
+
+/* The top edge of a card pocket: essentially flat, with one gentle dip in
+   the middle so a card can be thumbed out. Symmetric, so both panels use it
+   unchanged. */
+function pocketEdge(x0, x1, y) {
+  const w = x1 - x0;
+  // Traced off the bare panel photo, which shows the die-cut edge square-on:
+  // flat shoulders for the outer quarter each side, a steep drop, and the
+  // deepest point dead centre — symmetric, 0.147 of the panel width.
+  //   u    0    .125  .25   .375  .5    .625  .75   .875  1
+  //   drop .035 .005  .033  .116  .147  .117  .037  .014  .027
+  // Every segment meets its neighbour with a horizontal tangent, so the flat
+  // runs stay flat and the bottom stays rounded rather than pointed.
+  const depth = 31;
+  const yb = y + depth;
+  const p = (t) => (x0 + w * t).toFixed(1);
+  return `M${x0},${y} L${p(0.25)},${y}`
+       + ` C${p(0.34)},${y} ${p(0.36)},${yb} ${p(0.45)},${yb}`
+       + ` L${p(0.55)},${yb}`
+       + ` C${p(0.64)},${yb} ${p(0.66)},${y} ${p(0.75)},${y}`
+       + ` L${x1},${y}`;
+}
+
+function pocketPath(x0, x1, y, bottom) {
+  return `${pocketEdge(x0, x1, y)} L${x1},${bottom} L${x0},${bottom} Z`;
+}
+
+function roundedRect(x, y, w, h, r) {
+  return `M${x + r},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}`
+       + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h}`
+       + ` H${x + r} A${r},${r} 0 0 1 ${x},${y + h - r}`
+       + ` V${y + r} A${r},${r} 0 0 1 ${x + r},${y} Z`;
+}
+
+/* Top, right and bottom only — the left edge is the fold, which is not
+   stitched. Used for the closed view. */
+function stitchTopRightBottom(x, y, w, h, r) {
+  return `M${x},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}`
+       + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h}`
+       + ` H${x}`;
+}
+
+// Fine and closely spaced, as the saddle stitching reads in IMG_7465.
+const STITCH = 'stroke-width="1.05" stroke-opacity="0.92" '
+             + 'stroke-dasharray="2.4 2" stroke-linecap="round" fill="none"';
+// The lines flanking the centre sit tight against the pocket stacks, much
+// closer in than the perimeter stitching is to the outer edge.
+const SPINE_STITCH_INSET = 5;
+
+function bifoldClosed() {
+  const g = GEO;
+  const x = g.closedX, y = g.top, w = g.closedW, h = g.height;
+  const i = g.stitchInset;
+  return `
+    <ellipse cx="${x + w / 2}" cy="${y + h + 16}" rx="${w * 0.46}" ry="10"
+             fill="#000" opacity="0.5" filter="url(#softShadow)"/>
+
+    <path class="leather-fill" d="${roundedRect(x, y, w, h, g.radius)}"
+          fill="var(--tex-exterior)"/>
+    <path d="${roundedRect(x, y, w, h, g.radius)}" fill="#000" filter="url(#grain)"
+          style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
+    <path d="${roundedRect(x, y, w, h, g.radius)}" fill="url(#sheen)" opacity="0.5"/>
+
+    <!-- Spine fold down the left edge, where the wallet closes. -->
+    <path d="M${x},${y + g.radius} V${y + h - g.radius}" stroke="#000" stroke-opacity="0.35"
+          stroke-width="6" fill="none"/>
+    <path d="M${x + 7},${y + 8} V${y + h - 8}" stroke="#fff" stroke-opacity="0.06"
+          stroke-width="2" fill="none"/>
+
+    <!-- Stitching runs just inside the top, right and bottom edges. The
+         left edge is the fold, so it carries no stitching. -->
+    <path class="stitch" ${STITCH} stroke="var(--c-thread)"
+          d="${stitchTopRightBottom(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5)}"/>
+
+    <!-- Hand-burnished edge. -->
+    <path class="leather-fill" d="${roundedRect(x, y, w, h, g.radius)}" fill="none"
+          stroke="var(--s-exterior)" stroke-width="3"/>
+  `;
+}
+
+function bifoldOpen() {
+  const g = GEO;
+  const x = g.openX, y = g.top, w = g.openW, h = g.height;
+  const i = g.stitchInset;
+  const bottom = y + h;
+  const mid = x + w / 2;
+  const spineL = mid - g.spineW / 2;
+  const spineR = mid + g.spineW / 2;
+  const outline = roundedRect(x, y, w, h, g.radius);
+
+  const panels = [
+    { x0: x, x1: spineL },
+    { x0: spineR, x1: x + w },
+  ];
+
+  /* Each pocket: the shadow it throws on the layer behind, the leather, a
+     little grain, then the burnished edge along its top cut. */
+  const layer = (p, yTop, varName) => `
+    <path d="${pocketEdge(p.x0, p.x1, yTop)}" fill="none" stroke="#000" stroke-opacity="0.5"
+          stroke-width="6" filter="url(#edgeShadow)" transform="translate(0,2.5)"/>
+    <path class="leather-fill" d="${pocketPath(p.x0, p.x1, yTop, bottom)}"
+          fill="var(--tex-${varName})"/>
+    <path d="${pocketPath(p.x0, p.x1, yTop, bottom)}" fill="#000" filter="url(#grain)"
+          style="mix-blend-mode:overlay;opacity:var(--grain-${varName})"/>
+    <path class="leather-fill" d="${pocketEdge(p.x0, p.x1, yTop)}" fill="none"
+          stroke="var(--s-${varName})" stroke-width="2"/>`;
+
+  const pockets = panels.map((p) =>
+    layer(p, GEO.pocketUpper, 'pocket-upper') + layer(p, GEO.pocketLower, 'pocket-lower')
+  ).join('');
+
+  return `
+    <ellipse cx="${mid}" cy="${bottom + 16}" rx="${w * 0.45}" ry="10"
+             fill="#000" opacity="0.5" filter="url(#softShadow)"/>
+
+    <!-- One piece of body leather: there is no separate lining, so the
+         inside face and the centre spine are the same leather as the
+         outside. -->
+    <path class="leather-fill" d="${outline}" fill="var(--tex-exterior)"/>
+    <path d="${outline}" fill="#000" filter="url(#grain)"
+          style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
+
+    <g clip-path="url(#openClip)">
+      ${pockets}
+      <!-- The centre, where the wallet folds and folded cash sits. -->
+      <path d="M${spineL},${y} H${spineR} V${bottom} H${spineL} Z" fill="url(#foldShade)"/>
+    </g>
+
+    <path d="${outline}" fill="url(#sheen)" opacity="0.5" style="pointer-events:none"/>
+
+    <!-- Stitching: just inside the outer edge, and just inside each pocket
+         stack's inner edge either side of the centre. -->
+    <path class="stitch" ${STITCH} stroke="var(--c-thread)"
+          d="${roundedRect(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5)}"/>
+    <path class="stitch" ${STITCH} stroke="var(--c-thread)"
+          d="M${spineL - SPINE_STITCH_INSET},${y + i} V${bottom - i}"/>
+    <path class="stitch" ${STITCH} stroke="var(--c-thread)"
+          d="M${spineR + SPINE_STITCH_INSET},${y + i} V${bottom - i}"/>
+
+    <path class="leather-fill" d="${outline}" fill="none" stroke="var(--s-exterior)" stroke-width="3"/>
+  `;
+}
+
+const MODELS = {
+  bifold: {
+    name: 'Vertical Bifold',
+    detail: '4 card slots, 2 pockets',
+    closed: bifoldClosed,
+    open: bifoldOpen,
+  },
+};
+const MODEL = MODELS.bifold;
+
+/* ── State ──────────────────────────────────────────────────────────── */
+const state = {};
+TARGETS.forEach((t) => { state[t.key] = t.def; });
+state.thread = THREADS[0].id;
+
+const byId = (list, id) => list.find((x) => x.id === id) || list[0];
+
+const svg = document.getElementById('wallet');
+const specBox = document.getElementById('spec-text');
+const copyStatus = document.getElementById('copy-status');
+
+/* ── Build the SVG ──────────────────────────────────────────────────── */
+function buildWallet() {
+  const g = GEO;
+  const clip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+  clip.setAttribute('id', 'openClip');
+  clip.innerHTML = `<path d="${roundedRect(g.openX, g.top, g.openW, g.height, g.radius)}"/>`;
+  svg.querySelector('defs').appendChild(clip);
+
+  /* Swatch photos, for any leather that has one. Each pattern spans the whole
+     drawing rather than tiling, so there is no repeating seam and every piece
+     shows the part of the hide it sits over — the way pieces are really cut. */
+  const texDefs = LEATHERS.filter((l) => l.tex).map((l) => `
+    <pattern id="tex-${l.id}" patternUnits="userSpaceOnUse"
+             width="${VIEWBOX.w}" height="${VIEWBOX.h}">
+      <image href="${l.tex}" width="${VIEWBOX.w}" height="${VIEWBOX.h}"
+             preserveAspectRatio="xMidYMid slice"/>
+    </pattern>`).join('');
+  document.getElementById('tex-defs').innerHTML = texDefs;
+
+  document.getElementById('view-closed').innerHTML = MODEL.closed();
+  document.getElementById('view-open').innerHTML = MODEL.open();
+}
+
+/* A leather paints as its swatch photo when it has one, otherwise as flat
+   colour. Either way it is a single custom-property value, so switching
+   leathers stays one setProperty call. */
+const paint = (leather) => (leather.tex ? `url(#tex-${leather.id})` : leather.hex);
+
+function render() {
+  TARGETS.forEach((t) => {
+    const leather = byId(LEATHERS, state[t.key]);
+    const name = t.key.replace(/([A-Z])/g, '-$1').toLowerCase(); // pocketUpper -> pocket-upper
+    svg.style.setProperty(`--tex-${name}`, paint(leather));
+    svg.style.setProperty(`--s-${name}`, leather.shade);
+    svg.style.setProperty(`--grain-${name}`, leather.tex ? '0' : '0.24');
+  });
+  svg.style.setProperty('--c-thread', byId(THREADS, state.thread).hex);
+
+  document.querySelectorAll('[role="radio"]').forEach((el) => {
+    const on = state[el.dataset.group] === el.dataset.value;
+    el.setAttribute('aria-checked', String(on));
+    el.tabIndex = on ? 0 : -1;
+  });
+
+  specBox.value = buildSpec();
+  copyStatus.textContent = '';
+}
+
+/* ── Options UI ─────────────────────────────────────────────────────── */
+function swatchMarkup(group, item, isLeather) {
+  const chip = isLeather && item.tex
+    ? `background-image:url('${item.tex}')`
+    : `background-color:${item.hex}`;
+  // The button shows the short name; the full name and leather line go on
+  // aria-label so it is announced once, in full, rather than twice.
+  const label = isLeather ? `${item.name} — ${item.line}` : item.name;
+  return `<button type="button" class="swatch" role="radio" aria-checked="false" tabindex="-1"
+                  aria-label="${label}" data-group="${group}" data-value="${item.id}">
+            <span class="swatch-chip" style="${chip}" aria-hidden="true"></span>
+            <span>${item.name}</span>
+          </button>`;
+}
+
+function buildOptions() {
+  const groups = TARGETS.map((t) => ({
+    key: t.key, label: t.label, help: t.help, items: LEATHERS, isLeather: true,
+  }));
+  groups.push({
+    key: 'thread', label: 'Stitching', help: 'The thread colour running around every seam.',
+    items: THREADS, isLeather: false,
+  });
+
+  document.getElementById('options').innerHTML = groups.map((grp) => `
+    <div class="opt-group">
+      <h2 id="lbl-${grp.key}">${grp.label}</h2>
+      <p class="opt-help">${grp.help}</p>
+      <div class="swatch-row" role="radiogroup" aria-labelledby="lbl-${grp.key}" data-group="${grp.key}">
+        ${grp.items.map((it) => swatchMarkup(grp.key, it, grp.isLeather)).join('')}
+      </div>
+    </div>`).join('');
+
+  document.getElementById('options').addEventListener('click', (e) => {
+    const btn = e.target.closest('[role="radio"]');
+    if (!btn) return;
+    state[btn.dataset.group] = btn.dataset.value;
+    render();
+  });
+
+  // Arrow keys move through a group, as a radio group should.
+  document.getElementById('options').addEventListener('keydown', (e) => {
+    const btn = e.target.closest('[role="radio"]');
+    if (!btn) return;
+    const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+    if (!(e.key in keys)) return;
+    e.preventDefault();
+    const row = btn.closest('[role="radiogroup"]');
+    const all = [...row.querySelectorAll('[role="radio"]')];
+    const next = all[(all.indexOf(btn) + keys[e.key] + all.length) % all.length];
+    state[next.dataset.group] = next.dataset.value;
+    render();
+    next.focus();
+  });
+}
+
+/* ── Spec ───────────────────────────────────────────────────────────── */
+function buildSpec() {
+  const pad = Math.max(...TARGETS.map((t) => t.label.length), 'Stitching'.length) + 3;
+  const rows = TARGETS.map((t) => {
+    const l = byId(LEATHERS, state[t.key]);
+    return `${t.label.padEnd(pad)}${l.line} ${l.name}`;
+  });
+  const thread = byId(THREADS, state.thread);
+  rows.push(`${'Stitching'.padEnd(pad)}${thread.name}`);
+
+  const code = ['TPL-BF']
+    .concat(TARGETS.map((t) => `${t.code}:${state[t.key]}`))
+    .concat(`THR:${state.thread}`)
+    .join(' / ');
+
+  return [
+    'TRADERS POINT LEATHER — CUSTOM WALLET',
+    `${MODEL.name} — ${MODEL.detail}`,
+    '',
+    ...rows,
+    '',
+    `Build code: ${code}`,
+  ].join('\n');
+}
+
+/* ── Copy ───────────────────────────────────────────────────────────── */
+function selectSpec() {
+  specBox.focus();
+  specBox.select();
+  specBox.setSelectionRange(0, specBox.value.length);
+}
+
+async function copySpec() {
+  const text = specBox.value;
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      selectSpec();
+      if (!document.execCommand('copy')) throw new Error('execCommand refused');
+    }
+    copyStatus.textContent = 'Copied — paste it wherever you send it to us.';
+  } catch (err) {
+    // Clipboard blocked: select the text so it can be copied by hand.
+    selectSpec();
+    copyStatus.textContent = 'Copying is blocked here — the spec is selected, press Ctrl/⌘+C.';
+  }
+}
+
+/* ── View toggle ────────────────────────────────────────────────────── */
+function setView(open) {
+  document.getElementById('view-open').classList.toggle('is-active', open);
+  document.getElementById('view-closed').classList.toggle('is-active', !open);
+  document.getElementById('btn-open').setAttribute('aria-pressed', String(open));
+  document.getElementById('btn-closed').setAttribute('aria-pressed', String(!open));
+}
+
+/* ── Init ───────────────────────────────────────────────────────────── */
+buildWallet();
+buildOptions();
+render();
+
+document.getElementById('btn-open').addEventListener('click', () => setView(true));
+document.getElementById('btn-closed').addEventListener('click', () => setView(false));
+document.getElementById('copy-btn').addEventListener('click', copySpec);
+specBox.addEventListener('focus', selectSpec);
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.15 });
+reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
