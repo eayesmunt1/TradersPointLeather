@@ -521,7 +521,8 @@ body::after {
             in the preview. Leave it off and the hex is used.
    ══════════════════════════════════════════════════════════════════════ */
 const LEATHERS = [
-  { id: 'whiskey', name: 'Whiskey',         line: 'Horween Cavalier', hex: '#b0712e', shade: '#7d4a17' },
+  { id: 'whiskey', name: 'Whiskey',         line: 'Horween Cavalier', hex: '#704d29', shade: '#412c18',
+    tex: 'leather-whiskey.jpg' },
   { id: 'redbus',  name: 'London Bus Red',  line: 'Horween Cavalier', hex: '#9e2b23', shade: '#6b1712' },
   { id: 'ink',     name: 'Ink Blue',        line: 'Horween Cavalier', hex: '#26354f', shade: '#151f31' },
   { id: 'plum',    name: 'Plum',            line: 'Horween Cavalier', hex: '#5e2739', shade: '#3a1522' },
@@ -548,6 +549,7 @@ const TARGETS = [
    model means writing another function and adding one entry below — the
    option groups and the spec don't change.
    Drawn in a 540 × 400 viewBox. */
+const VIEWBOX = { w: 540, h: 400 };
 const GEO = {
   closedX: 165, closedW: 210,
   openX: 30, openW: 480,
@@ -603,9 +605,9 @@ function bifoldClosed() {
 
     <path class="leather-fill" d="${roundedRect(x, y, w, h, g.radius)}"
           fill="var(--tex-exterior)"/>
-    <path d="${roundedRect(x, y, w, h, g.radius)}" fill="#000" opacity="0.24"
-          filter="url(#grain)" style="mix-blend-mode:overlay"/>
-    <path d="${roundedRect(x, y, w, h, g.radius)}" fill="url(#sheen)"/>
+    <path d="${roundedRect(x, y, w, h, g.radius)}" fill="#000" filter="url(#grain)"
+          style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
+    <path d="${roundedRect(x, y, w, h, g.radius)}" fill="url(#sheen)" opacity="0.5"/>
 
     <!-- Spine fold down the left edge, where the wallet closes. -->
     <path d="M${x},${y + g.radius} V${y + h - g.radius}" stroke="#000" stroke-opacity="0.35"
@@ -646,8 +648,8 @@ function bifoldOpen() {
           stroke-width="6" filter="url(#edgeShadow)" transform="translate(0,2.5)"/>
     <path class="leather-fill" d="${pocketPath(p.x0, p.x1, yTop, bottom)}"
           fill="var(--tex-${varName})"/>
-    <path d="${pocketPath(p.x0, p.x1, yTop, bottom)}" fill="#000" opacity="0.22"
-          filter="url(#grain)" style="mix-blend-mode:overlay"/>
+    <path d="${pocketPath(p.x0, p.x1, yTop, bottom)}" fill="#000" filter="url(#grain)"
+          style="mix-blend-mode:overlay;opacity:var(--grain-${varName})"/>
     <path class="leather-fill" d="${pocketEdge(p.x0, p.x1, yTop)}" fill="none"
           stroke="var(--s-${varName})" stroke-width="2"/>`;
 
@@ -663,8 +665,8 @@ function bifoldOpen() {
          inside face and the centre spine are the same leather as the
          outside. -->
     <path class="leather-fill" d="${outline}" fill="var(--tex-exterior)"/>
-    <path d="${outline}" fill="#000" opacity="0.24" filter="url(#grain)"
-          style="mix-blend-mode:overlay"/>
+    <path d="${outline}" fill="#000" filter="url(#grain)"
+          style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
 
     <g clip-path="url(#openClip)">
       ${pockets}
@@ -674,7 +676,7 @@ function bifoldOpen() {
             stroke-width="3" fill="none"/>
     </g>
 
-    <path d="${outline}" fill="url(#sheen)" style="pointer-events:none"/>
+    <path d="${outline}" fill="url(#sheen)" opacity="0.5" style="pointer-events:none"/>
 
     <!-- Stitching: just inside the outer edge, and just inside each pocket
          stack's inner edge either side of the centre. -->
@@ -718,10 +720,14 @@ function buildWallet() {
   clip.innerHTML = `<path d="${roundedRect(g.openX, g.top, g.openW, g.height, g.radius)}"/>`;
   svg.querySelector('defs').appendChild(clip);
 
-  // Swatch photos, for any leather that has one.
+  /* Swatch photos, for any leather that has one. Each pattern spans the whole
+     drawing rather than tiling, so there is no repeating seam and every piece
+     shows the part of the hide it sits over — the way pieces are really cut. */
   const texDefs = LEATHERS.filter((l) => l.tex).map((l) => `
-    <pattern id="tex-${l.id}" patternUnits="userSpaceOnUse" width="240" height="240">
-      <image href="${l.tex}" width="240" height="240" preserveAspectRatio="xMidYMid slice"/>
+    <pattern id="tex-${l.id}" patternUnits="userSpaceOnUse"
+             width="${VIEWBOX.w}" height="${VIEWBOX.h}">
+      <image href="${l.tex}" width="${VIEWBOX.w}" height="${VIEWBOX.h}"
+             preserveAspectRatio="xMidYMid slice"/>
     </pattern>`).join('');
   document.getElementById('tex-defs').innerHTML = texDefs;
 
@@ -740,6 +746,7 @@ function render() {
     const name = t.key.replace(/([A-Z])/g, '-$1').toLowerCase(); // pocketUpper -> pocket-upper
     svg.style.setProperty(`--tex-${name}`, paint(leather));
     svg.style.setProperty(`--s-${name}`, leather.shade);
+    svg.style.setProperty(`--grain-${name}`, leather.tex ? '0' : '0.24');
   });
   svg.style.setProperty('--c-thread', byId(THREADS, state.thread).hex);
 
