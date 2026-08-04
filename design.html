@@ -391,14 +391,14 @@ body::after {
   <img class="logo-mark" src="logo.png" alt="Traders Point Leather compass logo" width="72" height="72">
   <h1>Design Your Wallet</h1>
   <div class="head-divider"></div>
-  <p>Every layer is cut separately, so every layer can be its own leather. Choose yours, and we'll build it.</p>
+  <p>The body and every pocket are cut separately, so each one can be its own leather. Choose yours, and we'll build it.</p>
 </header>
 
 <!-- CONFIGURATOR -->
 <div class="configurator">
   <div class="preview-col">
     <div class="preview-stage">
-      <svg id="wallet" class="wallet-svg" viewBox="0 0 460 380" role="img"
+      <svg id="wallet" class="wallet-svg" viewBox="0 0 540 400" role="img"
            aria-labelledby="wallet-title wallet-desc">
         <title id="wallet-title">Preview of your wallet</title>
         <desc id="wallet-desc">A drawing of the bifold wallet that updates as you choose leathers.</desc>
@@ -534,10 +534,9 @@ const THREADS = [
 /* The parts of the wallet a customer picks a leather for. `def` is the
    default selection — it must be an id from LEATHERS above. */
 const TARGETS = [
-  { key: 'exterior',    code: 'EXT', label: 'Exterior',           def: 'whiskey',
-    help: 'The outside of the wallet, front and back.' },
-  { key: 'interior',    code: 'INT', label: 'Interior & Spine',   def: 'plum',
-    help: 'The lining you see when it opens, and the centre spine.' },
+  { key: 'exterior',    code: 'EXT', label: 'Body',               def: 'whiskey',
+    help: 'The wallet body — outside, and the inside face it folds around. '
+        + 'There is no separate lining, so this is what shows behind the pockets.' },
   { key: 'pocketUpper', code: 'PU',  label: 'Upper Card Pockets', def: 'ink',
     help: 'The two pockets sitting higher on each side.' },
   { key: 'pocketLower', code: 'PL',  label: 'Lower Card Pockets', def: 'redbus',
@@ -548,35 +547,32 @@ const TARGETS = [
    One function per wallet model, keyed by id in MODELS. Adding another
    model means writing another function and adding one entry below — the
    option groups and the spec don't change.
-   Drawn in a 460 × 380 viewBox. */
+   Drawn in a 540 × 400 viewBox. */
 const GEO = {
-  closedX: 125, closedW: 210,
-  openX: 25, openW: 410,
-  top: 30, height: 300,
-  spineW: 22,
+  closedX: 165, closedW: 210,
+  openX: 30, openW: 480,
+  top: 40, height: 300,
+  spineW: 48,       // the gap between the two sides when open
   radius: 14,
-  stitchInset: 8,
-  waveUpper: 122,   // top edge of the upper pocket
-  waveLower: 208,   // top edge of the lower pocket
+  stitchInset: 9,   // stitching always sits just inside an edge, never on it
+  pocketUpper: 132, // top edge of the upper pocket
+  pocketLower: 218, // top edge of the lower pocket
 };
 
-/* The signature wave cut across the top of each card pocket: it rises,
-   dips toward the middle so a card can be thumbed out, then lifts to the
-   outer edge. `flip` mirrors it for the right-hand panel. */
-function waveEdge(x0, x1, y, flip) {
+/* The top edge of a card pocket: essentially flat, with one gentle dip in
+   the middle so a card can be thumbed out. Symmetric, so both panels use it
+   unchanged. */
+function pocketEdge(x0, x1, y) {
   const w = x1 - x0;
-  const p = (t) => (flip ? x1 - w * t : x0 + w * t);
-  return [
-    `M${p(0).toFixed(1)},${y}`,
-    `C${p(0.24).toFixed(1)},${y - 13} ${p(0.38).toFixed(1)},${y + 15} ${p(0.64).toFixed(1)},${y + 9}`,
-    `C${p(0.81).toFixed(1)},${y + 5} ${p(0.90).toFixed(1)},${y - 3} ${p(1).toFixed(1)},${y - 11}`,
-  ].join(' ');
+  const dip = 11;
+  const mid = x0 + w / 2;
+  return `M${x0},${y}`
+       + ` C${x0 + w * 0.30},${y} ${x0 + w * 0.37},${y + dip} ${mid},${y + dip}`
+       + ` C${x1 - w * 0.37},${y + dip} ${x1 - w * 0.30},${y} ${x1},${y}`;
 }
 
-function pocketPath(x0, x1, y, bottom, flip) {
-  const lead = flip ? x0 : x1;
-  const trail = flip ? x1 : x0;
-  return `${waveEdge(x0, x1, y, flip)} L${lead},${bottom} L${trail},${bottom} Z`;
+function pocketPath(x0, x1, y, bottom) {
+  return `${pocketEdge(x0, x1, y)} L${x1},${bottom} L${x0},${bottom} Z`;
 }
 
 function roundedRect(x, y, w, h, r) {
@@ -585,6 +581,17 @@ function roundedRect(x, y, w, h, r) {
        + ` H${x + r} A${r},${r} 0 0 1 ${x},${y + h - r}`
        + ` V${y + r} A${r},${r} 0 0 1 ${x + r},${y} Z`;
 }
+
+/* Top, right and bottom only — the left edge is the fold, which is not
+   stitched. Used for the closed view. */
+function stitchTopRightBottom(x, y, w, h, r) {
+  return `M${x},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}`
+       + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h}`
+       + ` H${x}`;
+}
+
+const STITCH = 'stroke-width="1.15" stroke-opacity="0.9" '
+             + 'stroke-dasharray="3.2 2.8" stroke-linecap="round" fill="none"';
 
 function bifoldClosed() {
   const g = GEO;
@@ -606,10 +613,10 @@ function bifoldClosed() {
     <path d="M${x + 7},${y + 8} V${y + h - 8}" stroke="#fff" stroke-opacity="0.06"
           stroke-width="2" fill="none"/>
 
-    <!-- Stitch line inset from the edge, as on the real piece. -->
-    <path class="stitch" d="${roundedRect(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5)}"
-          fill="none" stroke="var(--c-thread)" stroke-width="1.15" stroke-opacity="0.9"
-          stroke-dasharray="3.2 2.8" stroke-linecap="round"/>
+    <!-- Stitching runs just inside the top, right and bottom edges. The
+         left edge is the fold, so it carries no stitching. -->
+    <path class="stitch" ${STITCH} stroke="var(--c-thread)"
+          d="${stitchTopRightBottom(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5)}"/>
 
     <!-- Hand-burnished edge. -->
     <path class="leather-fill" d="${roundedRect(x, y, w, h, g.radius)}" fill="none"
@@ -628,57 +635,57 @@ function bifoldOpen() {
   const outline = roundedRect(x, y, w, h, g.radius);
 
   const panels = [
-    { x0: x, x1: spineL, flip: false },
-    { x0: spineR, x1: x + w, flip: true },
+    { x0: x, x1: spineL },
+    { x0: spineR, x1: x + w },
   ];
 
   /* Each pocket: the shadow it throws on the layer behind, the leather, a
-     little grain, then the burnished edge along its wave cut. */
-  const layer = (p, y, varName) => `
-    <path d="${waveEdge(p.x0, p.x1, y, p.flip)}" fill="none" stroke="#000" stroke-opacity="0.5"
+     little grain, then the burnished edge along its top cut. */
+  const layer = (p, yTop, varName) => `
+    <path d="${pocketEdge(p.x0, p.x1, yTop)}" fill="none" stroke="#000" stroke-opacity="0.5"
           stroke-width="6" filter="url(#edgeShadow)" transform="translate(0,2.5)"/>
-    <path class="leather-fill" d="${pocketPath(p.x0, p.x1, y, bottom, p.flip)}"
+    <path class="leather-fill" d="${pocketPath(p.x0, p.x1, yTop, bottom)}"
           fill="var(--tex-${varName})"/>
-    <path d="${pocketPath(p.x0, p.x1, y, bottom, p.flip)}" fill="#000" opacity="0.22"
+    <path d="${pocketPath(p.x0, p.x1, yTop, bottom)}" fill="#000" opacity="0.22"
           filter="url(#grain)" style="mix-blend-mode:overlay"/>
-    <path class="leather-fill" d="${waveEdge(p.x0, p.x1, y, p.flip)}" fill="none"
+    <path class="leather-fill" d="${pocketEdge(p.x0, p.x1, yTop)}" fill="none"
           stroke="var(--s-${varName})" stroke-width="2"/>`;
 
   const pockets = panels.map((p) =>
-    layer(p, GEO.waveUpper, 'pocket-upper') + layer(p, GEO.waveLower, 'pocket-lower')
+    layer(p, GEO.pocketUpper, 'pocket-upper') + layer(p, GEO.pocketLower, 'pocket-lower')
   ).join('');
 
   return `
     <ellipse cx="${mid}" cy="${bottom + 16}" rx="${w * 0.45}" ry="10"
              fill="#000" opacity="0.5" filter="url(#softShadow)"/>
 
-    <!-- Interior lining, which also shows through as the centre spine. -->
-    <path class="leather-fill" d="${outline}" fill="var(--tex-interior)"/>
+    <!-- One piece of body leather: there is no separate lining, so the
+         inside face and the centre spine are the same leather as the
+         outside. -->
+    <path class="leather-fill" d="${outline}" fill="var(--tex-exterior)"/>
     <path d="${outline}" fill="#000" opacity="0.24" filter="url(#grain)"
           style="mix-blend-mode:overlay"/>
 
     <g clip-path="url(#openClip)">
       ${pockets}
-      <!-- Centre cash pocket, between the two panels. -->
+      <!-- The centre, where the wallet folds and folded cash sits. -->
       <path d="M${spineL},${y} H${spineR} V${bottom} H${spineL} Z" fill="url(#foldShade)"/>
-      <path d="M${mid},${y + 10} V${bottom - 10}" stroke="#000" stroke-opacity="0.45"
+      <path d="M${mid},${y + 10} V${bottom - 10}" stroke="#000" stroke-opacity="0.4"
             stroke-width="3" fill="none"/>
     </g>
 
     <path d="${outline}" fill="url(#sheen)" style="pointer-events:none"/>
 
-    <!-- Stitching: around the outside, and either side of the spine. -->
-    <path class="stitch" d="${roundedRect(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5)}"
-          fill="none" stroke="var(--c-thread)" stroke-width="1.15" stroke-opacity="0.9"
-          stroke-dasharray="3.2 2.8" stroke-linecap="round"/>
-    <path class="stitch" d="M${spineL},${y + i} V${bottom - i}" fill="none"
-          stroke="var(--c-thread)" stroke-width="1.15" stroke-opacity="0.9"
-          stroke-dasharray="3.2 2.8" stroke-linecap="round"/>
-    <path class="stitch" d="M${spineR},${y + i} V${bottom - i}" fill="none"
-          stroke="var(--c-thread)" stroke-width="1.15" stroke-opacity="0.9"
-          stroke-dasharray="3.2 2.8" stroke-linecap="round"/>
+    <!-- Stitching: just inside the outer edge, and just inside each pocket
+         stack's inner edge either side of the centre. -->
+    <path class="stitch" ${STITCH} stroke="var(--c-thread)"
+          d="${roundedRect(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5)}"/>
+    <path class="stitch" ${STITCH} stroke="var(--c-thread)"
+          d="M${spineL - i},${y + i} V${bottom - i}"/>
+    <path class="stitch" ${STITCH} stroke="var(--c-thread)"
+          d="M${spineR + i},${y + i} V${bottom - i}"/>
 
-    <path class="leather-fill" d="${outline}" fill="none" stroke="var(--s-interior)" stroke-width="3"/>
+    <path class="leather-fill" d="${outline}" fill="none" stroke="var(--s-exterior)" stroke-width="3"/>
   `;
 }
 
