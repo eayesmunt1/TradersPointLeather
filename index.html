@@ -41,7 +41,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Traders Point Leather — Handcrafted in Indiana">
-<meta property="og:description" content="Full-grain leather wallets and belts, handcrafted one at a time in Indiana. Built to last a lifetime.">
+<meta property="og:description" content="Full-grain leather wallets and belts, handcrafted one at a time in Indiana. Built to outlast the phone in your pocket.">
 <meta property="og:image" content="https://traderspointleather.com/IMG_7868.jpg">
 <meta property="og:url" content="https://traderspointleather.com">
 <script type="application/ld+json">
@@ -235,13 +235,25 @@ body {
   background: var(--tan);
   color: var(--bg);
 }
+/* Centred with left/right rather than translateX(-50%): the fadeUp animation
+   ends on transform: translateY(0), which with fill-mode forwards would
+   permanently clobber a centring transform on this element. */
 .scroll-hint {
   position: absolute;
   bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  text-align: center;
   opacity: 0;
   animation: fadeUp 1s 1.4s forwards;
+}
+.scroll-hint-text {
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.85rem;
+  white-space: nowrap;
 }
 .scroll-hint span {
   display: block;
@@ -647,11 +659,14 @@ body::after {
   <h1>Traders Point<br>Leather</h1>
   <p class="hero-tagline">Simple &middot; Elegant &middot; Sturdy</p>
   <div class="hero-divider"></div>
-  <p class="hero-sub">Handcrafted leather goods made with care in Indiana. Built to last a lifetime.</p>
+  <p class="hero-sub">Handcrafted leather goods made with care in Indiana. Built to outlast the phone in your pocket.</p>
   <div class="hero-cta">
     <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Visit the Shop</a>
   </div>
-  <div class="scroll-hint"><span></span></div>
+  <div class="scroll-hint">
+    <p class="scroll-hint-text">Explore the craft</p>
+    <span></span>
+  </div>
 </section>
 
 <!-- PROCESS VIDEO + PHILOSOPHY -->
