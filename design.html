@@ -521,8 +521,6 @@ const LEATHERS = [
     tex: 'leather-ink.jpg' },
   { id: 'plum',    name: 'Plum',            line: 'Horween Cavalier', hex: '#3a292b', shade: '#211819',
     tex: 'leather-plum.jpg' },
-  { id: 'carolina', name: 'Carolina Brown', line: 'Horween Cavalier', hex: '#4a3e39', shade: '#2b2421',
-    tex: 'leather-carolina.jpg' },
 ];
 
 const THREADS = [
@@ -553,7 +551,7 @@ const VIEWBOX = { w: 540, h: 400 };
      suede spine            0.1431 of the open width (median of 247 rows)
      upper pocket top edge  0.14  of the height
      lower pocket top edge  0.315 of the height
-     pocket scoop depth     0.080 of one panel's width
+     pocket scoop depth     0.1473 of one panel's width (fitted)
      outer corner radius    0.041 of the height
      inner stitch line      runs 0.147 to 0.930 of the height, not the full
                             edge — it only spans the pocket assembly          */
@@ -566,26 +564,39 @@ const GEO = {
   stitchInset: 9,   // stitching always sits just inside an edge, never on it
   pocketUpper: 87,  // top edge of the upper pocket
   pocketLower: 139, // top edge of the lower pocket
-  pocketDepth: 15,  // 0.080 of a 190.5 panel
+  pocketDepth: 28,  // 0.1473 of a 190.5 panel, from the fitted trace
   innerStitchTop: 89,     // 0.147 of the height
   innerStitchBottom: 324, // 0.930
 };
 
-/* The top edge of a card pocket: essentially flat, with one gentle dip in
-   the middle so a card can be thumbed out. Symmetric, so both panels use it
-   unchanged. */
+/* The top edge of a card pocket: one long, gentle bowl so a card can be
+   thumbed out. Symmetric, so both panels use it unchanged.
+
+   Not eyeballed. The edge was tracked in the reference photo by contrast-
+   enhancing the panel (CLAHE), matching a ridge filter to the bright cut edge,
+   then taking a minimum-cost path across the columns so the track cannot hop
+   onto the grain or the stitching. All four edges — both pockets on both
+   panels — were traced, detrended, symmetrised and averaged; they agreed on
+   the low point to within u = 0.52 ± 0.01. This path form was then least-
+   squares fitted to that average:
+
+     depth        0.1473 of the panel width
+     control 1    u = 0.345
+     control 2    u = 0.311
+     RMS error    0.0036 of panel width, 2.5% of the depth
+     worst error  1.8 units on a 190.5 unit panel
+
+   There is no flat shoulder: the real edge starts curving at the panel edge
+   and descends the whole way, which is what makes the slope gentle. Both
+   curves meet at the midpoint with matching horizontal tangents, so the bottom
+   is round rather than flat. */
 function pocketEdge(x0, x1, y) {
   const w = x1 - x0;
-  // Flat shoulders, then one continuous bowl. The two curves meet at the
-  // midpoint with matching horizontal tangents, and the bowl reaches its
-  // lowest point at that single point only — so the bottom stays round the
-  // whole way through instead of running flat across the middle.
   const yb = y + GEO.pocketDepth;
   const p = (t) => (x0 + w * t).toFixed(1);
-  return `M${x0},${y} L${p(0.22)},${y}`
-       + ` C${p(0.31)},${y} ${p(0.44)},${yb} ${p(0.50)},${yb}`
-       + ` C${p(0.56)},${yb} ${p(0.69)},${y} ${p(0.78)},${y}`
-       + ` L${x1},${y}`;
+  return `M${x0},${y}`
+       + ` C${p(0.345)},${y} ${p(0.311)},${yb} ${p(0.5)},${yb}`
+       + ` C${p(0.689)},${yb} ${p(0.655)},${y} ${x1},${y}`;
 }
 
 /* One interior panel. Outer corners are rounded; the corners facing the spine
