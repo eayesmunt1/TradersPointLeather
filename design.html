@@ -571,11 +571,15 @@ const GEO = {
    unchanged. */
 function pocketEdge(x0, x1, y) {
   const w = x1 - x0;
-  const dip = 11;
-  const mid = x0 + w / 2;
+  // An ogee, not a bowl: level and high at the outer edge, a smooth S through
+  // the middle, then level and lower at the spine edge. Traced off the card
+  // slots in IMG_7383, where the edge falls steadily from u=0 to u=0.5 and
+  // stays down — roughly 0.13 of the panel width. Horizontal tangents at both
+  // ends keep the flat runs flat.
+  const depth = 28;
   return `M${x0},${y}`
-       + ` C${x0 + w * 0.30},${y} ${x0 + w * 0.37},${y + dip} ${mid},${y + dip}`
-       + ` C${x1 - w * 0.37},${y + dip} ${x1 - w * 0.30},${y} ${x1},${y}`;
+       + ` C${(x0 + w * 0.46).toFixed(1)},${y}`
+       + ` ${(x1 - w * 0.46).toFixed(1)},${y + depth} ${x1},${y + depth}`;
 }
 
 function pocketPath(x0, x1, y, bottom) {
@@ -597,8 +601,12 @@ function stitchTopRightBottom(x, y, w, h, r) {
        + ` H${x}`;
 }
 
-const STITCH = 'stroke-width="1.15" stroke-opacity="0.9" '
-             + 'stroke-dasharray="3.2 2.8" stroke-linecap="round" fill="none"';
+// Fine and closely spaced, as the saddle stitching reads in IMG_7465.
+const STITCH = 'stroke-width="1.05" stroke-opacity="0.92" '
+             + 'stroke-dasharray="2.4 2" stroke-linecap="round" fill="none"';
+// The lines flanking the centre sit tight against the pocket stacks, much
+// closer in than the perimeter stitching is to the outer edge.
+const SPINE_STITCH_INSET = 5;
 
 function bifoldClosed() {
   const g = GEO;
@@ -677,8 +685,6 @@ function bifoldOpen() {
       ${pockets}
       <!-- The centre, where the wallet folds and folded cash sits. -->
       <path d="M${spineL},${y} H${spineR} V${bottom} H${spineL} Z" fill="url(#foldShade)"/>
-      <path d="M${mid},${y + 10} V${bottom - 10}" stroke="#000" stroke-opacity="0.4"
-            stroke-width="3" fill="none"/>
     </g>
 
     <path d="${outline}" fill="url(#sheen)" opacity="0.5" style="pointer-events:none"/>
@@ -688,9 +694,9 @@ function bifoldOpen() {
     <path class="stitch" ${STITCH} stroke="var(--c-thread)"
           d="${roundedRect(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5)}"/>
     <path class="stitch" ${STITCH} stroke="var(--c-thread)"
-          d="M${spineL - i},${y + i} V${bottom - i}"/>
+          d="M${spineL - SPINE_STITCH_INSET},${y + i} V${bottom - i}"/>
     <path class="stitch" ${STITCH} stroke="var(--c-thread)"
-          d="M${spineR + i},${y + i} V${bottom - i}"/>
+          d="M${spineR + SPINE_STITCH_INSET},${y + i} V${bottom - i}"/>
 
     <path class="leather-fill" d="${outline}" fill="none" stroke="var(--s-exterior)" stroke-width="3"/>
   `;
