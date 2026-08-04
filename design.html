@@ -571,15 +571,21 @@ const GEO = {
    unchanged. */
 function pocketEdge(x0, x1, y) {
   const w = x1 - x0;
-  // An ogee, not a bowl: level and high at the outer edge, a smooth S through
-  // the middle, then level and lower at the spine edge. Traced off the card
-  // slots in IMG_7383, where the edge falls steadily from u=0 to u=0.5 and
-  // stays down — roughly 0.13 of the panel width. Horizontal tangents at both
-  // ends keep the flat runs flat.
-  const depth = 28;
-  return `M${x0},${y}`
-       + ` C${(x0 + w * 0.46).toFixed(1)},${y}`
-       + ` ${(x1 - w * 0.46).toFixed(1)},${y + depth} ${x1},${y + depth}`;
+  // Traced off the bare panel photo, which shows the die-cut edge square-on:
+  // flat shoulders for the outer quarter each side, a steep drop, and the
+  // deepest point dead centre — symmetric, 0.147 of the panel width.
+  //   u    0    .125  .25   .375  .5    .625  .75   .875  1
+  //   drop .035 .005  .033  .116  .147  .117  .037  .014  .027
+  // Every segment meets its neighbour with a horizontal tangent, so the flat
+  // runs stay flat and the bottom stays rounded rather than pointed.
+  const depth = 31;
+  const yb = y + depth;
+  const p = (t) => (x0 + w * t).toFixed(1);
+  return `M${x0},${y} L${p(0.25)},${y}`
+       + ` C${p(0.34)},${y} ${p(0.36)},${yb} ${p(0.45)},${yb}`
+       + ` L${p(0.55)},${yb}`
+       + ` C${p(0.64)},${yb} ${p(0.66)},${y} ${p(0.75)},${y}`
+       + ` L${x1},${y}`;
 }
 
 function pocketPath(x0, x1, y, bottom) {
