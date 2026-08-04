@@ -418,14 +418,6 @@ body::after {
             <feGaussianBlur stdDeviation="3.2"/>
           </filter>
 
-          <!-- Rounding of the spine fold. -->
-          <linearGradient id="foldShade" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%"   stop-color="#000" stop-opacity="0.30"/>
-            <stop offset="45%"  stop-color="#000" stop-opacity="0"/>
-            <stop offset="55%"  stop-color="#000" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#000" stop-opacity="0.30"/>
-          </linearGradient>
-
           <!-- Fine grain so a flat colour still reads as leather before the
                swatch photos land. Kept subtle; photos will sit on top of it. -->
           <filter id="grain" x="0" y="0" width="100%" height="100%">
@@ -555,15 +547,23 @@ const TARGETS = [
    option groups and the spec don't change.
    Drawn in a 540 × 400 viewBox. */
 const VIEWBOX = { w: 540, h: 400 };
+/* Proportions measured off the open reference photo (IMG_2528), which shows
+   the whole wallet flat and square-on:
+     open aspect            1.484   (4873 x 3284 px)
+     suede spine            0.080 of the open width
+     upper pocket top edge  0.14  of the height
+     lower pocket top edge  0.315 of the height
+     pocket scoop depth     0.080 of one panel's width                       */
 const GEO = {
-  closedX: 165, closedW: 210,
-  openX: 30, openW: 480,
-  top: 40, height: 300,
-  spineW: 48,       // the gap between the two sides when open
-  radius: 14,
+  closedX: 167, closedW: 205,
+  openX: 47, openW: 445,   // 445/300 = 1.483
+  top: 45, height: 300,
+  spineW: 36,              // suede spine showing between the two panels
+  radius: 11,
   stitchInset: 9,   // stitching always sits just inside an edge, never on it
-  pocketUpper: 132, // top edge of the upper pocket
-  pocketLower: 218, // top edge of the lower pocket
+  pocketUpper: 87,  // top edge of the upper pocket
+  pocketLower: 139, // top edge of the lower pocket
+  pocketDepth: 16,  // 0.080 of a 204.5 panel
 };
 
 /* The top edge of a card pocket: essentially flat, with one gentle dip in
@@ -571,21 +571,28 @@ const GEO = {
    unchanged. */
 function pocketEdge(x0, x1, y) {
   const w = x1 - x0;
-  // Traced off the bare panel photo, which shows the die-cut edge square-on:
-  // flat shoulders for the outer quarter each side, a steep drop, and the
-  // deepest point dead centre — symmetric, 0.147 of the panel width.
-  //   u    0    .125  .25   .375  .5    .625  .75   .875  1
-  //   drop .035 .005  .033  .116  .147  .117  .037  .014  .027
-  // Every segment meets its neighbour with a horizontal tangent, so the flat
-  // runs stay flat and the bottom stays rounded rather than pointed.
-  const depth = 31;
-  const yb = y + depth;
+  // Flat shoulders, then one continuous bowl. The two curves meet at the
+  // midpoint with matching horizontal tangents, and the bowl reaches its
+  // lowest point at that single point only — so the bottom stays round the
+  // whole way through instead of running flat across the middle.
+  const yb = y + GEO.pocketDepth;
   const p = (t) => (x0 + w * t).toFixed(1);
-  return `M${x0},${y} L${p(0.25)},${y}`
-       + ` C${p(0.34)},${y} ${p(0.36)},${yb} ${p(0.45)},${yb}`
-       + ` L${p(0.55)},${yb}`
-       + ` C${p(0.64)},${yb} ${p(0.66)},${y} ${p(0.75)},${y}`
+  return `M${x0},${y} L${p(0.22)},${y}`
+       + ` C${p(0.31)},${y} ${p(0.44)},${yb} ${p(0.50)},${yb}`
+       + ` C${p(0.56)},${yb} ${p(0.69)},${y} ${p(0.78)},${y}`
        + ` L${x1},${y}`;
+}
+
+/* One interior panel. Outer corners are rounded; the corners facing the spine
+   are square, as the reference photo shows. */
+function panelPath(x, y, w, h, r, side) {
+  if (side === 'left') {
+    return `M${x + r},${y} H${x + w} V${y + h} H${x + r}`
+         + ` A${r},${r} 0 0 1 ${x},${y + h - r} V${y + r}`
+         + ` A${r},${r} 0 0 1 ${x + r},${y} Z`;
+  }
+  return `M${x},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}`
+       + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${x} Z`;
 }
 
 function pocketPath(x0, x1, y, bottom) {
@@ -610,9 +617,6 @@ function stitchTopRightBottom(x, y, w, h, r) {
 // Fine and closely spaced, as the saddle stitching reads in IMG_7465.
 const STITCH = 'stroke-width="1.05" stroke-opacity="0.92" '
              + 'stroke-dasharray="2.4 2" stroke-linecap="round" fill="none"';
-// The lines flanking the centre sit tight against the pocket stacks, much
-// closer in than the perimeter stitching is to the outer edge.
-const SPINE_STITCH_INSET = 5;
 
 function bifoldClosed() {
   const g = GEO;
@@ -653,11 +657,10 @@ function bifoldOpen() {
   const mid = x + w / 2;
   const spineL = mid - g.spineW / 2;
   const spineR = mid + g.spineW / 2;
-  const outline = roundedRect(x, y, w, h, g.radius);
 
   const panels = [
-    { x0: x, x1: spineL },
-    { x0: spineR, x1: x + w },
+    { x0: x, x1: spineL, side: 'left' },
+    { x0: spineR, x1: x + w, side: 'right' },
   ];
 
   /* Each pocket: the shadow it throws on the layer behind, the leather, a
@@ -672,39 +675,50 @@ function bifoldOpen() {
     <path class="leather-fill" d="${pocketEdge(p.x0, p.x1, yTop)}" fill="none"
           stroke="var(--s-${varName})" stroke-width="2"/>`;
 
-  const pockets = panels.map((p) =>
-    layer(p, GEO.pocketUpper, 'pocket-upper') + layer(p, GEO.pocketLower, 'pocket-lower')
-  ).join('');
+  /* Each panel is its own assembly: stitched right around its own perimeter,
+     with the pockets clipped to it. */
+  const panelMarkup = panels.map((p, n) => {
+    const pw = p.x1 - p.x0;
+    const outline = panelPath(p.x0, y, pw, h, g.radius, p.side);
+    const clipId = `panelClip${n}`;
+    return `
+      <clipPath id="${clipId}"><path d="${outline}"/></clipPath>
+
+      <path class="leather-fill" d="${outline}" fill="var(--tex-exterior)"/>
+      <path d="${outline}" fill="#000" filter="url(#grain)"
+            style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
+
+      <g clip-path="url(#${clipId})">
+        ${layer(p, g.pocketUpper, 'pocket-upper')}
+        ${layer(p, g.pocketLower, 'pocket-lower')}
+      </g>
+
+      <path d="${outline}" fill="url(#sheen)" opacity="0.45" style="pointer-events:none"/>
+
+      <!-- Stitched on all four sides, the spine edge included. -->
+      <path class="stitch" ${STITCH} stroke="var(--c-thread)"
+            d="${panelPath(p.x0 + i, y + i, pw - i * 2, h - i * 2,
+                           Math.max(g.radius - 4, 2), p.side)}"/>
+
+      <path class="leather-fill" d="${outline}" fill="none"
+            stroke="var(--s-exterior)" stroke-width="2.5"/>`;
+  }).join('');
 
   return `
     <ellipse cx="${mid}" cy="${bottom + 16}" rx="${w * 0.45}" ry="10"
              fill="#000" opacity="0.5" filter="url(#softShadow)"/>
 
-    <!-- One piece of body leather: there is no separate lining, so the
-         inside face and the centre spine are the same leather as the
-         outside. -->
-    <path class="leather-fill" d="${outline}" fill="var(--tex-exterior)"/>
-    <path d="${outline}" fill="#000" filter="url(#grain)"
-          style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
+    <!-- The spine is the body leather's flesh side showing between the two
+         panels — lighter and matte against the grain, like the suede strip in
+         the reference photo. Drawn first so the panels overlap its edges. -->
+    <path class="leather-fill" d="M${spineL - 3},${y} H${spineR + 3} V${bottom} H${spineL - 3} Z"
+          fill="var(--tex-exterior)"/>
+    <path d="M${spineL - 3},${y} H${spineR + 3} V${bottom} H${spineL - 3} Z"
+          fill="#fff" opacity="0.22"/>
+    <path d="M${spineL - 3},${y} H${spineR + 3} V${bottom} H${spineL - 3} Z"
+          fill="#000" opacity="0.42" filter="url(#grain)" style="mix-blend-mode:overlay"/>
 
-    <g clip-path="url(#openClip)">
-      ${pockets}
-      <!-- The centre, where the wallet folds and folded cash sits. -->
-      <path d="M${spineL},${y} H${spineR} V${bottom} H${spineL} Z" fill="url(#foldShade)"/>
-    </g>
-
-    <path d="${outline}" fill="url(#sheen)" opacity="0.5" style="pointer-events:none"/>
-
-    <!-- Stitching: just inside the outer edge, and just inside each pocket
-         stack's inner edge either side of the centre. -->
-    <path class="stitch" ${STITCH} stroke="var(--c-thread)"
-          d="${roundedRect(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5)}"/>
-    <path class="stitch" ${STITCH} stroke="var(--c-thread)"
-          d="M${spineL - SPINE_STITCH_INSET},${y + i} V${bottom - i}"/>
-    <path class="stitch" ${STITCH} stroke="var(--c-thread)"
-          d="M${spineR + SPINE_STITCH_INSET},${y + i} V${bottom - i}"/>
-
-    <path class="leather-fill" d="${outline}" fill="none" stroke="var(--s-exterior)" stroke-width="3"/>
+    ${panelMarkup}
   `;
 }
 
@@ -731,12 +745,6 @@ const copyStatus = document.getElementById('copy-status');
 
 /* ── Build the SVG ──────────────────────────────────────────────────── */
 function buildWallet() {
-  const g = GEO;
-  const clip = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
-  clip.setAttribute('id', 'openClip');
-  clip.innerHTML = `<path d="${roundedRect(g.openX, g.top, g.openW, g.height, g.radius)}"/>`;
-  svg.querySelector('defs').appendChild(clip);
-
   /* Swatch photos, for any leather that has one. Each pattern spans the whole
      drawing rather than tiling, so there is no repeating seam and every piece
      shows the part of the hide it sits over — the way pieces are really cut. */
