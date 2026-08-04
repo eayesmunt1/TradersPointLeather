@@ -587,17 +587,24 @@ const GEO = {
      RMS error    0.0036 of panel width, 2.5% of the depth
      worst error  1.8 units on a 190.5 unit panel
 
-   There is no flat shoulder: the real edge starts curving at the panel edge
-   and descends the whole way, which is what makes the slope gentle. Both
-   curves meet at the midpoint with matching horizontal tangents, so the bottom
-   is round rather than flat. */
+   The template has a flat shoulder of 8% of the length at each end, per the
+   maker. Fitting with that fixed gives controls at u = 0.274 and 0.351 and a
+   depth of 0.1492, for an RMS of 1.0 units and a worst case of 2.1. An earlier
+   fit that left the shoulder free drove it to its lower bound, which is what
+   the trace alone suggests — the trace is least reliable exactly where the
+   edge runs flat, so the stated 8% governs.
+
+   Every junction meets with a horizontal tangent: the shoulders stay flat, and
+   the two curves meet at the midpoint so the bottom is round rather than
+   running flat across the middle. */
 function pocketEdge(x0, x1, y) {
   const w = x1 - x0;
   const yb = y + GEO.pocketDepth;
   const p = (t) => (x0 + w * t).toFixed(1);
-  return `M${x0},${y}`
-       + ` C${p(0.345)},${y} ${p(0.311)},${yb} ${p(0.5)},${yb}`
-       + ` C${p(0.689)},${yb} ${p(0.655)},${y} ${x1},${y}`;
+  return `M${x0},${y} L${p(0.08)},${y}`
+       + ` C${p(0.274)},${y} ${p(0.351)},${yb} ${p(0.5)},${yb}`
+       + ` C${p(0.649)},${yb} ${p(0.726)},${y} ${p(0.92)},${y}`
+       + ` L${x1},${y}`;
 }
 
 /* One interior panel. Outer corners are rounded; the corners facing the spine
