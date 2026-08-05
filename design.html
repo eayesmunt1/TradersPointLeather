@@ -523,8 +523,22 @@ const LEATHERS = [
     tex: 'leather-plum.jpg' },
 ];
 
+/* Sampled off the two spool photos. Both were shot in open shade, so the light
+   is skylight and everything reads cool — the white thread measured #b8c8dc
+   before correction. Each frame is white-balanced off its white spool, then
+   each thread is the median of a patch with the groove shadows and the
+   specular sheen both rejected; these threads are glossy enough that leaving
+   the sheen in turned the burgundy mauve. */
 const THREADS = [
-  { id: 'cream', name: 'Natural Cream', hex: '#e8ddd0' },
+  { id: 'white',     name: 'White',      hex: '#c2c3c4' },
+  { id: 'cream',     name: 'Cream',      hex: '#ccb8a0' },
+  { id: 'wheat',     name: 'Wheat',      hex: '#b5a26e' },
+  { id: 'copper',    name: 'Copper',     hex: '#5f2610' },
+  { id: 'burgundy',  name: 'Burgundy',   hex: '#774248' },
+  { id: 'navy',      name: 'Navy',       hex: '#102b53' },
+  { id: 'slate',     name: 'Slate Teal', hex: '#102034' },
+  { id: 'royal',     name: 'Royal Blue', hex: '#021b68' },
+  { id: 'aubergine', name: 'Aubergine',  hex: '#170e1b' },
 ];
 
 /* The parts of the wallet a customer picks a leather for. `def` is the
@@ -656,9 +670,47 @@ function stitchTopRightBottom(x, y, w, h, r) {
        + ` H${x}`;
 }
 
-// Fine and closely spaced, as the saddle stitching reads in IMG_7465.
 const STITCH = 'stroke-width="1.05" stroke-opacity="0.92" '
-             + 'stroke-dasharray="2.4 2" stroke-linecap="round" fill="none"';
+             + 'stroke-linecap="round" fill="none"';
+
+/* French / saddle stitch: each stitch is its own mark, set at a slant to the
+   seam rather than running along it. A dash array can only lay dashes along a
+   path, so the seams are drawn as guide paths and then replaced, at build
+   time, by one short segment per stitch. */
+const STITCH_LEN = 3.4;    // length of a single stitch
+const STITCH_GAP = 5.0;    // centre to centre along the seam
+const STITCH_SLANT = 15;   // degrees off the seam
+
+function slantedStitches(d, spacing, len, deg) {
+  const NS = 'http://www.w3.org/2000/svg';
+  const probe = document.createElementNS(NS, 'path');
+  probe.setAttribute('d', d);
+  probe.setAttribute('fill', 'none');
+  svg.appendChild(probe);
+
+  const total = probe.getTotalLength();
+  const rad = deg * Math.PI / 180;
+  const cos = Math.cos(rad), sin = Math.sin(rad);
+  const half = len / 2;
+  const out = [];
+
+  for (let s = spacing / 2; s <= total; s += spacing) {
+    // Local tangent from a short chord either side of the stitch, so the
+    // slant stays true to the seam around the corners and the pocket bowls.
+    const p = probe.getPointAtLength(s);
+    const back = probe.getPointAtLength(Math.max(s - 0.6, 0));
+    const fwd = probe.getPointAtLength(Math.min(s + 0.6, total));
+    let tx = fwd.x - back.x, ty = fwd.y - back.y;
+    const m = Math.hypot(tx, ty) || 1;
+    tx /= m; ty /= m;
+    const dx = tx * cos - ty * sin;
+    const dy = tx * sin + ty * cos;
+    out.push(`M${(p.x - dx * half).toFixed(2)},${(p.y - dy * half).toFixed(2)}`
+           + `L${(p.x + dx * half).toFixed(2)},${(p.y + dy * half).toFixed(2)}`);
+  }
+  probe.remove();
+  return out.join('');
+}
 
 function bifoldClosed() {
   const g = GEO;
@@ -805,6 +857,14 @@ function buildWallet() {
 
   document.getElementById('view-closed').innerHTML = MODEL.closed();
   document.getElementById('view-open').innerHTML = MODEL.open();
+
+  /* Turn each seam guide into individual slanted stitches. Needs the paths in
+     the document, so it runs here rather than in the geometry functions. The
+     elements keep their class and their var(--c-thread) stroke, so changing
+     thread still recolours them. */
+  document.querySelectorAll('#view-closed path.stitch, #view-open path.stitch')
+    .forEach((el) => el.setAttribute('d',
+      slantedStitches(el.getAttribute('d'), STITCH_GAP, STITCH_LEN, STITCH_SLANT)));
 }
 
 /* A leather paints as its swatch photo when it has one, otherwise as flat
