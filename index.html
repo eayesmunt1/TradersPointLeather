@@ -155,7 +155,10 @@ body {
   align-items: center;
   text-align: center;
   position: relative;
-  padding: 2rem;
+  /* Extra bottom padding reserves the band occupied by .scroll-hint, which is
+     absolutely positioned and so takes no part in this flex layout. Without it,
+     centred content grows downward into the hint instead of growing the hero. */
+  padding: 2rem 2rem 8rem;
   overflow: hidden;
 }
 .hero::before {
@@ -213,27 +216,29 @@ body {
   opacity: 0;
   animation: fadeUp 1s 0.9s forwards;
 }
-.hero-cta {
+/* Hero photo. Sits in the slot the shop button used to occupy and inherits its
+   1.1s beat in the fadeUp stagger. */
+.hero-feature {
   margin-top: 2.5rem;
+  width: 100%;
+  max-width: 400px;
   opacity: 0;
   animation: fadeUp 1s 1.1s forwards;
 }
-.hero-cta a {
-  display: inline-block;
-  padding: 1rem 3rem;
-  background: transparent;
-  border: 1px solid var(--tan);
-  color: var(--tan);
-  text-decoration: none;
-  font-size: 0.8rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  font-weight: 500;
-  transition: all 0.4s;
-}
-.hero-cta a:hover {
-  background: var(--tan);
-  color: var(--bg);
+.hero-feature img {
+  width: 100%;
+  height: auto;
+  /* 22vh is the cap at which "Explore the craft" stays above the fold on a
+     375x667 phone — the smallest case, and the only remaining signpost to the
+     process video now that the hero shop button is gone. Taller caps push the
+     cue off screen there and drop the video further down everywhere. */
+  max-height: 22vh;
+  object-fit: cover;
+  /* Anchored to the bottom to keep the brass Horween tag in frame; it sits low
+     in the source photo and any higher position clips it. */
+  object-position: center bottom;
+  display: block;
+  border-radius: 8px;
 }
 /* Centred with left/right rather than translateX(-50%): the fadeUp animation
    ends on transform: translateY(0), which with fill-mode forwards would
@@ -245,7 +250,7 @@ body {
   right: 0;
   text-align: center;
   opacity: 0;
-  animation: fadeUp 1s 1.4s forwards;
+  animation: fadeUp 1s 1.1s forwards;
 }
 .scroll-hint-text {
   font-size: 0.65rem;
@@ -634,7 +639,10 @@ body::after {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
-  .hero { padding-top: 3rem; justify-content: flex-start; padding-bottom: 4rem; }
+  /* Centred rather than top-aligned: without the shop button the hero content
+     is short enough to centre without overflowing, and top-aligning it would
+     leave a dead band above the pinned scroll hint. */
+  .hero { padding-top: 2rem; justify-content: center; padding-bottom: 8rem; }
   .hero-logo { width: 90px; height: 90px; margin-bottom: 1.5rem; }
   .pillars { grid-template-columns: 1fr; }
   .pillar { padding: 3rem 2rem; }
@@ -660,8 +668,10 @@ body::after {
   <p class="hero-tagline">Simple &middot; Elegant &middot; Sturdy</p>
   <div class="hero-divider"></div>
   <p class="hero-sub">Handcrafted leather goods made with care in Indiana. Built to outlast the phone in your pocket.</p>
-  <div class="hero-cta">
-    <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Visit the Shop</a>
+  <!-- Loads eagerly: it is above the fold, alongside the Vimeo embed below, so
+       it is kept small (840x756, ~137KB) rather than deferred. -->
+  <div class="hero-feature">
+    <img src="hero-horween.jpg" alt="Open bifold wallet in Horween leather beside a brass Famous Horween Leathers tag" width="840" height="756">
   </div>
   <div class="scroll-hint">
     <p class="scroll-hint-text">Explore the craft</p>
