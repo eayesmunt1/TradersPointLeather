@@ -269,34 +269,12 @@ body {
   animation: scrollPulse 2s infinite;
 }
 
-/* ── PHILOSOPHY TEXT (paired with the process video) ── */
-.philosophy {
-  max-width: 650px;
-  text-align: center;
-  position: relative;
-}
 .section-label {
   font-size: 0.7rem;
   letter-spacing: 0.4em;
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: 2rem;
-}
-.philosophy h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  font-weight: 700;
-  color: var(--white);
-  line-height: 1.3;
-  margin-bottom: 2rem;
-}
-.philosophy p:not(.section-label) {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.2rem;
-  line-height: 1.8;
-  color: var(--tan-light);
-  max-width: 650px;
-  margin: 0 auto;
 }
 
 /* ── PILLARS ── */
@@ -400,32 +378,15 @@ body {
 }
 .gallery-item:hover::after { opacity: 0; }
 
-/* ── CRAFT: process video + philosophy, side by side on desktop ── */
+/* ── CRAFT: process video ── */
 .craft {
   padding: 6rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
 }
-.craft-grid {
-  display: grid;
-  gap: 3.5rem;
-  align-items: center;
-  justify-items: center;
-}
 .craft-media {
   width: 100%;
   text-align: center;
-}
-@media (min-width: 900px) {
-  .craft-grid {
-    grid-template-columns: 400px minmax(0, 1fr);
-    gap: 4.5rem;
-  }
-  /* "The Process" label is redundant beside the philosophy copy; keep it only
-     on mobile, where the video stands alone above the text. */
-  .craft-media .section-label { display: none; }
-  .philosophy { text-align: left; }
-  .philosophy p:not(.section-label) { margin: 0; }
 }
 .video-wrapper {
   position: relative;
@@ -679,19 +640,12 @@ body::after {
   </div>
 </section>
 
-<!-- PROCESS VIDEO + PHILOSOPHY -->
+<!-- PROCESS VIDEO -->
 <section class="craft reveal" id="craft">
-  <div class="craft-grid">
-    <div class="craft-media">
-      <p class="section-label">The Process</p>
-      <div class="video-wrapper">
-        <iframe src="https://player.vimeo.com/video/1214378807?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title="Traders Point Leather — Process"></iframe>
-      </div>
-    </div>
-    <div class="philosophy">
-      <p class="section-label">Our Philosophy</p>
-      <h2>Every stitch tells a story of precision, quality, and craftsmanship.</h2>
-      <p>At Traders Point Leather, we care about getting the details right. Each piece is carefully cut from quality leathers — including Horween and Wickett &amp; Craig — precisely stitched with heavy-duty bonded nylon thread, and hand-burnished to a smooth, polished edge finish. Just leather, time and attention to detail.</p>
+  <div class="craft-media">
+    <p class="section-label">The Process</p>
+    <div class="video-wrapper">
+      <iframe src="https://player.vimeo.com/video/1214378807?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title="Traders Point Leather — Process"></iframe>
     </div>
   </div>
 </section>
