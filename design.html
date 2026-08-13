@@ -739,6 +739,19 @@ function pocketPath(x0, x1, y, bottom, depth) {
   return `${pocketEdge(x0, x1, y, depth)} L${x1},${bottom} L${x0},${bottom} Z`;
 }
 
+/* Every cut edge of a pocket, as one open run: up one side, over the scooped
+   top, down the other. The pocket is a layer laid on the panel, so its sides
+   are cut edges too and carry the same burnish as its top — they read as the
+   line where the layers stack, and they stop where the pocket does, which is
+   why the panel above the topmost pocket shows none.
+
+   The bottom is left out. It is the wallet's own bottom edge, burnished once
+   with the panel rather than once per layer over it. */
+function pocketCutEdges(x0, x1, y, bottom, depth) {
+  const top = pocketEdge(x0, x1, y, depth).replace(/^M/, 'L');
+  return `M${x0},${bottom} ${top} L${x1},${bottom}`;
+}
+
 /* The closed wallet is one panel's outline seen from the outside: the fold runs
    down the left, where the leather turns rather than being cut, so the top-left
    and bottom-left corners stay square, as the closed photo shows. Only the cut
@@ -882,7 +895,9 @@ function walletOpen(g) {
        <path d="${spineRect}" fill="#000" opacity="0.12"/>`;
 
   /* Each pocket: the shadow it throws on the layer behind, the leather, a
-     little grain, then the burnished edge along its top cut. */
+     little grain, then the burnish along its cut edges. The shadow stays on the
+     top edge alone — that is the cut standing proud of the layer behind, where
+     the sides lie flat against the panel edge. */
   const layer = (p, yTop, varName) => `
     <path d="${pocketEdge(p.x0, p.x1, yTop, g.pocketDepth)}" fill="none" stroke="#000" stroke-opacity="0.5"
           stroke-width="6" filter="url(#edgeShadow)" transform="translate(0,2.5)"/>
@@ -890,8 +905,8 @@ function walletOpen(g) {
           fill="var(--tex-${varName})"/>
     <path d="${pocketPath(p.x0, p.x1, yTop, bottom, g.pocketDepth)}" fill="#000" filter="url(#grain)"
           style="mix-blend-mode:overlay;opacity:var(--grain-${varName})"/>
-    <path class="leather-fill" d="${pocketEdge(p.x0, p.x1, yTop, g.pocketDepth)}" fill="none"
-          stroke="var(--s-${varName})" stroke-width="2"/>`;
+    <path class="leather-fill" d="${pocketCutEdges(p.x0, p.x1, yTop, bottom, g.pocketDepth)}"
+          fill="none" stroke="var(--s-${varName})" stroke-width="2"/>`;
 
   /* Each panel is its own assembly: stitched right around its own perimeter,
      with the pockets clipped to it. */
