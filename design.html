@@ -572,7 +572,8 @@ const VERTICAL_GEO = {
   closedX: 167, closedW: 205,
   openX: 47, openW: 445,   // 445/300 = 1.483
   top: 45, height: 300,
-  spineW: 64,              // suede spine showing between the two panels
+  spineW: 64,              // the spine showing between the two panels
+  spineSide: 'flesh',      // the suede strip in IMG_7465
   radius: 13,
   stitchInset: 9,   // stitching always sits just inside an edge, never on it
   pocketUpper: 87,  // top edge of the upper pocket
@@ -586,17 +587,19 @@ const VERTICAL_GEO = {
   shadowDy: 16, shadowRy: 10,
 };
 
-/* The classic bifold — the one that lies flat in a back pocket. Same
-   construction throughout: a spine of the body leather's flesh side, a panel
-   either side stitched right around, two scooped pockets on each. Only the
-   proportions differ, so it shares every path function above, including the
-   fitted pocket edge.
+/* The classic bifold — the one that lies flat in a back pocket. The same three
+   pieces as the vertical: a spine of the body leather, a panel either side, two
+   scooped pockets on each. It shares every path function above, including the
+   fitted pocket edge; where it differs it says so in this table — the spine
+   shows its skin side rather than its flesh side, and the top edge is left
+   unstitched.
 
-   Read off the reference photos (IMG_2045 closed, and the open shot the maker
-   sent) against the stated 8.75 × 3.5 open, 4.4 × 3.5 closed:
+   Read off the reference photos (IMG_2045 closed, IMG_2302 open) against the
+   stated 8.75 × 3.5 open, 4.4 × 3.5 closed. IMG_2302 measures 2.50 along its
+   long axis against the spine, which is the stated aspect exactly:
      open aspect            2.500
      closed aspect          1.250
-     suede spine            0.100 of the open width
+     spine                  0.100 of the open width
      upper pocket top edge  0.172 of the height
      lower pocket top edge  0.349 of the height
      pocket scoop depth     0.135 of the height = 0.120 of one panel's width
@@ -613,6 +616,7 @@ const CLASSIC_GEO = {
   openX: 30, openW: 480,       // 480/192 = 2.500, centred
   top: 34, height: 192,        // (260 - 192) / 2 = 34, vertically centred
   spineW: 48,                  // 0.100 of the open width; panels are 216 wide
+  spineSide: 'grain',          // skin side up, as IMG_2302 shows
   radius: 13,                  // 0.068 of the height — rounder than the vertical
   stitchInset: 7,              // 0.128in, against 0.135in on the vertical model
   pocketUpper: 67,             // top + 0.172 of the height
@@ -792,6 +796,34 @@ function walletOpen(g) {
     { x0: spineR, x1: x + w, side: 'right' },
   ];
 
+  /* The strip of the body leather showing between the two panels. Which side of
+     it faces up is a property of the model, and the two are not subtle.
+
+     On the vertical it is the flesh side: IMG_7465 shows a bright, matte nap
+     against the grain either side of it, so it is lightened and given a heavy
+     grain with no sheen.
+
+     On the classic it is the skin side — the same face as the exterior, smooth,
+     with the grain's own wrinkles and highlight, reading continuous with the
+     panels rather than as a contrasting band. IMG_2302, the open classic, shows
+     it plainly: only the panels' burnished cut edges and the seams either side
+     separate the three pieces. So it is painted exactly as a panel is.
+
+     Drawn first either way, so the panels overlap its edges. */
+  const spineRect = `M${spineL - 3},${y} H${spineR + 3} V${bottom} H${spineL - 3} Z`;
+  const spineMarkup = g.spineSide === 'flesh'
+    ? `<path class="leather-fill" d="${spineRect}" fill="var(--tex-exterior)"/>
+       <path d="${spineRect}" fill="#fff" opacity="0.22"/>
+       <path d="${spineRect}" fill="#000" opacity="0.42" filter="url(#grain)"
+             style="mix-blend-mode:overlay"/>`
+    : `<path class="leather-fill" d="${spineRect}" fill="var(--tex-exterior)"/>
+       <path d="${spineRect}" fill="#000" filter="url(#grain)"
+             style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
+       <path d="${spineRect}" fill="url(#sheen)" opacity="0.45"/>
+       <!-- It lies in the valley of the fold, a little shaded by the panels
+            standing either side of it. -->
+       <path d="${spineRect}" fill="#000" opacity="0.12"/>`;
+
   /* Each pocket: the shadow it throws on the layer behind, the leather, a
      little grain, then the burnished edge along its top cut. */
   const layer = (p, yTop, varName) => `
@@ -846,15 +878,7 @@ function walletOpen(g) {
     <ellipse cx="${mid}" cy="${bottom + g.shadowDy}" rx="${w * 0.45}" ry="${g.shadowRy}"
              fill="#000" opacity="0.5" filter="url(#softShadow)"/>
 
-    <!-- The spine is the body leather's flesh side showing between the two
-         panels — lighter and matte against the grain, like the suede strip in
-         the reference photo. Drawn first so the panels overlap its edges. -->
-    <path class="leather-fill" d="M${spineL - 3},${y} H${spineR + 3} V${bottom} H${spineL - 3} Z"
-          fill="var(--tex-exterior)"/>
-    <path d="M${spineL - 3},${y} H${spineR + 3} V${bottom} H${spineL - 3} Z"
-          fill="#fff" opacity="0.22"/>
-    <path d="M${spineL - 3},${y} H${spineR + 3} V${bottom} H${spineL - 3} Z"
-          fill="#000" opacity="0.42" filter="url(#grain)" style="mix-blend-mode:overlay"/>
+    ${spineMarkup}
 
     ${panelMarkup}
   `;
