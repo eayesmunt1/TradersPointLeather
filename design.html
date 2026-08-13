@@ -581,6 +581,7 @@ const VERTICAL_GEO = {
   innerStitchTop: 89,     // 0.147 of the height
   innerStitchBottom: 324, // 0.930
   stitchOverhang: 4,      // how far the outer run runs past the spine edge
+  topStitched: true,      // stitched right around each panel, as IMG_7465 shows
   stitchDash: '2.4 2',    // 15.2 stitches to the inch at 66.7 units/inch
   shadowDy: 16, shadowRy: 10,
 };
@@ -620,6 +621,11 @@ const CLASSIC_GEO = {
   innerStitchTop: 63,          // top + 0.151
   innerStitchBottom: 213,      // top + 0.932
   stitchOverhang: 4,           // an absolute run onto the suede, as above
+  /* The note compartment opens along the whole top edge, so that edge carries
+     no stitching: each seam runs from the top edge down the outer edge and
+     along the bottom. IMG_2045 shows the top bare, burnished but unstitched,
+     against the stitched edge and bottom beside it. */
+  topStitched: false,
   /* Both models are drawn in a 540-wide box, so a unit is the same number of
      screen pixels in each — but this wallet is drawn at 82% of the vertical
      model's units per inch, so the vertical model's dash would read a fifth
@@ -683,22 +689,29 @@ function panelPath(x, y, w, h, r, side) {
        + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${x} Z`;
 }
 
-/* A panel's perimeter stitching covers three sides only — top, outer edge and
-   bottom. The spine edge is stitched separately and only over the height of
+/* A panel's perimeter stitching covers three sides at most — top, outer edge
+   and bottom. The spine edge is stitched separately and only over the height of
    the pocket assembly, which is what the reference shows.
 
    `oh` runs both open ends past the panel's spine edge, so the first and last
    stitch of each run straddle that edge and land on the suede rather than
-   stopping short inside the panel. */
-function panelStitchOuter(x, y, w, h, r, side, oh) {
-  if (side === 'left') {
-    const end = x + w + oh;
-    return `M${end},${y} H${x + r} A${r},${r} 0 0 0 ${x},${y + r}`
-         + ` V${y + h - r} A${r},${r} 0 0 0 ${x + r},${y + h} H${end}`;
+   stopping short inside the panel.
+
+   `topOh` is null on a model stitched across the top. On one whose note
+   compartment opens along that edge it is how far the open end runs up past the
+   inset, so the run begins at the cut edge rather than inside it — there is no
+   suede to land on up there, so it stops level with the edge. */
+function panelStitchOuter(x, y, w, h, r, side, oh, topOh) {
+  const outer = side === 'left'
+    ? { sweep: 0, corner: x + r, edge: x, end: x + w + oh }
+    : { sweep: 1, corner: x + w - r, edge: x + w, end: x - oh };
+  const down = ` V${y + h - r} A${r},${r} 0 0 ${outer.sweep} ${outer.corner},${y + h}`
+             + ` H${outer.end}`;
+  if (topOh !== null && topOh !== undefined) {
+    return `M${outer.edge},${y - topOh}${down}`;
   }
-  const end = x - oh;
-  return `M${end},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}`
-       + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${end}`;
+  return `M${outer.end},${y} H${outer.corner}`
+       + ` A${r},${r} 0 0 ${outer.sweep} ${outer.edge},${y + r}${down}`;
 }
 
 function pocketPath(x0, x1, y, bottom, depth) {
@@ -712,12 +725,14 @@ function pocketPath(x0, x1, y, bottom, depth) {
    view, so it is the same function. */
 const closedBody = (x, y, w, h, r) => panelPath(x, y, w, h, r, 'right');
 
-/* Top, right and bottom only — the left edge is the fold, which is not
-   stitched. Used for the closed view. */
-function stitchTopRightBottom(x, y, w, h, r) {
-  return `M${x},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}`
-       + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h}`
-       + ` H${x}`;
+/* The closed view's seam. The left edge is the fold, so it is never stitched,
+   and the top edge is stitched only on a model that closes across it — the
+   classic's note compartment opens along the whole top, and IMG_2045 shows that
+   edge bare. `topOh`, as on a panel, starts the run at the cut edge. */
+function stitchClosed(x, y, w, h, r, topOh) {
+  const down = ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${x}`;
+  if (topOh !== null && topOh !== undefined) return `M${x + w},${y - topOh}${down}`;
+  return `M${x},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}${down}`;
 }
 
 /* Fine and closely spaced, as the saddle stitching reads in IMG_7465. The dash
@@ -750,10 +765,12 @@ function walletClosed(g) {
     <path d="M${x + 7},${y + 8} V${y + h - 8}" stroke="#fff" stroke-opacity="0.06"
           stroke-width="2" fill="none"/>
 
-    <!-- Stitching runs just inside the top, right and bottom edges. The
-         left edge is the fold, so it carries no stitching. -->
+    <!-- Stitching runs just inside the cut edges. The left edge is the fold, so
+         it carries none; the top carries none either on a model that opens
+         along it. -->
     <path class="stitch" ${st} stroke="var(--c-thread)"
-          d="${stitchTopRightBottom(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5)}"/>
+          d="${stitchClosed(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5,
+                            g.topStitched ? null : i)}"/>
 
     <!-- Hand-burnished edge. -->
     <path class="leather-fill" d="${closedBody(x, y, w, h, g.radius)}" fill="none"
@@ -809,12 +826,14 @@ function walletOpen(g) {
 
       <path d="${outline}" fill="url(#sheen)" opacity="0.45" style="pointer-events:none"/>
 
-      <!-- Top, outer edge and bottom in one run; the spine edge separately,
-           spanning only the pocket assembly rather than the full height. -->
+      <!-- Top, outer edge and bottom in one run — the top only where the model
+           is stitched across it — and the spine edge separately, spanning only
+           the pocket assembly rather than the full height. -->
       <path class="stitch" ${st} stroke="var(--c-thread)"
             d="${panelStitchOuter(p.x0 + i, y + i, pw - i * 2, h - i * 2,
                                   Math.max(g.radius - 4, 2), p.side,
-                                  i + g.stitchOverhang)}"/>
+                                  i + g.stitchOverhang,
+                                  g.topStitched ? null : i)}"/>
       <path class="stitch" ${st} stroke="var(--c-thread)"
             d="M${p.side === 'left' ? p.x1 - i : p.x0 + i},${g.innerStitchTop}`
             + ` V${g.innerStitchBottom}"/>
