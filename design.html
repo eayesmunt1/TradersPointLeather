@@ -573,7 +573,7 @@ const VERTICAL_GEO = {
   openX: 47, openW: 445,   // 445/300 = 1.483
   top: 45, height: 300,
   spineW: 64,              // the spine showing between the two panels
-  spineSide: 'flesh',      // the suede strip in IMG_7465
+  spineSide: 'flesh',      // a suede strip against the grain either side
   radius: 13,
   stitchInset: 9,   // stitching always sits just inside an edge, never on it
   pocketUpper: 87,  // top edge of the upper pocket
@@ -582,7 +582,7 @@ const VERTICAL_GEO = {
   innerStitchTop: 89,     // 0.147 of the height
   innerStitchBottom: 324, // 0.930
   stitchOverhang: 4,      // how far the outer run runs past the spine edge
-  topStitched: true,      // stitched right around each panel, as IMG_7465 shows
+  topStitched: true,      // stitched right around each panel
   stitchDash: '2.4 2',    // 15.2 stitches to the inch at 66.7 units/inch
   shadowDy: 16, shadowRy: 10,
 };
@@ -594,8 +594,8 @@ const VERTICAL_GEO = {
    shows its skin side rather than its flesh side, and the top edge is left
    unstitched.
 
-   Read off the reference photos (IMG_2045 closed, IMG_2302 open) against the
-   stated 8.75 × 3.5 open, 4.4 × 3.5 closed. IMG_2302 measures 2.50 along its
+   Read off the reference photos, closed and open, against the stated
+   8.75 × 3.5 open, 4.4 × 3.5 closed. The open photo measures 2.50 along its
    long axis against the spine, which is the stated aspect exactly:
      open aspect            2.500
      closed aspect          1.250
@@ -616,7 +616,7 @@ const CLASSIC_GEO = {
   openX: 30, openW: 480,       // 480/192 = 2.500, centred
   top: 34, height: 192,        // (260 - 192) / 2 = 34, vertically centred
   spineW: 48,                  // 0.100 of the open width; panels are 216 wide
-  spineSide: 'grain',          // skin side up, as IMG_2302 shows
+  spineSide: 'grain',          // skin side up, as the open photo shows
   radius: 13,                  // 0.068 of the height — rounder than the vertical
   stitchInset: 7,              // 0.128in, against 0.135in on the vertical model
   pocketUpper: 67,             // top + 0.172 of the height
@@ -627,8 +627,8 @@ const CLASSIC_GEO = {
   stitchOverhang: 4,           // an absolute run onto the suede, as above
   /* The note compartment opens along the whole top edge, so that edge carries
      no stitching: each seam runs from the top edge down the outer edge and
-     along the bottom. IMG_2045 shows the top bare, burnished but unstitched,
-     against the stitched edge and bottom beside it. */
+     along the bottom. The closed photo shows that edge bare, burnished but
+     unstitched, against the stitched edge and bottom beside it. */
   topStitched: false,
   /* Both models are drawn in a 540-wide box, so a unit is the same number of
      screen pixels in each — but this wallet is drawn at 82% of the vertical
@@ -724,15 +724,16 @@ function pocketPath(x0, x1, y, bottom, depth) {
 
 /* The closed wallet is one panel's outline seen from the outside: the fold runs
    down the left, where the leather turns rather than being cut, so the top-left
-   and bottom-left corners stay square — IMG_2045 shows them crisp. Only the cut
+   and bottom-left corners stay square, as the closed photo shows. Only the cut
    edges at the right are rounded and burnished. Same rule as a panel in the open
    view, so it is the same function. */
 const closedBody = (x, y, w, h, r) => panelPath(x, y, w, h, r, 'right');
 
 /* The closed view's seam. The left edge is the fold, so it is never stitched,
    and the top edge is stitched only on a model that closes across it — the
-   classic's note compartment opens along the whole top, and IMG_2045 shows that
-   edge bare. `topOh`, as on a panel, starts the run at the cut edge. */
+   classic's note compartment opens along the whole top, and the closed photo
+   shows that edge bare. `topOh`, as on a panel, starts the run at the cut
+   edge. */
 function stitchClosed(x, y, w, h, r, topOh) {
   const down = ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${x}`;
   if (topOh !== null && topOh !== undefined) return `M${x + w},${y - topOh}${down}`;
@@ -799,15 +800,15 @@ function walletOpen(g) {
   /* The strip of the body leather showing between the two panels. Which side of
      it faces up is a property of the model, and the two are not subtle.
 
-     On the vertical it is the flesh side: IMG_7465 shows a bright, matte nap
-     against the grain either side of it, so it is lightened and given a heavy
-     grain with no sheen.
+     On the vertical it is the flesh side: a bright, matte nap against the grain
+     either side of it, so it is lightened and given a heavy grain with no
+     sheen.
 
      On the classic it is the skin side — the same face as the exterior, smooth,
      with the grain's own wrinkles and highlight, reading continuous with the
-     panels rather than as a contrasting band. IMG_2302, the open classic, shows
-     it plainly: only the panels' burnished cut edges and the seams either side
-     separate the three pieces. So it is painted exactly as a panel is.
+     panels rather than as a contrasting band. Only the panels' burnished cut
+     edges and the seams either side separate the three pieces, so the spine is
+     painted exactly as a panel is.
 
      Drawn first either way, so the panels overlap its edges. */
   const spineRect = `M${spineL - 3},${y} H${spineR + 3} V${bottom} H${spineL - 3} Z`;
