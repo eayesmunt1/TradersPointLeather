@@ -23,7 +23,7 @@
 <!-- Unlisted page: not linked from the site, not in sitemap.xml, and kept out of search. -->
 <meta name="robots" content="noindex, nofollow">
 <title>Design Your Wallet — Traders Point Leather</title>
-<meta name="description" content="Choose the leather for every layer of a Traders Point Leather bifold and see it come together.">
+<meta name="description" content="Choose the leather for every layer of a Traders Point Leather bifold — classic or vertical — and see it come together.">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -198,6 +198,10 @@ body {
   margin-left: 0.15rem;
 }
 .swatch:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 3px; }
+/* The style picker shows a shape rather than a colour, so its chip drops the
+   swatch frame and draws an outline in the swatch's own text colour. */
+.swatch-chip.chip-shape { border: none; background: none; color: inherit; }
+.swatch-chip.chip-shape svg { display: block; width: 26px; height: 26px; }
 
 /* ── SPEC ── */
 .spec-section {
@@ -398,10 +402,12 @@ body::after {
 <div class="configurator">
   <div class="preview-col">
     <div class="preview-stage">
-      <svg id="wallet" class="wallet-svg" viewBox="0 0 540 400" role="img"
+      <!-- viewBox and desc are the default model's; buildWallet() sets both
+           from whichever style is chosen. -->
+      <svg id="wallet" class="wallet-svg" viewBox="0 0 540 260" role="img"
            aria-labelledby="wallet-title wallet-desc">
         <title id="wallet-title">Preview of your wallet</title>
-        <desc id="wallet-desc">A drawing of the bifold wallet that updates as you choose leathers.</desc>
+        <desc id="wallet-desc">A drawing of the wallet that updates as you choose leathers.</desc>
         <defs>
           <!-- Populated at runtime: one <pattern> per leather that has a swatch photo. -->
           <g id="tex-defs"></g>
@@ -554,11 +560,16 @@ const TARGETS = [
 ];
 
 /* ── Geometry ─────────────────────────────────────────────────────────
-   One function per wallet model, keyed by id in MODELS. Adding another
-   model means writing another function and adding one entry below — the
-   option groups and the spec don't change.
-   Drawn in a 540 × 400 viewBox. */
-const VIEWBOX = { w: 540, h: 400 };
+   Every wallet is drawn by the same two functions, walletClosed and
+   walletOpen, from a table of proportions. Adding another model of the same
+   construction means writing another table and adding one entry to MODELS —
+   the option groups and the spec don't change. A model built differently
+   (a card holder with no spine, say) can supply its own pair of functions
+   with the same (geo) signature.
+
+   Each table carries its own viewBox, so a tall wallet and a wide one each
+   fill their frame rather than floating in a box sized for the other. */
+
 /* Proportions measured off the open reference photo (IMG_2528), which shows
    the whole wallet flat and square-on:
      open aspect            1.481
@@ -569,11 +580,14 @@ const VIEWBOX = { w: 540, h: 400 };
      outer corner radius    0.041 of the height
      inner stitch line      runs 0.147 to 0.930 of the height, not the full
                             edge — it only spans the pocket assembly          */
-const GEO = {
+const VERTICAL_GEO = {
+  id: 'vertical',
+  viewW: 540, viewH: 400,
   closedX: 167, closedW: 205,
   openX: 47, openW: 445,   // 445/300 = 1.483
   top: 45, height: 300,
-  spineW: 64,              // suede spine showing between the two panels
+  spineW: 64,              // the spine showing between the two panels
+  spineSide: 'flesh',      // a suede strip against the grain either side
   radius: 13,
   stitchInset: 9,   // stitching always sits just inside an edge, never on it
   pocketUpper: 87,  // top edge of the upper pocket
@@ -582,6 +596,60 @@ const GEO = {
   innerStitchTop: 89,     // 0.147 of the height
   innerStitchBottom: 324, // 0.930
   stitchOverhang: 4,      // how far the outer run runs past the spine edge
+  topStitched: true,      // stitched right around each panel
+  unitsPerInch: 66.7,     // the scale the stitch lengths are drawn at
+  shadowDy: 16, shadowRy: 10,
+};
+
+/* The classic bifold — the one that lies flat in a back pocket. The same three
+   pieces as the vertical: a spine of the body leather, a panel either side, two
+   scooped pockets on each. It shares every path function above, including the
+   fitted pocket edge; where it differs it says so in this table — the spine
+   shows its skin side rather than its flesh side, and the top edge is left
+   unstitched.
+
+   Read off the reference photos, closed and open, against the stated
+   8.75 × 3.5 open, 4.4 × 3.5 closed. The open photo measures 2.50 along its
+   long axis against the spine, which is the stated aspect exactly:
+     open aspect            2.500
+     closed aspect          1.250
+     spine                  0.100 of the open width
+     upper pocket top edge  0.172 of the height
+     lower pocket top edge  0.349 of the height
+     pocket scoop depth     0.135 of the height = 0.120 of one panel's width
+     outer corner radius    0.068 of the height
+     inner stitch line      runs 0.151 to 0.932 of the height
+
+   Drawn in a 540 × 260 box, so the wallet fills 0.74 of its frame — the same
+   share the vertical model has of its taller one. 3.5 inches is 192 units
+   here, i.e. 54.9 units to the inch against the vertical model's 66.7. */
+const CLASSIC_GEO = {
+  id: 'classic',
+  viewW: 540, viewH: 260,
+  closedX: 150, closedW: 240,  // 240/192 = 1.250, centred
+  openX: 30, openW: 480,       // 480/192 = 2.500, centred
+  top: 34, height: 192,        // (260 - 192) / 2 = 34, vertically centred
+  spineW: 48,                  // 0.100 of the open width; panels are 216 wide
+  spineSide: 'grain',          // skin side up, as the open photo shows
+  radius: 13,                  // 0.068 of the height — rounder than the vertical
+  stitchInset: 7,              // 0.128in, against 0.135in on the vertical model
+  pocketUpper: 67,             // top + 0.172 of the height
+  pocketLower: 101,            // top + 0.349
+  pocketDepth: 26,             // 0.120 of the 216 panel; the photo reads 0.123
+  innerStitchTop: 63,          // top + 0.151
+  innerStitchBottom: 213,      // top + 0.932
+  stitchOverhang: 4,           // an absolute run onto the suede, as above
+  /* The note compartment opens along the whole top edge, so that edge carries
+     no stitching: each seam runs from the top edge down the outer edge and
+     along the bottom. The closed photo shows that edge bare, burnished but
+     unstitched, against the stitched edge and bottom beside it. */
+  topStitched: false,
+  /* Both models are drawn in a 540-wide box, so a unit is the same number of
+     screen pixels in each — but this wallet is drawn at 82% of the vertical
+     model's units per inch, so a stitch held in units would read a fifth
+     coarser against the leather. Stating the scale keeps it the same stitch. */
+  unitsPerInch: 54.9,
+  shadowDy: 12, shadowRy: 7,
 };
 
 /* The top edge of a card pocket: one long, gentle bowl so a card can be
@@ -610,10 +678,15 @@ const GEO = {
 
    Every junction meets with a horizontal tangent: the shoulders stay flat, and
    the two curves meet at the midpoint so the bottom is round rather than
-   running flat across the middle. */
-function pocketEdge(x0, x1, y) {
+   running flat across the middle.
+
+   The depth is passed in rather than read from a geo table, because it is the
+   only quantity here carrying a unit — the shoulders, the control points and
+   the tangents are all fractions of the span. So every model shares this one
+   fitted curve: a wider, shorter panel gets the same bowl, stretched. */
+function pocketEdge(x0, x1, y, depth) {
   const w = x1 - x0;
-  const yb = y + GEO.pocketDepth;
+  const yb = y + depth;
   const p = (t) => (x0 + w * t).toFixed(1);
   return `M${x0},${y} L${p(0.08)},${y}`
        + ` C${p(0.274)},${y} ${p(0.351)},${yb} ${p(0.5)},${yb}`
@@ -633,53 +706,75 @@ function panelPath(x, y, w, h, r, side) {
        + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${x} Z`;
 }
 
-/* A panel's perimeter stitching covers three sides only — top, outer edge and
-   bottom. The spine edge is stitched separately and only over the height of
-   the pocket assembly, which is what the reference shows.
+/* A panel's three cut sides — top, outer edge and bottom — as one open run,
+   leaving out the edge that faces the spine. It carries both the perimeter
+   seam and the burnished edge, which cover the same three sides: the spine edge
+   is stitched separately, over the height of the pocket assembly only, and is
+   left unburnished so the panels meet the spine without a drawn line.
 
    `oh` runs both open ends past the panel's spine edge, so the first and last
    stitch of each run straddle that edge and land on the suede rather than
-   stopping short inside the panel. */
-function panelStitchOuter(x, y, w, h, r, side, oh) {
-  if (side === 'left') {
-    const end = x + w + oh;
-    return `M${end},${y} H${x + r} A${r},${r} 0 0 0 ${x},${y + r}`
-         + ` V${y + h - r} A${r},${r} 0 0 0 ${x + r},${y + h} H${end}`;
+   stopping short inside the panel. The burnished edge passes 0 and so stops
+   square on the edge.
+
+   `topOh` is null on a model stitched across the top. On one whose note
+   compartment opens along that edge it is how far the open end runs up past the
+   inset, so the run begins at the cut edge rather than inside it — there is no
+   suede to land on up there, so it stops level with the edge. The burnished
+   edge passes null either way: an unstitched top edge is still a cut one. */
+function panelOuterRun(x, y, w, h, r, side, oh, topOh) {
+  const outer = side === 'left'
+    ? { sweep: 0, corner: x + r, edge: x, end: x + w + oh }
+    : { sweep: 1, corner: x + w - r, edge: x + w, end: x - oh };
+  const down = ` V${y + h - r} A${r},${r} 0 0 ${outer.sweep} ${outer.corner},${y + h}`
+             + ` H${outer.end}`;
+  if (topOh !== null && topOh !== undefined) {
+    return `M${outer.edge},${y - topOh}${down}`;
   }
-  const end = x - oh;
-  return `M${end},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}`
-       + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${end}`;
+  return `M${outer.end},${y} H${outer.corner}`
+       + ` A${r},${r} 0 0 ${outer.sweep} ${outer.edge},${y + r}${down}`;
 }
 
-function pocketPath(x0, x1, y, bottom) {
-  return `${pocketEdge(x0, x1, y)} L${x1},${bottom} L${x0},${bottom} Z`;
+function pocketPath(x0, x1, y, bottom, depth) {
+  return `${pocketEdge(x0, x1, y, depth)} L${x1},${bottom} L${x0},${bottom} Z`;
 }
 
-function roundedRect(x, y, w, h, r) {
-  return `M${x + r},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}`
-       + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h}`
-       + ` H${x + r} A${r},${r} 0 0 1 ${x},${y + h - r}`
-       + ` V${y + r} A${r},${r} 0 0 1 ${x + r},${y} Z`;
+/* The closed wallet is one panel's outline seen from the outside: the fold runs
+   down the left, where the leather turns rather than being cut, so the top-left
+   and bottom-left corners stay square, as the closed photo shows. Only the cut
+   edges at the right are rounded and burnished. Same rule as a panel in the open
+   view, so it is the same function. */
+const closedBody = (x, y, w, h, r) => panelPath(x, y, w, h, r, 'right');
+
+/* The closed view's seam. The left edge is the fold, so it is never stitched,
+   and the top edge is stitched only on a model that closes across it — the
+   classic's note compartment opens along the whole top, and the closed photo
+   shows that edge bare. `topOh`, as on a panel, starts the run at the cut
+   edge. */
+function stitchClosed(x, y, w, h, r, topOh) {
+  const down = ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${x}`;
+  if (topOh !== null && topOh !== undefined) return `M${x + w},${y - topOh}${down}`;
+  return `M${x},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}${down}`;
 }
 
-/* Top, right and bottom only — the left edge is the fold, which is not
-   stitched. Used for the closed view. */
-function stitchTopRightBottom(x, y, w, h, r) {
-  return `M${x},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}`
-       + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h}`
-       + ` H${x}`;
-}
-
+/* The thread as it reads on screen, and the same for every model: the stitches
+   themselves are laid out below, not by a dash array. */
 const STITCH = 'stroke-width="1.05" stroke-opacity="0.92" '
              + 'stroke-linecap="round" fill="none"';
 
 /* French / saddle stitch: each stitch is its own mark, set at a slant to the
    seam rather than running along it. A dash array can only lay dashes along a
    path, so the seams are drawn as guide paths and then replaced, at build
-   time, by one short segment per stitch. */
-const STITCH_LEN = 5.1;    // length of a single stitch
-const STITCH_GAP = 8.2;    // centre to centre along the seam
-const STITCH_SLANT = 15;   // degrees off the seam
+   time, by one short segment per stitch.
+
+   A stitch is a real dimension, so these are held in inches and scaled by the
+   model's own units to the inch. Held in drawing units they would be a fifth
+   coarser on the classic, which is drawn at 82% of the vertical model's scale.
+   Against the vertical model's 66.7 units to the inch they are the 5.1 and 8.2
+   units the spacing was set to. */
+const STITCH_LEN = 5.1 / 66.7;   // 0.076in, the length of a single stitch
+const STITCH_GAP = 8.2 / 66.7;   // 0.123in centre to centre — 8.1 to the inch
+const STITCH_SLANT = 15;         // degrees off the seam
 
 function slantedStitches(d, spacing, len, deg) {
   const NS = 'http://www.w3.org/2000/svg';
@@ -712,39 +807,40 @@ function slantedStitches(d, spacing, len, deg) {
   return out.join('');
 }
 
-function bifoldClosed() {
-  const g = GEO;
+function walletClosed(g) {
   const x = g.closedX, y = g.top, w = g.closedW, h = g.height;
   const i = g.stitchInset;
   return `
-    <ellipse cx="${x + w / 2}" cy="${y + h + 16}" rx="${w * 0.46}" ry="10"
+    <ellipse cx="${x + w / 2}" cy="${y + h + g.shadowDy}" rx="${w * 0.46}" ry="${g.shadowRy}"
              fill="#000" opacity="0.5" filter="url(#softShadow)"/>
 
-    <path class="leather-fill" d="${roundedRect(x, y, w, h, g.radius)}"
+    <path class="leather-fill" d="${closedBody(x, y, w, h, g.radius)}"
           fill="var(--tex-exterior)"/>
-    <path d="${roundedRect(x, y, w, h, g.radius)}" fill="#000" filter="url(#grain)"
+    <path d="${closedBody(x, y, w, h, g.radius)}" fill="#000" filter="url(#grain)"
           style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
-    <path d="${roundedRect(x, y, w, h, g.radius)}" fill="url(#sheen)" opacity="0.5"/>
+    <path d="${closedBody(x, y, w, h, g.radius)}" fill="url(#sheen)" opacity="0.5"/>
 
-    <!-- Spine fold down the left edge, where the wallet closes. -->
-    <path d="M${x},${y + g.radius} V${y + h - g.radius}" stroke="#000" stroke-opacity="0.35"
+    <!-- Spine fold down the left edge, where the wallet closes. It runs the
+         full height now that the corners it meets are square. -->
+    <path d="M${x},${y} V${y + h}" stroke="#000" stroke-opacity="0.35"
           stroke-width="6" fill="none"/>
     <path d="M${x + 7},${y + 8} V${y + h - 8}" stroke="#fff" stroke-opacity="0.06"
           stroke-width="2" fill="none"/>
 
-    <!-- Stitching runs just inside the top, right and bottom edges. The
-         left edge is the fold, so it carries no stitching. -->
+    <!-- Stitching runs just inside the cut edges. The left edge is the fold, so
+         it carries none; the top carries none either on a model that opens
+         along it. -->
     <path class="stitch" ${STITCH} stroke="var(--c-thread)"
-          d="${stitchTopRightBottom(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5)}"/>
+          d="${stitchClosed(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5,
+                            g.topStitched ? null : i)}"/>
 
     <!-- Hand-burnished edge. -->
-    <path class="leather-fill" d="${roundedRect(x, y, w, h, g.radius)}" fill="none"
+    <path class="leather-fill" d="${closedBody(x, y, w, h, g.radius)}" fill="none"
           stroke="var(--s-exterior)" stroke-width="3"/>
   `;
 }
 
-function bifoldOpen() {
-  const g = GEO;
+function walletOpen(g) {
   const x = g.openX, y = g.top, w = g.openW, h = g.height;
   const i = g.stitchInset;
   const bottom = y + h;
@@ -757,16 +853,44 @@ function bifoldOpen() {
     { x0: spineR, x1: x + w, side: 'right' },
   ];
 
+  /* The strip of the body leather showing between the two panels. Which side of
+     it faces up is a property of the model, and the two are not subtle.
+
+     On the vertical it is the flesh side: a bright, matte nap against the grain
+     either side of it, so it is lightened and given a heavy grain with no
+     sheen.
+
+     On the classic it is the skin side — the same face as the exterior, smooth,
+     with the grain's own wrinkles and highlight, reading continuous with the
+     panels rather than as a contrasting band. Only the panels' burnished cut
+     edges and the seams either side separate the three pieces, so the spine is
+     painted exactly as a panel is.
+
+     Drawn first either way, so the panels overlap its edges. */
+  const spineRect = `M${spineL - 3},${y} H${spineR + 3} V${bottom} H${spineL - 3} Z`;
+  const spineMarkup = g.spineSide === 'flesh'
+    ? `<path class="leather-fill" d="${spineRect}" fill="var(--tex-exterior)"/>
+       <path d="${spineRect}" fill="#fff" opacity="0.22"/>
+       <path d="${spineRect}" fill="#000" opacity="0.42" filter="url(#grain)"
+             style="mix-blend-mode:overlay"/>`
+    : `<path class="leather-fill" d="${spineRect}" fill="var(--tex-exterior)"/>
+       <path d="${spineRect}" fill="#000" filter="url(#grain)"
+             style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
+       <path d="${spineRect}" fill="url(#sheen)" opacity="0.45"/>
+       <!-- It lies in the valley of the fold, a little shaded by the panels
+            standing either side of it. -->
+       <path d="${spineRect}" fill="#000" opacity="0.12"/>`;
+
   /* Each pocket: the shadow it throws on the layer behind, the leather, a
      little grain, then the burnished edge along its top cut. */
   const layer = (p, yTop, varName) => `
-    <path d="${pocketEdge(p.x0, p.x1, yTop)}" fill="none" stroke="#000" stroke-opacity="0.5"
+    <path d="${pocketEdge(p.x0, p.x1, yTop, g.pocketDepth)}" fill="none" stroke="#000" stroke-opacity="0.5"
           stroke-width="6" filter="url(#edgeShadow)" transform="translate(0,2.5)"/>
-    <path class="leather-fill" d="${pocketPath(p.x0, p.x1, yTop, bottom)}"
+    <path class="leather-fill" d="${pocketPath(p.x0, p.x1, yTop, bottom, g.pocketDepth)}"
           fill="var(--tex-${varName})"/>
-    <path d="${pocketPath(p.x0, p.x1, yTop, bottom)}" fill="#000" filter="url(#grain)"
+    <path d="${pocketPath(p.x0, p.x1, yTop, bottom, g.pocketDepth)}" fill="#000" filter="url(#grain)"
           style="mix-blend-mode:overlay;opacity:var(--grain-${varName})"/>
-    <path class="leather-fill" d="${pocketEdge(p.x0, p.x1, yTop)}" fill="none"
+    <path class="leather-fill" d="${pocketEdge(p.x0, p.x1, yTop, g.pocketDepth)}" fill="none"
           stroke="var(--s-${varName})" stroke-width="2"/>`;
 
   /* Each panel is its own assembly: stitched right around its own perimeter,
@@ -774,7 +898,9 @@ function bifoldOpen() {
   const panelMarkup = panels.map((p, n) => {
     const pw = p.x1 - p.x0;
     const outline = panelPath(p.x0, y, pw, h, g.radius, p.side);
-    const clipId = `panelClip${n}`;
+    // Ids are document-global and url(#id) takes the first match in document
+    // order, so they carry the model to stay unambiguous.
+    const clipId = `clip-${g.id}-${n}`;
     return `
       <clipPath id="${clipId}"><path d="${outline}"/></clipPath>
 
@@ -789,52 +915,65 @@ function bifoldOpen() {
 
       <path d="${outline}" fill="url(#sheen)" opacity="0.45" style="pointer-events:none"/>
 
-      <!-- Top, outer edge and bottom in one run; the spine edge separately,
-           spanning only the pocket assembly rather than the full height. -->
+      <!-- Top, outer edge and bottom in one run — the top only where the model
+           is stitched across it — and the spine edge separately, spanning only
+           the pocket assembly rather than the full height. -->
       <path class="stitch" ${STITCH} stroke="var(--c-thread)"
-            d="${panelStitchOuter(p.x0 + i, y + i, pw - i * 2, h - i * 2,
-                                  Math.max(g.radius - 4, 2), p.side,
-                                  i + g.stitchOverhang)}"/>
+            d="${panelOuterRun(p.x0 + i, y + i, pw - i * 2, h - i * 2,
+                               Math.max(g.radius - 4, 2), p.side,
+                               i + g.stitchOverhang,
+                               g.topStitched ? null : i)}"/>
       <path class="stitch" ${STITCH} stroke="var(--c-thread)"
             d="M${p.side === 'left' ? p.x1 - i : p.x0 + i},${g.innerStitchTop}`
             + ` V${g.innerStitchBottom}"/>
 
-      <path class="leather-fill" d="${outline}" fill="none"
+      <!-- Burnished along the three cut edges only. The spine edge carries no
+           line, so the panel meets the spine on colour and seam alone. -->
+      <path class="leather-fill" fill="none"
+            d="${panelOuterRun(p.x0, y, pw, h, g.radius, p.side, 0, null)}"
             stroke="var(--s-exterior)" stroke-width="2.5"/>`;
   }).join('');
 
   return `
-    <ellipse cx="${mid}" cy="${bottom + 16}" rx="${w * 0.45}" ry="10"
+    <ellipse cx="${mid}" cy="${bottom + g.shadowDy}" rx="${w * 0.45}" ry="${g.shadowRy}"
              fill="#000" opacity="0.5" filter="url(#softShadow)"/>
 
-    <!-- The spine is the body leather's flesh side showing between the two
-         panels — lighter and matte against the grain, like the suede strip in
-         the reference photo. Drawn first so the panels overlap its edges. -->
-    <path class="leather-fill" d="M${spineL - 3},${y} H${spineR + 3} V${bottom} H${spineL - 3} Z"
-          fill="var(--tex-exterior)"/>
-    <path d="M${spineL - 3},${y} H${spineR + 3} V${bottom} H${spineL - 3} Z"
-          fill="#fff" opacity="0.22"/>
-    <path d="M${spineL - 3},${y} H${spineR + 3} V${bottom} H${spineL - 3} Z"
-          fill="#000" opacity="0.42" filter="url(#grain)" style="mix-blend-mode:overlay"/>
+    ${spineMarkup}
 
     ${panelMarkup}
   `;
 }
 
+/* Insertion order is the order the styles are offered in, so the default
+   comes first. `code` is the prefix on the build code — the vertical model
+   keeps TPL-BF, so codes on orders already placed still read the same. */
 const MODELS = {
-  bifold: {
+  classic: {
+    name: 'Classic Bifold',
+    detail: '4 card slots, 2 pockets',
+    code: 'TPL-CB',
+    geo: CLASSIC_GEO,
+    closed: walletClosed,
+    open: walletOpen,
+  },
+  vertical: {
     name: 'Vertical Bifold',
     detail: '4 card slots, 2 pockets',
-    closed: bifoldClosed,
-    open: bifoldOpen,
+    code: 'TPL-BF',
+    geo: VERTICAL_GEO,
+    closed: walletClosed,
+    open: walletOpen,
   },
 };
-const MODEL = MODELS.bifold;
+const DEFAULT_MODEL = 'classic';
+const MODEL_LIST = Object.entries(MODELS).map(([id, m]) => ({ id, ...m }));
+const currentModel = () => MODELS[state.model] || MODELS[DEFAULT_MODEL];
 
 /* ── State ──────────────────────────────────────────────────────────── */
 const state = {};
 TARGETS.forEach((t) => { state[t.key] = t.def; });
 state.thread = THREADS[0].id;
+state.model = DEFAULT_MODEL;
 
 const byId = (list, id) => list.find((x) => x.id === id) || list[0];
 
@@ -844,27 +983,39 @@ const copyStatus = document.getElementById('copy-status');
 
 /* ── Build the SVG ──────────────────────────────────────────────────── */
 function buildWallet() {
+  const m = currentModel(), g = m.geo;
+
+  /* Each model has its own frame, so a tall wallet and a wide one each fill
+     the stage rather than one floating in a box sized for the other. */
+  svg.setAttribute('viewBox', `0 0 ${g.viewW} ${g.viewH}`);
+  document.getElementById('wallet-desc').textContent =
+    `A drawing of the ${m.name.toLowerCase()} that updates as you choose leathers.`;
+
   /* Swatch photos, for any leather that has one. Each pattern spans the whole
      drawing rather than tiling, so there is no repeating seam and every piece
      shows the part of the hide it sits over — the way pieces are really cut. */
   const texDefs = LEATHERS.filter((l) => l.tex).map((l) => `
     <pattern id="tex-${l.id}" patternUnits="userSpaceOnUse"
-             width="${VIEWBOX.w}" height="${VIEWBOX.h}">
-      <image href="${l.tex}" width="${VIEWBOX.w}" height="${VIEWBOX.h}"
+             width="${g.viewW}" height="${g.viewH}">
+      <image href="${l.tex}" width="${g.viewW}" height="${g.viewH}"
              preserveAspectRatio="xMidYMid slice"/>
     </pattern>`).join('');
   document.getElementById('tex-defs').innerHTML = texDefs;
 
-  document.getElementById('view-closed').innerHTML = MODEL.closed();
-  document.getElementById('view-open').innerHTML = MODEL.open();
+  /* Only the contents of the two view groups are replaced, so whichever view
+     is showing stays showing when the model changes. */
+  document.getElementById('view-closed').innerHTML = m.closed(g);
+  document.getElementById('view-open').innerHTML = m.open(g);
 
   /* Turn each seam guide into individual slanted stitches. Needs the paths in
      the document, so it runs here rather than in the geometry functions. The
      elements keep their class and their var(--c-thread) stroke, so changing
-     thread still recolours them. */
+     thread still recolours them. Both lengths are scaled off the model, so the
+     stitch reads the same size against the leather whichever is drawn. */
+  const gap = STITCH_GAP * g.unitsPerInch, len = STITCH_LEN * g.unitsPerInch;
   document.querySelectorAll('#view-closed path.stitch, #view-open path.stitch')
     .forEach((el) => el.setAttribute('d',
-      slantedStitches(el.getAttribute('d'), STITCH_GAP, STITCH_LEN, STITCH_SLANT)));
+      slantedStitches(el.getAttribute('d'), gap, len, STITCH_SLANT)));
 }
 
 /* A leather paints as its swatch photo when it has one, otherwise as flat
@@ -893,27 +1044,58 @@ function render() {
 }
 
 /* ── Options UI ─────────────────────────────────────────────────────── */
-function swatchMarkup(group, item, isLeather) {
-  const chip = isLeather && item.tex
-    ? `background-image:url('${item.tex}')`
-    : `background-color:${item.hex}`;
-  // The button shows the short name; the full name and leather line go on
-  // aria-label so it is announced once, in full, rather than twice.
-  const label = isLeather ? `${item.name} — ${item.line}` : item.name;
+
+/* A style is a shape, not a colour, so its chip is the model's own closed
+   silhouette scaled into the 26-unit chip box — taken from the same geometry
+   the preview is drawn from, so the two can never disagree. Stroked in
+   currentColor, so it brightens on hover and on selection along with the rest
+   of the swatch and needs no rules of its own. */
+function modelChip(m) {
+  const g = m.geo;
+  const box = 21;                    // leaves a 2.5 margin inside the 26 chip
+  const ar = g.closedW / g.height;
+  const w = ar >= 1 ? box : box * ar;
+  const h = ar >= 1 ? box / ar : box;
+  const x = (26 - w) / 2, y = (26 - h) / 2;
+  const r = Math.max((g.radius / g.height) * h, 1.2);
+  const n = (v) => v.toFixed(1);
+  return `<svg viewBox="0 0 26 26" width="26" height="26" fill="none"
+               stroke="currentColor" stroke-width="1.3" focusable="false" aria-hidden="true">
+            <path d="${closedBody(x, y, w, h, r)}"/>
+            <path d="M${n(x + 3)},${n(y + 2.5)} V${n(y + h - 2.5)}" stroke-opacity="0.45"/>
+          </svg>`;
+}
+
+function swatchMarkup(group, item, kind) {
+  const chip = kind === 'model'
+    ? `<span class="swatch-chip chip-shape" aria-hidden="true">${modelChip(item)}</span>`
+    : `<span class="swatch-chip" aria-hidden="true" style="${
+        kind === 'leather' && item.tex ? `background-image:url('${item.tex}')`
+                                       : `background-color:${item.hex}`}"></span>`;
+  // The button shows the short name; the full name and the leather line or the
+  // slot count go on aria-label so it is announced once, in full, not twice.
+  const label = kind === 'leather' ? `${item.name} — ${item.line}`
+              : kind === 'model'   ? `${item.name} — ${item.detail}`
+              : item.name;
   return `<button type="button" class="swatch" role="radio" aria-checked="false" tabindex="-1"
                   aria-label="${label}" data-group="${group}" data-value="${item.id}">
-            <span class="swatch-chip" style="${chip}" aria-hidden="true"></span>
+            ${chip}
             <span>${item.name}</span>
           </button>`;
 }
 
 function buildOptions() {
-  const groups = TARGETS.map((t) => ({
-    key: t.key, label: t.label, help: t.help, items: LEATHERS, isLeather: true,
+  const groups = [{
+    key: 'model', label: 'Style', kind: 'model', items: MODEL_LIST,
+    help: 'Both are bifolds, cut and hand-stitched the same way — the classic lies flat '
+        + 'in a back pocket, the vertical stands tall in a front one.',
+  }];
+  TARGETS.forEach((t) => groups.push({
+    key: t.key, label: t.label, help: t.help, items: LEATHERS, kind: 'leather',
   }));
   groups.push({
     key: 'thread', label: 'Stitching', help: 'The thread colour running around every seam.',
-    items: THREADS, isLeather: false,
+    items: THREADS, kind: 'thread',
   });
 
   document.getElementById('options').innerHTML = groups.map((grp) => `
@@ -921,15 +1103,14 @@ function buildOptions() {
       <h2 id="lbl-${grp.key}">${grp.label}</h2>
       <p class="opt-help">${grp.help}</p>
       <div class="swatch-row" role="radiogroup" aria-labelledby="lbl-${grp.key}" data-group="${grp.key}">
-        ${grp.items.map((it) => swatchMarkup(grp.key, it, grp.isLeather)).join('')}
+        ${grp.items.map((it) => swatchMarkup(grp.key, it, grp.kind)).join('')}
       </div>
     </div>`).join('');
 
   document.getElementById('options').addEventListener('click', (e) => {
     const btn = e.target.closest('[role="radio"]');
     if (!btn) return;
-    state[btn.dataset.group] = btn.dataset.value;
-    render();
+    choose(btn.dataset.group, btn.dataset.value);
   });
 
   // Arrow keys move through a group, as a radio group should.
@@ -942,10 +1123,21 @@ function buildOptions() {
     const row = btn.closest('[role="radiogroup"]');
     const all = [...row.querySelectorAll('[role="radio"]')];
     const next = all[(all.indexOf(btn) + keys[e.key] + all.length) % all.length];
-    state[next.dataset.group] = next.dataset.value;
-    render();
+    choose(next.dataset.group, next.dataset.value);
     next.focus();
   });
+}
+
+/* Changing a leather never touches the DOM — every fill is a custom property
+   on the <svg>, so render() alone is enough. Changing the style is different:
+   the geometry is different, so the drawing has to be rebuilt. The properties
+   live on the <svg> itself rather than on the paths, so the new markup comes
+   up already wearing the leathers that were chosen. */
+function choose(group, value) {
+  const changed = state[group] !== value;
+  state[group] = value;
+  if (changed && group === 'model') buildWallet();
+  render();
 }
 
 /* ── Spec ───────────────────────────────────────────────────────────── */
@@ -958,14 +1150,15 @@ function buildSpec() {
   const thread = byId(THREADS, state.thread);
   rows.push(`${'Stitching'.padEnd(pad)}${thread.name}`);
 
-  const code = ['TPL-BF']
+  const m = currentModel();
+  const code = [m.code]
     .concat(TARGETS.map((t) => `${t.code}:${state[t.key]}`))
     .concat(`THR:${state.thread}`)
     .join(' / ');
 
   return [
     'TRADERS POINT LEATHER — CUSTOM WALLET',
-    `${MODEL.name} — ${MODEL.detail}`,
+    `${m.name} — ${m.detail}`,
     '',
     ...rows,
     '',
