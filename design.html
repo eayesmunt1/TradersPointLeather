@@ -705,12 +705,12 @@ function pocketPath(x0, x1, y, bottom, depth) {
   return `${pocketEdge(x0, x1, y, depth)} L${x1},${bottom} L${x0},${bottom} Z`;
 }
 
-function roundedRect(x, y, w, h, r) {
-  return `M${x + r},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}`
-       + ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h}`
-       + ` H${x + r} A${r},${r} 0 0 1 ${x},${y + h - r}`
-       + ` V${y + r} A${r},${r} 0 0 1 ${x + r},${y} Z`;
-}
+/* The closed wallet is one panel's outline seen from the outside: the fold runs
+   down the left, where the leather turns rather than being cut, so the top-left
+   and bottom-left corners stay square — IMG_2045 shows them crisp. Only the cut
+   edges at the right are rounded and burnished. Same rule as a panel in the open
+   view, so it is the same function. */
+const closedBody = (x, y, w, h, r) => panelPath(x, y, w, h, r, 'right');
 
 /* Top, right and bottom only — the left edge is the fold, which is not
    stitched. Used for the closed view. */
@@ -737,14 +737,15 @@ function walletClosed(g) {
     <ellipse cx="${x + w / 2}" cy="${y + h + g.shadowDy}" rx="${w * 0.46}" ry="${g.shadowRy}"
              fill="#000" opacity="0.5" filter="url(#softShadow)"/>
 
-    <path class="leather-fill" d="${roundedRect(x, y, w, h, g.radius)}"
+    <path class="leather-fill" d="${closedBody(x, y, w, h, g.radius)}"
           fill="var(--tex-exterior)"/>
-    <path d="${roundedRect(x, y, w, h, g.radius)}" fill="#000" filter="url(#grain)"
+    <path d="${closedBody(x, y, w, h, g.radius)}" fill="#000" filter="url(#grain)"
           style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
-    <path d="${roundedRect(x, y, w, h, g.radius)}" fill="url(#sheen)" opacity="0.5"/>
+    <path d="${closedBody(x, y, w, h, g.radius)}" fill="url(#sheen)" opacity="0.5"/>
 
-    <!-- Spine fold down the left edge, where the wallet closes. -->
-    <path d="M${x},${y + g.radius} V${y + h - g.radius}" stroke="#000" stroke-opacity="0.35"
+    <!-- Spine fold down the left edge, where the wallet closes. It runs the
+         full height now that the corners it meets are square. -->
+    <path d="M${x},${y} V${y + h}" stroke="#000" stroke-opacity="0.35"
           stroke-width="6" fill="none"/>
     <path d="M${x + 7},${y + 8} V${y + h - 8}" stroke="#fff" stroke-opacity="0.06"
           stroke-width="2" fill="none"/>
@@ -755,7 +756,7 @@ function walletClosed(g) {
           d="${stitchTopRightBottom(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5)}"/>
 
     <!-- Hand-burnished edge. -->
-    <path class="leather-fill" d="${roundedRect(x, y, w, h, g.radius)}" fill="none"
+    <path class="leather-fill" d="${closedBody(x, y, w, h, g.radius)}" fill="none"
           stroke="var(--s-exterior)" stroke-width="3"/>
   `;
 }
@@ -947,7 +948,7 @@ function modelChip(m) {
   const n = (v) => v.toFixed(1);
   return `<svg viewBox="0 0 26 26" width="26" height="26" fill="none"
                stroke="currentColor" stroke-width="1.3" focusable="false" aria-hidden="true">
-            <rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="${n(r)}"/>
+            <path d="${closedBody(x, y, w, h, r)}"/>
             <path d="M${n(x + 3)},${n(y + 2.5)} V${n(y + h - 2.5)}" stroke-opacity="0.45"/>
           </svg>`;
 }
