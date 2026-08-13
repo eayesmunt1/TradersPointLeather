@@ -412,12 +412,26 @@ body::after {
           <!-- Populated at runtime: one <pattern> per leather that has a swatch photo. -->
           <g id="tex-defs"></g>
 
-          <!-- Soft light across the top-left, the way pull-up leather catches it. -->
-          <radialGradient id="sheen" cx="32%" cy="18%" r="78%">
+          <!-- Soft light across the top-left, the way pull-up leather catches it.
+               In user space, not bounding-box units: one light over the whole
+               drawing, so the pieces are lit as one object. Per bounding box
+               every panel and the spine would carry its own little vignette and
+               they would meet at a visible step. buildWallet() sets the centre
+               and radius, the frame being the model's; these are the classic's. -->
+          <radialGradient id="sheen" gradientUnits="userSpaceOnUse"
+                          cx="172.8" cy="46.8" r="421.2">
             <stop offset="0%"   stop-color="#fff" stop-opacity="0.10"/>
             <stop offset="45%"  stop-color="#fff" stop-opacity="0.02"/>
             <stop offset="100%" stop-color="#000" stop-opacity="0.30"/>
           </radialGradient>
+
+          <!-- The valley of the fold: deepest down the middle of the spine and
+               nothing at all at its edges, so the panels meet it without a step. -->
+          <linearGradient id="foldShade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stop-color="#000" stop-opacity="0"/>
+            <stop offset="50%"  stop-color="#000" stop-opacity="0.16"/>
+            <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+          </linearGradient>
 
           <!-- Softens the shadow each pocket casts on the layer behind it. -->
           <filter id="edgeShadow" x="-15%" y="-60%" width="130%" height="260%">
@@ -892,7 +906,7 @@ function walletOpen(g) {
        <path d="${spineRect}" fill="url(#sheen)" opacity="0.45"/>
        <!-- It lies in the valley of the fold, a little shaded by the panels
             standing either side of it. -->
-       <path d="${spineRect}" fill="#000" opacity="0.12"/>`;
+       <path d="${spineRect}" fill="url(#foldShade)"/>`;
 
   /* Each pocket: the shadow it throws on the layer behind, the leather, a
      little grain, then the burnish along its cut edges. The shadow stays on the
@@ -1016,6 +1030,12 @@ function buildWallet() {
              preserveAspectRatio="xMidYMid slice"/>
     </pattern>`).join('');
   document.getElementById('tex-defs').innerHTML = texDefs;
+
+  /* The light spans the frame, so its centre and reach are the model's too. */
+  const sheen = document.getElementById('sheen');
+  sheen.setAttribute('cx', (g.viewW * 0.32).toFixed(1));
+  sheen.setAttribute('cy', (g.viewH * 0.18).toFixed(1));
+  sheen.setAttribute('r', (Math.max(g.viewW, g.viewH) * 0.78).toFixed(1));
 
   /* Only the contents of the two view groups are replaced, so whichever view
      is showing stays showing when the model changes. */
