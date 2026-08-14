@@ -412,12 +412,26 @@ body::after {
           <!-- Populated at runtime: one <pattern> per leather that has a swatch photo. -->
           <g id="tex-defs"></g>
 
-          <!-- Soft light across the top-left, the way pull-up leather catches it. -->
-          <radialGradient id="sheen" cx="32%" cy="18%" r="78%">
+          <!-- Soft light across the top-left, the way pull-up leather catches it.
+               In user space, not bounding-box units: one light over the whole
+               drawing, so the pieces are lit as one object. Per bounding box
+               every panel and the spine would carry its own little vignette and
+               they would meet at a visible step. buildWallet() sets the centre
+               and radius, the frame being the model's; these are the classic's. -->
+          <radialGradient id="sheen" gradientUnits="userSpaceOnUse"
+                          cx="172.8" cy="46.8" r="421.2">
             <stop offset="0%"   stop-color="#fff" stop-opacity="0.10"/>
             <stop offset="45%"  stop-color="#fff" stop-opacity="0.02"/>
             <stop offset="100%" stop-color="#000" stop-opacity="0.30"/>
           </radialGradient>
+
+          <!-- The valley of the fold: deepest down the middle of the spine and
+               nothing at all at its edges, so the panels meet it without a step. -->
+          <linearGradient id="foldShade" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stop-color="#000" stop-opacity="0"/>
+            <stop offset="50%"  stop-color="#000" stop-opacity="0.16"/>
+            <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+          </linearGradient>
 
           <!-- Softens the shadow each pocket casts on the layer behind it. -->
           <filter id="edgeShadow" x="-15%" y="-60%" width="130%" height="260%">
@@ -739,6 +753,19 @@ function pocketPath(x0, x1, y, bottom, depth) {
   return `${pocketEdge(x0, x1, y, depth)} L${x1},${bottom} L${x0},${bottom} Z`;
 }
 
+/* Every cut edge of a pocket, as one open run: up one side, over the scooped
+   top, down the other. The pocket is a layer laid on the panel, so its sides
+   are cut edges too and carry the same burnish as its top — they read as the
+   line where the layers stack, and they stop where the pocket does, which is
+   why the panel above the topmost pocket shows none.
+
+   The bottom is left out. It is the wallet's own bottom edge, burnished once
+   with the panel rather than once per layer over it. */
+function pocketCutEdges(x0, x1, y, bottom, depth) {
+  const top = pocketEdge(x0, x1, y, depth).replace(/^M/, 'L');
+  return `M${x0},${bottom} ${top} L${x1},${bottom}`;
+}
+
 /* The closed wallet is one panel's outline seen from the outside: the fold runs
    down the left, where the leather turns rather than being cut, so the top-left
    and bottom-left corners stay square, as the closed photo shows. Only the cut
@@ -879,10 +906,12 @@ function walletOpen(g) {
        <path d="${spineRect}" fill="url(#sheen)" opacity="0.45"/>
        <!-- It lies in the valley of the fold, a little shaded by the panels
             standing either side of it. -->
-       <path d="${spineRect}" fill="#000" opacity="0.12"/>`;
+       <path d="${spineRect}" fill="url(#foldShade)"/>`;
 
   /* Each pocket: the shadow it throws on the layer behind, the leather, a
-     little grain, then the burnished edge along its top cut. */
+     little grain, then the burnish along its cut edges. The shadow stays on the
+     top edge alone — that is the cut standing proud of the layer behind, where
+     the sides lie flat against the panel edge. */
   const layer = (p, yTop, varName) => `
     <path d="${pocketEdge(p.x0, p.x1, yTop, g.pocketDepth)}" fill="none" stroke="#000" stroke-opacity="0.5"
           stroke-width="6" filter="url(#edgeShadow)" transform="translate(0,2.5)"/>
@@ -890,8 +919,8 @@ function walletOpen(g) {
           fill="var(--tex-${varName})"/>
     <path d="${pocketPath(p.x0, p.x1, yTop, bottom, g.pocketDepth)}" fill="#000" filter="url(#grain)"
           style="mix-blend-mode:overlay;opacity:var(--grain-${varName})"/>
-    <path class="leather-fill" d="${pocketEdge(p.x0, p.x1, yTop, g.pocketDepth)}" fill="none"
-          stroke="var(--s-${varName})" stroke-width="2"/>`;
+    <path class="leather-fill" d="${pocketCutEdges(p.x0, p.x1, yTop, bottom, g.pocketDepth)}"
+          fill="none" stroke="var(--s-${varName})" stroke-width="2"/>`;
 
   /* Each panel is its own assembly: stitched right around its own perimeter,
      with the pockets clipped to it. */
@@ -1001,6 +1030,12 @@ function buildWallet() {
              preserveAspectRatio="xMidYMid slice"/>
     </pattern>`).join('');
   document.getElementById('tex-defs').innerHTML = texDefs;
+
+  /* The light spans the frame, so its centre and reach are the model's too. */
+  const sheen = document.getElementById('sheen');
+  sheen.setAttribute('cx', (g.viewW * 0.32).toFixed(1));
+  sheen.setAttribute('cy', (g.viewH * 0.18).toFixed(1));
+  sheen.setAttribute('r', (Math.max(g.viewW, g.viewH) * 0.78).toFixed(1));
 
   /* Only the contents of the two view groups are replaced, so whichever view
      is showing stays showing when the model changes. */
