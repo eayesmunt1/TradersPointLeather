@@ -654,10 +654,17 @@ const CLASSIC_GEO = {
   innerStitchBottom: 213,      // top + 0.932
   stitchOverhang: 4,           // an absolute run onto the suede, as above
   /* The note compartment opens along the whole top edge, so that edge carries
-     no stitching: each seam runs from the top edge down the outer edge and
-     along the bottom. The closed photo shows that edge bare, burnished but
+     no stitching: each seam runs from the bottom, up the outer edge, and stops
+     short of the top. The closed photo shows that edge bare, burnished but
      unstitched, against the stitched edge and bottom beside it. */
   topStitched: false,
+  /* How far below the top cut edge the outer seam stops. The seam holds the
+     note compartment closed, so it ends where that compartment's mouth begins
+     rather than running out at the cut edge — the last stitch would have
+     nothing but the opening above it. 16 units is 0.29in, which clears the
+     rounded top corner (radius 0.24in) and leaves the whole of it bare, so the
+     stop reads as deliberate rather than as a seam a stitch short. */
+  stitchTopGap: 16,
   /* Both models are drawn in a 540-wide box, so a unit is the same number of
      screen pixels in each — but this wallet is drawn at 82% of the vertical
      model's units per inch, so a stitch held in units would read a fifth
@@ -731,19 +738,20 @@ function panelPath(x, y, w, h, r, side) {
    stopping short inside the panel. The burnished edge passes 0 and so stops
    square on the edge.
 
-   `topOh` is null on a model stitched across the top. On one whose note
-   compartment opens along that edge it is how far the open end runs up past the
-   inset, so the run begins at the cut edge rather than inside it — there is no
-   suede to land on up there, so it stops level with the edge. The burnished
-   edge passes null either way: an unstitched top edge is still a cut one. */
-function panelOuterRun(x, y, w, h, r, side, oh, topOh) {
+   `topStart` is null on a model stitched across the top, which draws the top
+   edge and its corner as part of the run. On one whose note compartment opens
+   along that edge it is the y the run starts at: the seam comes up the outer
+   edge and stops there, short of the cut edge, leaving the top corner bare.
+   The burnished edge passes null either way, since it covers the three cut
+   sides whether or not they are stitched. */
+function panelOuterRun(x, y, w, h, r, side, oh, topStart) {
   const outer = side === 'left'
     ? { sweep: 0, corner: x + r, edge: x, end: x + w + oh }
     : { sweep: 1, corner: x + w - r, edge: x + w, end: x - oh };
   const down = ` V${y + h - r} A${r},${r} 0 0 ${outer.sweep} ${outer.corner},${y + h}`
              + ` H${outer.end}`;
-  if (topOh !== null && topOh !== undefined) {
-    return `M${outer.edge},${y - topOh}${down}`;
+  if (topStart !== null && topStart !== undefined) {
+    return `M${outer.edge},${topStart}${down}`;
   }
   return `M${outer.end},${y} H${outer.corner}`
        + ` A${r},${r} 0 0 ${outer.sweep} ${outer.edge},${y + r}${down}`;
@@ -776,11 +784,11 @@ const closedBody = (x, y, w, h, r) => panelPath(x, y, w, h, r, 'right');
 /* The closed view's seam. The left edge is the fold, so it is never stitched,
    and the top edge is stitched only on a model that closes across it — the
    classic's note compartment opens along the whole top, and the closed photo
-   shows that edge bare. `topOh`, as on a panel, starts the run at the cut
-   edge. */
-function stitchClosed(x, y, w, h, r, topOh) {
+   shows that edge bare. `topStart`, as on a panel, is the y the run up the
+   outer edge stops at, short of the top. */
+function stitchClosed(x, y, w, h, r, topStart) {
   const down = ` V${y + h - r} A${r},${r} 0 0 1 ${x + w - r},${y + h} H${x}`;
-  if (topOh !== null && topOh !== undefined) return `M${x + w},${y - topOh}${down}`;
+  if (topStart !== null && topStart !== undefined) return `M${x + w},${topStart}${down}`;
   return `M${x},${y} H${x + w - r} A${r},${r} 0 0 1 ${x + w},${y + r}${down}`;
 }
 
@@ -855,11 +863,11 @@ function walletClosed(g) {
           stroke-width="2" fill="none"/>
 
     <!-- Stitching runs just inside the cut edges. The left edge is the fold, so
-         it carries none; the top carries none either on a model that opens
-         along it. -->
+         it carries none; on a model that opens along the top, the seam stops
+         below that edge rather than running out at it. -->
     <path class="stitch" ${STITCH} stroke="var(--c-thread)"
           d="${stitchClosed(x + i, y + i, w - i * 2, h - i * 2, g.radius - 5,
-                            g.topStitched ? null : i)}"/>
+                            g.topStitched ? null : y + g.stitchTopGap)}"/>
 
     <!-- Hand-burnished edge. -->
     <path class="leather-fill" d="${closedBody(x, y, w, h, g.radius)}" fill="none"
@@ -945,13 +953,14 @@ function walletOpen(g) {
       <path d="${outline}" fill="url(#sheen)" opacity="0.45" style="pointer-events:none"/>
 
       <!-- Top, outer edge and bottom in one run — the top only where the model
-           is stitched across it — and the spine edge separately, spanning only
-           the pocket assembly rather than the full height. -->
+           is stitched across it, and where it is not, the run stops short of
+           the top edge — and the spine edge separately, spanning only the
+           pocket assembly rather than the full height. -->
       <path class="stitch" ${STITCH} stroke="var(--c-thread)"
             d="${panelOuterRun(p.x0 + i, y + i, pw - i * 2, h - i * 2,
                                Math.max(g.radius - 4, 2), p.side,
                                i + g.stitchOverhang,
-                               g.topStitched ? null : i)}"/>
+                               g.topStitched ? null : y + g.stitchTopGap)}"/>
       <path class="stitch" ${STITCH} stroke="var(--c-thread)"
             d="M${p.side === 'left' ? p.x1 - i : p.x0 + i},${g.innerStitchTop}`
             + ` V${g.innerStitchBottom}"/>
