@@ -20,8 +20,6 @@
     })(window, document, "clarity", "script", "xu1ikt3qv4");
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<!-- Unlisted page: not linked from the site, not in sitemap.xml, and kept out of search. -->
-<meta name="robots" content="noindex, nofollow">
 <title>Design Your Wallet — Traders Point Leather</title>
 <meta name="description" content="Choose the leather for every layer of a Traders Point Leather bifold — classic or vertical — and see it come together.">
 <link rel="icon" type="image/png" href="/favicon.png">
@@ -202,6 +200,44 @@ body {
    swatch frame and draws an outline in the swatch's own text colour. */
 .swatch-chip.chip-shape { border: none; background: none; color: inherit; }
 .swatch-chip.chip-shape svg { display: block; width: 26px; height: 26px; }
+
+/* ── MONOGRAM ── */
+/* The one option that is typed rather than chosen, so it is the one control on
+   the page that isn't a swatch. Set in the stamp's own Arial rather than the
+   page's Playfair, so the field already looks like what gets pressed into the
+   leather. */
+.mono-field { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.25rem; }
+#monogram {
+  width: 8.5rem;
+  flex: none;
+  background: var(--bg);
+  border: 1px solid rgba(196,168,130,0.18);
+  border-radius: 3px;
+  color: var(--cream);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  /* Letter-spacing pads to the right of the last letter, which drags centred
+     text off centre by that much. Half of it back as indent re-centres it. */
+  text-indent: 0.22em;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 0.6rem 0.5rem;
+  transition: border-color 0.3s;
+}
+#monogram:hover { border-color: rgba(196,168,130,0.4); }
+#monogram:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 2px; }
+#monogram::placeholder { color: rgba(154,142,130,0.45); }
+/* Empty until a keystroke is turned away, the same as the spec's copy status. */
+.mono-status {
+  flex: 1 1 10rem;
+  min-height: 1.2em;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  color: var(--tan);
+}
 
 /* ── SPEC ── */
 .spec-section {
@@ -442,8 +478,25 @@ body::after {
     </div>
   </div>
 
-  <!-- Option groups are generated from the config block in the script below. -->
-  <div class="options-col" id="options"></div>
+  <!-- Option groups are generated from the config block in the script below.
+       The monogram is a text field rather than a row of swatches, so it is
+       written out here and left alone while #options is filled. -->
+  <div class="options-col">
+    <div id="options"></div>
+
+    <div class="opt-group">
+      <h2><label for="monogram">Monogram</label></h2>
+      <p class="opt-help">Up to four letters, blind-embossed low on the outside back —
+        no ink and no foil, just the hide pressed darker. Letters only, and no letter
+        more than twice.</p>
+      <div class="mono-field">
+        <input id="monogram" type="text" placeholder="ABC" autocomplete="off"
+               autocapitalize="characters" autocorrect="off" spellcheck="false"
+               aria-describedby="mono-status">
+        <span class="mono-status" id="mono-status" role="status" aria-live="polite"></span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- SPEC -->
@@ -550,6 +603,13 @@ const TARGETS = [
   { key: 'pocketLower', code: 'PL',  label: 'Lower Card Pockets', def: 'redbus',
     help: 'The two front pockets, closest to you.' },
 ];
+
+/* How many letters a monogram may carry, and how many times any one of them
+   may appear. Both are stamping limits rather than screen ones: four letters is
+   what fits in the corner at a size worth pressing, and a third repeat of the
+   same letter almost always means a typo rather than a name. */
+const MONOGRAM_MAX = 4;
+const MONOGRAM_MAX_REPEAT = 2;
 
 /* ── Geometry ─────────────────────────────────────────────────────────
    Every wallet is drawn by the same two functions, walletClosed and
@@ -820,6 +880,53 @@ function slantedStitches(d, spacing, len, deg) {
   return out.join('');
 }
 
+/* The monogram, blind-embossed: pressed in with a heated die, no ink and no
+   foil. So it cannot be drawn as type laid on the leather — there is nothing
+   there but leather. Every layer multiplies into what is already painted
+   instead, which darkens the swatch photo without covering it: the grain still
+   runs through the letters, because the letters are the hide.
+
+   Three copies sell the impression. The sheen lights the wallet from the upper
+   left, so the wall on that side of a depression turns away from the light and
+   the one opposite catches it — a dark copy offset up and left, the darkened
+   face itself, then a light copy offset down and right.
+
+   That lit lip screens rather than multiplies, and it is what keeps the stamp
+   legible on plum and ink blue: those hides are already close to black, so
+   there is almost nothing left for a multiply to darken, and on real leather it
+   is the catch of light along the pressed edge that shows the letters at all.
+
+   Set in Arial, uppercase — the die the shop stamps with, not a display face
+   chosen for the page. What is typed is uppercased as it is taken, so the two
+   can't disagree.
+
+   Placed and sized in inches against the model's own scale, the way the stitch
+   lengths above are, so the stamp sits the same distance in from the cut edges
+   and reads the same size against the leather on either model. */
+function monogramMarkup(g) {
+  const u = g.unitsPerInch;
+  const size = 0.26 * u;          // about a 0.18in cap height
+  const ls = 0.03 * u;
+  /* Anchored to the bottom right corner of the exterior, inside the seam. The
+     spacing pads past the last letter as well, which walks an end-anchored run
+     left by that much, so it is added back. */
+  const x = g.closedX + g.closedW - g.stitchInset - 0.18 * u + ls;
+  const y = g.top + g.height - g.stitchInset - 0.20 * u;
+  const off = size * 0.05;
+  const n = (v) => v.toFixed(2);
+  const layer = (dx, dy, fill, opacity, blend) => `
+    <text x="${n(x + dx)}" y="${n(y + dy)}" text-anchor="end" fill="${fill}"
+          font-family="Arial, Helvetica, sans-serif" font-weight="700"
+          font-size="${n(size)}" letter-spacing="${n(ls)}"
+          style="mix-blend-mode:${blend};opacity:${opacity}">${state.monogram}</text>`;
+  return `
+    <g id="monogram-stamp" aria-hidden="true"${state.monogram ? '' : ' style="display:none"'}>
+      ${layer(-off, -off, '#000', 0.45, 'multiply')}
+      ${layer(0, 0, '#000', 0.28, 'multiply')}
+      ${layer(off * 1.2, off * 1.2, '#fff', 0.22, 'screen')}
+    </g>`;
+}
+
 function walletClosed(g) {
   const x = g.closedX, y = g.top, w = g.closedW, h = g.height;
   const i = g.stitchInset;
@@ -832,6 +939,11 @@ function walletClosed(g) {
     <path d="${closedBody(x, y, w, h, g.radius)}" fill="#000" filter="url(#grain)"
           style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
     <path d="${closedBody(x, y, w, h, g.radius)}" fill="url(#sheen)" opacity="0.5"/>
+
+    <!-- Stamped into the corner furthest from the fold — the bottom right of
+         the wallet as it sits closed. Drawn over the sheen so it darkens the
+         lit leather as well as the shaded. -->
+    ${monogramMarkup(g)}
 
     <!-- Spine fold down the left edge, where the wallet closes. It runs the
          full height now that the corners it meets are square. -->
@@ -990,6 +1102,7 @@ const state = {};
 TARGETS.forEach((t) => { state[t.key] = t.def; });
 state.thread = THREADS[0].id;
 state.model = DEFAULT_MODEL;
+state.monogram = '';
 
 const byId = (list, id) => list.find((x) => x.id === id) || list[0];
 
@@ -1003,8 +1116,6 @@ function buildWallet() {
   /* Each model has its own frame, so a tall wallet and a wide one each fill
      the stage rather than one floating in a box sized for the other. */
   svg.setAttribute('viewBox', `0 0 ${g.viewW} ${g.viewH}`);
-  document.getElementById('wallet-desc').textContent =
-    `A drawing of the ${m.name.toLowerCase()} that updates as you choose leathers.`;
 
   /* Swatch photos, for any leather that has one. Each pattern spans the whole
      drawing rather than tiling, so there is no repeating seam and every piece
@@ -1053,6 +1164,20 @@ function render() {
     svg.style.setProperty(`--grain-${name}`, leather.tex ? '0' : '0.24');
   });
   svg.style.setProperty('--c-thread', byId(THREADS, state.thread).hex);
+
+  /* Only the letters change, so the stamp is written in place. Rebuilding the
+     drawing on every keystroke would re-run the stitch pass — hundreds of
+     measured points — for three words of text. */
+  const stamp = document.getElementById('monogram-stamp');
+  stamp.style.display = state.monogram ? '' : 'none';
+  stamp.querySelectorAll('text').forEach((t) => { t.textContent = state.monogram; });
+
+  /* Spoken in place of the drawing, so it carries the monogram too. Spaced out
+     letter by letter, or a screen reader reads three initials as a word. */
+  const m = currentModel();
+  document.getElementById('wallet-desc').textContent =
+    `A drawing of the ${m.name.toLowerCase()} that updates as you choose leathers`
+    + (state.monogram ? `, embossed ${[...state.monogram].join(' ')} on the outside back.` : '.');
 
   document.querySelectorAll('[role="radio"]').forEach((el) => {
     const on = state[el.dataset.group] === el.dataset.value;
@@ -1160,6 +1285,39 @@ function choose(group, value) {
   render();
 }
 
+/* ── Monogram ───────────────────────────────────────────────────────────
+   The one thing on the page that is typed rather than chosen, so the one thing
+   that can be asked for wrong. Rather than refuse the whole entry, each
+   character is taken or dropped on its own: what has already been typed stays
+   on screen and only the offending keystroke disappears — with a line saying
+   why, since a key that silently does nothing reads as a broken field.
+
+   The length is held here rather than in a maxlength attribute for the same
+   reason: the attribute drops the extra letters of a pasted name without
+   saying so. */
+function monogramReason(ch, kept) {
+  if (!/[A-Z]/.test(ch)) return 'Letters only — no numbers, spaces or punctuation.';
+  if (kept.length >= MONOGRAM_MAX) return `${MONOGRAM_MAX} letters is the most that fits.`;
+  return `A letter can be used ${MONOGRAM_MAX_REPEAT} times at most.`;
+}
+
+function sanitizeMonogram(raw) {
+  const counts = {};
+  let kept = '', note = '';
+  for (const ch of raw.toUpperCase()) {
+    const ok = /[A-Z]/.test(ch)
+            && kept.length < MONOGRAM_MAX
+            && (counts[ch] || 0) < MONOGRAM_MAX_REPEAT;
+    if (ok) {
+      counts[ch] = (counts[ch] || 0) + 1;
+      kept += ch;
+    } else if (!note) {
+      note = monogramReason(ch, kept);
+    }
+  }
+  return { text: kept, note };
+}
+
 /* ── Spec ───────────────────────────────────────────────────────────── */
 function buildSpec() {
   // Plain `Label: value` rows — the spec is read in a mail client now, where a
@@ -1169,11 +1327,17 @@ function buildSpec() {
     return `${t.label}: ${l.line} ${l.name}`;
   });
   rows.push(`Stitching: ${byId(THREADS, state.thread).name}`);
+  /* Written out even when there isn't one: a row saying None tells whoever cuts
+     the wallet that no stamp was wanted, rather than leaving them to wonder
+     whether it was left off by mistake. It carries further in an email than it
+     did in a box of text on the page. */
+  rows.push(`Monogram: ${state.monogram || 'None'}`);
 
   const m = currentModel();
   const code = [m.code]
     .concat(TARGETS.map((t) => `${t.code}:${state[t.key]}`))
     .concat(`THR:${state.thread}`)
+    .concat(`MON:${state.monogram || 'none'}`)
     .join(' / ');
 
   return [
@@ -1219,6 +1383,26 @@ render();
 
 document.getElementById('btn-open').addEventListener('click', () => setView(true));
 document.getElementById('btn-closed').addEventListener('click', () => setView(false));
+
+const monoInput = document.getElementById('monogram');
+const monoStatus = document.getElementById('mono-status');
+monoInput.addEventListener('input', () => {
+  const at = monoInput.selectionStart;
+  const { text, note } = sanitizeMonogram(monoInput.value);
+  if (text !== monoInput.value) {
+    monoInput.value = text;
+    // Back where it was, or at the end when what it sat after is gone.
+    const to = Math.min(at === null ? text.length : at, text.length);
+    monoInput.setSelectionRange(to, to);
+  }
+  state.monogram = text;
+  render();
+  monoStatus.textContent = note;
+  // The stamp is on the outside, so show that face while it is being typed.
+  if (text && document.getElementById('view-open').classList.contains('is-active')) {
+    setView(false);
+  }
+});
 
 // Reveal on scroll
 const reveals = document.querySelectorAll('.reveal');

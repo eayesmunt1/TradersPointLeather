@@ -521,6 +521,17 @@ body {
 }
 .btn-shop:hover { background: var(--tan-light); transform: translateY(-2px); }
 .btn-shop:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 3px; }
+.banner-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+/* Secondary to the Shop button beside it: the same button, drawn rather than
+   filled, so the two read as a pair without competing for the eye. The outline
+   is an inset shadow rather than a border, which would make it a pixel taller
+   than the solid one next to it. */
+.btn-design {
+  background: transparent;
+  color: var(--tan);
+  box-shadow: inset 0 0 0 1px var(--tan);
+}
+.btn-design:hover { background: var(--tan); color: var(--bg); }
 .banner-contact {
   display: block;
   margin-top: 1.25rem;
@@ -616,6 +627,10 @@ body::after {
   .gallery-item.full { grid-column: span 1 !important; grid-row: span 1 !important; }
   .hero h1 { font-size: 1.9rem; letter-spacing: 0.1em; }
   .product-cards { grid-template-columns: 1fr; }
+  /* Stacked full width rather than side by side: at 375px the two labels
+     wrap mid-word if they share a line. */
+  .banner-actions { flex-direction: column; align-items: stretch; }
+  .banner-cta .btn-shop { padding: 1.1rem 1rem; }
   .footer-links { flex-direction: column; gap: 1rem; }
 }
 </style>
@@ -733,7 +748,10 @@ body::after {
 <section class="banner-cta reveal">
   <h2>Find Your Piece</h2>
   <p>Handmade. One at a time. Shipped from Indiana to your door.</p>
-  <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener" class="btn-shop">Shop</a>
+  <div class="banner-actions">
+    <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener" class="btn-shop">Shop</a>
+    <a href="/design.html" class="btn-shop btn-design">Design Your Wallet</a>
+  </div>
   <a href="mailto:eyesmunt@icloud.com" class="banner-contact">or get in touch &rarr;</a>
 </section>
 
@@ -743,6 +761,7 @@ body::after {
   <div class="footer-brand">Traders Point Leather</div>
   <div class="footer-loc">Handcrafted in Indiana</div>
   <div class="footer-links">
+    <a href="/design.html">Design Your Wallet</a>
     <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Etsy Shop</a>
     <a href="https://traderspointleather.com" target="_blank" rel="noopener">TradersPointLeather.com</a>
     <a href="mailto:eyesmunt@icloud.com">Contact</a>
