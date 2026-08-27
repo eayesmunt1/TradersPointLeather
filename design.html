@@ -224,24 +224,6 @@ body {
   color: var(--tan-light);
   margin-bottom: 2.5rem;
 }
-#spec-text {
-  width: 100%;
-  min-height: 260px;
-  background: var(--bg);
-  border: 1px solid rgba(196,168,130,0.18);
-  border-radius: 3px;
-  color: var(--cream);
-  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-  font-size: 0.82rem;
-  line-height: 1.75;
-  padding: 1.5rem;
-  resize: vertical;
-  text-align: left;
-  white-space: pre;
-  overflow-wrap: normal;
-  overflow-x: auto;
-}
-#spec-text:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 2px; }
 .spec-actions { margin-top: 1.75rem; }
 .btn-shop {
   display: inline-block;
@@ -260,10 +242,9 @@ body {
 }
 .btn-shop:hover { background: var(--tan-light); transform: translateY(-2px); }
 .btn-shop:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 3px; }
-.copy-status {
+.spec-note {
   display: block;
   margin-top: 1.1rem;
-  min-height: 1.2em;
   font-size: 0.8rem;
   letter-spacing: 0.1em;
   color: var(--tan);
@@ -380,7 +361,6 @@ body::after {
   .view-toggle { margin-top: 1rem; }
   .view-toggle button { padding: 0.6rem 1.35rem; }
   .spec-section { padding: 3.5rem 1.5rem; }
-  #spec-text { font-size: 0.72rem; padding: 1rem; }
   .btn-shop { width: 100%; padding: 1.1rem 1rem; }
   .real-pieces { padding: 4rem 1.5rem; }
   .pieces-grid { grid-template-columns: 1fr; gap: 1.5rem; }
@@ -457,12 +437,10 @@ body::after {
   <div class="spec-inner">
     <p class="section-label">Your Build</p>
     <h2>The Spec</h2>
-    <p>Copy this and send it over with your order — it's everything we need to cut your wallet.</p>
-    <label for="spec-text" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">Your wallet specification</label>
-    <textarea id="spec-text" readonly spellcheck="false"></textarea>
+    <p>Everything we need to cut your wallet — sent straight to the bench.</p>
     <div class="spec-actions">
-      <button type="button" class="btn-shop" id="copy-btn">Copy the Spec</button>
-      <span class="copy-status" id="copy-status" role="status" aria-live="polite"></span>
+      <a class="btn-shop" id="send-btn" href="#">Send the Spec</a>
+      <span class="spec-note">Opens a draft in your email app, addressed to us.</span>
     </div>
   </div>
 </section>
@@ -978,8 +956,7 @@ state.model = DEFAULT_MODEL;
 const byId = (list, id) => list.find((x) => x.id === id) || list[0];
 
 const svg = document.getElementById('wallet');
-const specBox = document.getElementById('spec-text');
-const copyStatus = document.getElementById('copy-status');
+const sendBtn = document.getElementById('send-btn');
 
 /* ── Build the SVG ──────────────────────────────────────────────────── */
 function buildWallet() {
@@ -1039,8 +1016,7 @@ function render() {
     el.tabIndex = on ? 0 : -1;
   });
 
-  specBox.value = buildSpec();
-  copyStatus.textContent = '';
+  sendBtn.href = buildMailtoHref();
 }
 
 /* ── Options UI ─────────────────────────────────────────────────────── */
@@ -1142,13 +1118,13 @@ function choose(group, value) {
 
 /* ── Spec ───────────────────────────────────────────────────────────── */
 function buildSpec() {
-  const pad = Math.max(...TARGETS.map((t) => t.label.length), 'Stitching'.length) + 3;
+  // Plain `Label: value` rows — the spec is read in a mail client now, where a
+  // proportional font would tear any column alignment apart.
   const rows = TARGETS.map((t) => {
     const l = byId(LEATHERS, state[t.key]);
-    return `${t.label.padEnd(pad)}${l.line} ${l.name}`;
+    return `${t.label}: ${l.line} ${l.name}`;
   });
-  const thread = byId(THREADS, state.thread);
-  rows.push(`${'Stitching'.padEnd(pad)}${thread.name}`);
+  rows.push(`Stitching: ${byId(THREADS, state.thread).name}`);
 
   const m = currentModel();
   const code = [m.code]
@@ -1166,28 +1142,22 @@ function buildSpec() {
   ].join('\n');
 }
 
-/* ── Copy ───────────────────────────────────────────────────────────── */
-function selectSpec() {
-  specBox.focus();
-  specBox.select();
-  specBox.setSelectionRange(0, specBox.value.length);
-}
+/* ── Send ───────────────────────────────────────────────────────────── */
+const CONTACT = 'eyesmunt@icloud.com';
 
-async function copySpec() {
-  const text = specBox.value;
-  try {
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(text);
-    } else {
-      selectSpec();
-      if (!document.execCommand('copy')) throw new Error('execCommand refused');
-    }
-    copyStatus.textContent = 'Copied — paste it wherever you send it to us.';
-  } catch (err) {
-    // Clipboard blocked: select the text so it can be copied by hand.
-    selectSpec();
-    copyStatus.textContent = 'Copying is blocked here — the spec is selected, press Ctrl/⌘+C.';
-  }
+/* The button is an anchor, so the browser opens the draft natively — the href
+   is just kept in step with the current build by render(). */
+function buildMailtoHref() {
+  const subject = `Custom wallet spec — ${currentModel().name}`;
+  const body = [
+    buildSpec(),
+    '',
+    '—',
+    "Anything else you'd like us to know:",
+    '',
+  ].join('\n');
+  return `mailto:${CONTACT}?subject=${encodeURIComponent(subject)}`
+       + `&body=${encodeURIComponent(body)}`;
 }
 
 /* ── View toggle ────────────────────────────────────────────────────── */
@@ -1205,8 +1175,6 @@ render();
 
 document.getElementById('btn-open').addEventListener('click', () => setView(true));
 document.getElementById('btn-closed').addEventListener('click', () => setView(false));
-document.getElementById('copy-btn').addEventListener('click', copySpec);
-specBox.addEventListener('focus', selectSpec);
 
 // Reveal on scroll
 const reveals = document.querySelectorAll('.reveal');
