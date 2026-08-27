@@ -203,8 +203,9 @@ body {
 
 /* ── MONOGRAM ── */
 /* The one option that is typed rather than chosen, so it is the one control on
-   the page that isn't a swatch. Set in the same face the stamp is drawn in, so
-   the field already looks like what gets pressed into the leather. */
+   the page that isn't a swatch. Set in the stamp's own Arial rather than the
+   page's Playfair, so the field already looks like what gets pressed into the
+   leather. */
 .mono-field { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.25rem; }
 #monogram {
   width: 8.5rem;
@@ -213,8 +214,8 @@ body {
   border: 1px solid rgba(196,168,130,0.18);
   border-radius: 3px;
   color: var(--cream);
-  font-family: 'Playfair Display', serif;
-  font-size: 1.35rem;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: 0.22em;
   /* Letter-spacing pads to the right of the last letter, which drags centred
@@ -882,6 +883,10 @@ function slantedStitches(d, spacing, len, deg) {
    there is almost nothing left for a multiply to darken, and on real leather it
    is the catch of light along the pressed edge that shows the letters at all.
 
+   Set in Arial, uppercase — the die the shop stamps with, not a display face
+   chosen for the page. What is typed is uppercased as it is taken, so the two
+   can't disagree.
+
    Placed and sized in inches against the model's own scale, the way the stitch
    lengths above are, so the stamp sits the same distance in from the cut edges
    and reads the same size against the leather on either model. */
@@ -898,7 +903,7 @@ function monogramMarkup(g) {
   const n = (v) => v.toFixed(2);
   const layer = (dx, dy, fill, opacity, blend) => `
     <text x="${n(x + dx)}" y="${n(y + dy)}" text-anchor="end" fill="${fill}"
-          font-family="'Playfair Display', Georgia, serif" font-weight="700"
+          font-family="Arial, Helvetica, sans-serif" font-weight="700"
           font-size="${n(size)}" letter-spacing="${n(ls)}"
           style="mix-blend-mode:${blend};opacity:${opacity}">${state.monogram}</text>`;
   return `
