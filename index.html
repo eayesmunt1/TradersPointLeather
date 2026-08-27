@@ -438,12 +438,16 @@ body {
   gap: 2rem;
 }
 .product-card {
+  display: block;
+  color: inherit;
+  text-decoration: none;
   background: var(--bg-warm);
   border: 1px solid rgba(196,168,130,0.08);
   overflow: hidden;
   transition: border-color 0.4s;
 }
 .product-card:hover { border-color: rgba(196,168,130,0.25); }
+.product-card:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 3px; }
 .product-card-img {
   aspect-ratio: 4/3;
   overflow: hidden;
@@ -470,16 +474,16 @@ body {
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
-.product-card-body a {
+.card-cta {
+  display: inline-block;
   font-size: 0.75rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--tan);
-  text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-color 0.3s;
 }
-.product-card-body a:hover { border-bottom-color: var(--tan); }
+.product-card:hover .card-cta { border-bottom-color: var(--tan); }
 
 /* ── BANNER CTA ── */
 .banner-cta {
@@ -692,36 +696,36 @@ body::after {
   <p class="section-label">What We Make</p>
   <h2>Everyday Carry, Elevated</h2>
   <div class="product-cards">
-    <div class="product-card">
+    <a class="product-card" href="https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4401934583&section_id=58176763" target="_blank" rel="noopener">
       <div class="product-card-img">
         <img src="IMG_2045.jpeg" alt="Brown classic bifold wallet in hand" loading="lazy" width="800" height="1200">
       </div>
       <div class="product-card-body">
         <h3>Bifold Wallets</h3>
         <p>4 card slots and 2 pockets for extra cards and folded cash. Full-grain leather, precision-stitched with bonded nylon or polyester thread. Available in multiple colors.</p>
-        <a href="https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4401934583&section_id=58176763" target="_blank" rel="noopener">Shop Wallets &rarr;</a>
+        <span class="card-cta">Shop Wallets &rarr;</span>
       </div>
-    </div>
-    <div class="product-card">
+    </a>
+    <a class="product-card" href="https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4419228681&section_id=58173348" target="_blank" rel="noopener">
       <div class="product-card-img">
         <img src="IMG_5640.jpg" alt="Traders Point Leather Belt" loading="lazy" width="600" height="900">
       </div>
       <div class="product-card-body">
         <h3>Leather Belts</h3>
         <p>Solid brass hardware on a single piece of thick full-grain leather. No layers, no filler. This belt will outlast everything else in your closet.</p>
-        <a href="https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4419228681&section_id=58173348" target="_blank" rel="noopener">Shop Belts &rarr;</a>
+        <span class="card-cta">Shop Belts &rarr;</span>
       </div>
-    </div>
-    <div class="product-card">
+    </a>
+    <a class="product-card" href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">
       <div class="product-card-img">
         <img src="IMG_6451.jpeg" alt="Traders Point Leather packaging" loading="lazy" width="600" height="900">
       </div>
       <div class="product-card-body">
         <h3>Gift-Ready</h3>
         <p>Every order ships in our branded box, wrapped in tissue and tied with natural twine. Ready to give — or to keep for yourself.</p>
-        <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Browse All &rarr;</a>
+        <span class="card-cta">Browse All &rarr;</span>
       </div>
-    </div>
+    </a>
   </div>
 </section>
 
