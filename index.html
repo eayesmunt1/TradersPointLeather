@@ -315,16 +315,30 @@ body {
   color: var(--text-muted);
 }
 .pillar-img {
+  position: relative;
   width: 100%;
   aspect-ratio: 4/3;
   overflow: hidden;
   margin-bottom: 2rem;
   border-radius: 4px;
+  background: var(--bg-warm);
 }
 .pillar-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+/* 16:9 video cover-filling the 4:3 slot: match the slot's height, overflow the sides. */
+.pillar-img iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 100%;
+  width: auto;
+  aspect-ratio: 16 / 9;
+  min-width: 100%;
+  border: 0;
 }
 
 /* ── GALLERY ── */
@@ -644,13 +658,13 @@ body::after {
     <p>We source quality full-grain leathers — including Horween and Wickett &amp; Craig — many of which develop a rich pull-up effect that deepens and patinas with the use of the owner. Each piece gets better with age.</p>
   </div>
   <div class="pillar">
-    <div class="pillar-img"><img src="IMG_7384.jpg" alt="Finished edge detail" loading="lazy" width="800" height="533"></div>
+    <div class="pillar-img"><iframe src="https://player.vimeo.com/video/1221760928?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" loading="lazy" title="Traders Point Leather — Precision stitching"></iframe></div>
     <div class="pillar-num">02</div>
     <h3>Precision Stitched</h3>
     <p>Every seam is stitched with bonded nylon or bonded polyester thread — the same materials used in heavy-duty industrial applications. Clean, consistent, and incredibly strong.</p>
   </div>
   <div class="pillar">
-    <div class="pillar-img"><img src="IMG_7117.jpg" alt="Navy wallet edge" loading="lazy" width="800" height="533"></div>
+    <div class="pillar-img"><iframe src="https://player.vimeo.com/video/1221758628?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" loading="lazy" title="Traders Point Leather — Hand burnishing edges"></iframe></div>
     <div class="pillar-num">03</div>
     <h3>Hand Burnished</h3>
     <p>Every piece has its edges hand-burnished to a glossy, polished finish. It's a slow process — but it's what separates a handcrafted piece from a factory one.</p>
