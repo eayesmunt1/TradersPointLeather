@@ -295,9 +295,18 @@ body {
   color: var(--white);
   margin-bottom: 3rem;
 }
-.pieces-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+/* Two frames, and portrait ones: the photographs stand the wallet up the
+   frame, so a landscape crop would cut both ends off it. Narrower than the
+   section around them so a pair does not run the full 1200px. */
+.pieces-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  max-width: 860px;
+  margin: 0 auto;
+}
 .pieces-grid figure { margin: 0; }
-.pieces-grid .img-wrap { aspect-ratio: 4/3; overflow: hidden; }
+.pieces-grid .img-wrap { aspect-ratio: 3/4; overflow: hidden; }
 .pieces-grid img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
 .pieces-grid figure:hover img { transform: scale(1.05); }
 .pieces-grid figcaption {
@@ -518,16 +527,12 @@ body::after {
   <h2>Pieces We've Built</h2>
   <div class="pieces-grid">
     <figure>
-      <div class="img-wrap"><img src="IMG_7465.jpeg" alt="Open navy bifold wallet showing two stitched panels either side of the suede spine" loading="lazy" width="800" height="533"></div>
-      <figcaption>Two panels, each stitched right around, either side of the spine.</figcaption>
+      <div class="img-wrap"><img src="piece-brown-exterior.jpg" alt="A tan bifold wallet lying open with its outside facing up, stitched right around the edge and creased down the fold" loading="lazy" width="1200" height="1800"></div>
+      <figcaption>The outside, opened flat — stitched right around, creased where it folds.</figcaption>
     </figure>
     <figure>
-      <div class="img-wrap"><img src="IMG_7383.jpg" alt="Open bifold wallet showing four card slots and the centre cash pocket" loading="lazy" width="800" height="533"></div>
-      <figcaption>Four card slots, scooped for easy access, plus the centre pocket.</figcaption>
-    </figure>
-    <figure>
-      <div class="img-wrap"><img src="IMG_7117.jpg" alt="Close view of a navy bifold wallet's hand-burnished edge and contrast stitching" loading="lazy" width="800" height="533"></div>
-      <figcaption>Contrast stitching and hand-burnished edges, up close.</figcaption>
+      <div class="img-wrap"><img src="piece-burgundy-cards.jpg" alt="A burgundy bifold wallet open, showing a scooped card slot on each panel either side of the fold and the Traders Point Leather mark embossed into the right-hand panel" loading="lazy" width="1200" height="1800"></div>
+      <figcaption>Scooped card slots, and the blind-embossed mark.</figcaption>
     </figure>
   </div>
 </section>
