@@ -295,13 +295,15 @@ body {
   color: var(--white);
   margin-bottom: 3rem;
 }
-/* Two frames, and portrait ones: the photographs stand the wallet up the
-   frame, so a landscape crop would cut both ends off it. Narrower than the
-   section around them so a pair does not run the full 1200px. */
+/* Portrait frames, two to a row: the photographs stand the wallet up the
+   frame, so a landscape crop would cut both ends off it, and four across
+   would leave every caption wrapping. Narrower than the section around them
+   so the grid does not run the full 1200px. The rows are held well apart —
+   at the columns' 4px a caption would sit against the picture beneath it. */
 .pieces-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
+  gap: 2.25rem 4px;
   max-width: 860px;
   margin: 0 auto;
 }
@@ -531,8 +533,16 @@ body::after {
       <figcaption>The outside, opened flat — stitched right around, creased where it folds.</figcaption>
     </figure>
     <figure>
+      <div class="img-wrap"><img src="piece-brown-cards.jpg" alt="A brown bifold wallet open on a studded metal trunk, a scooped card slot over darker leather on each panel and the Traders Point Leather mark embossed into the upper one" loading="lazy" width="1200" height="1800"></div>
+      <figcaption>Open: a scooped card slot on each panel.</figcaption>
+    </figure>
+    <figure>
+      <div class="img-wrap"><img src="piece-brown-detail.jpg" alt="Close view along the edge of an open brown wallet, the saddle stitching running down the burnished edge and the Traders Point Leather mark pressed into the panel beside it" loading="lazy" width="1200" height="1800"></div>
+      <figcaption>The mark stamped blind, and the stitching up close.</figcaption>
+    </figure>
+    <figure>
       <div class="img-wrap"><img src="piece-burgundy-cards.jpg" alt="A burgundy bifold wallet open, showing a scooped card slot on each panel either side of the fold and the Traders Point Leather mark embossed into the right-hand panel" loading="lazy" width="1200" height="1800"></div>
-      <figcaption>Scooped card slots, and the blind-embossed mark.</figcaption>
+      <figcaption>The same build in another hide.</figcaption>
     </figure>
   </div>
 </section>
