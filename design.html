@@ -352,6 +352,20 @@ body::after {
   background-size: 256px 256px;
 }
 
+/* ── WIDE SCREENS ──
+   The heading clamps top out around 1100px, so a large monitor was showing a
+   laptop's type. One step up, and the configurator widens to match — the wallet
+   preview is the point of this page and it grows with the column. The 720px
+   spec column and the 800px header keep their widths: those are text, and text
+   set much wider than that is harder to read, not grander. */
+@media (min-width: 1400px) {
+  .page-head h1 { font-size: 3.4rem; }
+  .page-head p { font-size: 1.4rem; }
+  .configurator { max-width: 1320px; gap: 5rem; }
+  .spec-inner h2,
+  .real-pieces h2 { font-size: 2.8rem; }
+}
+
 /* ── ANIMATIONS ── */
 .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s, transform 0.8s; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
@@ -367,6 +381,23 @@ body::after {
 }
 
 /* ── RESPONSIVE ── */
+/* Between the two-column configurator and the phone layout there is a band
+   where the options column is squeezed under ~400px: the leather swatches wrap
+   into ragged rows and the fixed-width monogram field pushes its status line
+   onto its own row. Nothing is gained by holding two columns that narrow, so
+   the page goes single-column here instead of at 768px, and the wide preview
+   is simply centred. */
+@media (max-width: 1024px) {
+  .configurator {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    max-width: 720px;
+  }
+  /* Static rather than sticky: pinned to the top of a single column it would
+     sit over the options it is meant to sit beside. */
+  .preview-col { position: static; }
+}
+
 @media (max-width: 768px) {
   .page-head { padding: 3rem 1.5rem 2rem; }
   .configurator {

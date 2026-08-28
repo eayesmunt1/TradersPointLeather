@@ -243,15 +243,25 @@ body {
 /* Centred with left/right rather than translateX(-50%): the fadeUp animation
    ends on transform: translateY(0), which with fill-mode forwards would
    permanently clobber a centring transform on this element. */
+/* A link rather than the decoration it used to be: #craft is right below it and
+   html already scrolls smoothly, so the one visitor who reads the cue and still
+   does not scroll can click it instead. It arrives at 0.7s rather than last in
+   the stagger — the pause before someone decides the page has ended is the one
+   moment the cue has to exist. Resting appearance is unchanged. */
 .scroll-hint {
   position: absolute;
   bottom: 2rem;
   left: 0;
   right: 0;
+  display: block;
   text-align: center;
+  text-decoration: none;
+  cursor: pointer;
   opacity: 0;
-  animation: fadeUp 1s 1.1s forwards;
+  animation: fadeUp 1s 0.7s forwards;
 }
+.scroll-hint:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 3px; }
+.scroll-hint:hover .scroll-hint-text { color: var(--tan); }
 .scroll-hint-text {
   font-size: 0.65rem;
   letter-spacing: 0.3em;
@@ -259,6 +269,7 @@ body {
   color: var(--text-muted);
   margin-bottom: 0.85rem;
   white-space: nowrap;
+  transition: color 0.3s;
 }
 .scroll-hint span {
   display: block;
@@ -284,7 +295,10 @@ body {
   gap: 1px;
   background: rgba(196,168,130,0.1);
   margin: 4rem 0;
-  max-width: 1200px;
+  /* The 1px gaps show this background through as the hairlines between cells,
+     so the gutter cannot be padding — that would paint a tan band down each
+     side. Taken off the width instead, which leaves the trick intact. */
+  max-width: min(1200px, calc(100% - 4rem));
   margin-left: auto;
   margin-right: auto;
 }
@@ -398,10 +412,31 @@ body {
   max-width: 1200px;
   margin: 0 auto;
 }
+.craft .section-label { text-align: center; }
 .craft-media {
   width: 100%;
   text-align: center;
 }
+/* Stacked under the video on a phone; set beside it on a desktop, where the
+   video alone left the widest empty screen on the site. Left-aligned in both
+   cases — centred body copy is harder to read back to the start of a line. */
+.craft-copy {
+  margin-top: 2.5rem;
+  text-align: left;
+}
+.craft-copy h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: var(--white);
+  margin-bottom: 1.25rem;
+}
+.craft-copy p {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+.craft-copy p:last-child { margin-bottom: 0; }
 .video-wrapper {
   position: relative;
   width: 100%;
@@ -633,6 +668,116 @@ body::after {
   .banner-cta .btn-shop { padding: 1.1rem 1rem; }
   .footer-links { flex-direction: column; gap: 1rem; }
 }
+
+/* ── DESKTOP ──
+   The page was drawn at phone sizes and grew outwards, so several caps below
+   are phone caps. They are relaxed here rather than edited in place, so the
+   reasoning recorded against each base rule still describes the phone it was
+   written for. This is the first min-width query on the site. */
+@media (min-width: 769px) {
+  /* The hero used to be exactly 100vh, so it ended flush with the fold and not
+     one pixel of the next section showed. Visitors read that as the end of the
+     page. Ending it short leaves the section below sliced by the bottom edge,
+     which is the cue people actually act on — the pulsing hairline never was.
+
+     Everything below is sized against viewport HEIGHT rather than width, which
+     is the constraint that actually binds here: the hero is a fixed stack of
+     content competing with the fold for room, and a laptop 768px tall has to
+     give up what a 1440px monitor can spend. Written as clamps rather than a
+     ladder of height breakpoints so it scales continuously — measured, the peek
+     holds from 740px of viewport height upwards. */
+  .hero { min-height: 88vh; padding-bottom: clamp(5.5rem, 12vh, 7.5rem); }
+  .hero-logo {
+    width: clamp(88px, 13vh, 140px);
+    height: clamp(88px, 13vh, 140px);
+    margin-bottom: clamp(1rem, 2.2vh, 2rem);
+  }
+  /* Same 2.2rem-4rem bounds as the base rule; the height term only bites on a
+     short screen, where a 4rem two-line heading is what crowds out the peek. */
+  .hero h1 { font-size: clamp(2.2rem, min(5vw, 7.2vh), 4rem); }
+  .hero-divider { margin: clamp(1rem, 2.4vh, 2rem) auto; }
+  /* Wider, not taller: at 400px the photo was a stamp in the middle of a 1440px
+     screen, and height is the one dimension the peek cannot spare. The base
+     rule's 22vh stays as written — it is tuned for a 375x667 phone and the
+     comment against it still describes that phone. */
+  .hero-feature { margin-top: clamp(1.25rem, 3vh, 2.5rem); max-width: 560px; }
+  .hero-feature img { max-height: clamp(110px, 20vh, 260px); }
+  .scroll-hint { bottom: clamp(1.25rem, 2.4vh, 2rem); }
+  .scroll-hint span { height: clamp(28px, 4.4vh, 40px); }
+
+  /* A sliver of empty padding tells nobody anything, so the top padding comes
+     off until it is the label that lands in the exposed band, cut off by the
+     fold. The cue is a word you cannot finish reading.
+
+     The hint links to this section too, so it also gets a scroll margin: the
+     jump lands with a little air above the label rather than butting it against
+     the top edge of the window. */
+  .craft { padding-top: 1.75rem; scroll-margin-top: 2rem; }
+  .craft-media {
+    display: grid;
+    grid-template-columns: minmax(0, 330px) minmax(0, 470px);
+    gap: 4rem;
+    align-items: center;
+    justify-content: center;
+  }
+  .craft-copy { margin-top: 0; }
+}
+
+/* ── WIDE SCREENS ──
+   Every heading clamp above tops out by about 1280px, so until now a 2560px
+   display showed a 1280px laptop's type. One step up, and the containers widen
+   to match: enough that the page does not look like a phone layout stranded in
+   the middle of a monitor, and no more than that. */
+@media (min-width: 1400px) {
+  .hero h1 { font-size: 4.6rem; }
+  .hero-sub { font-size: 1.4rem; max-width: 580px; }
+  .gallery-section h2,
+  .products h2,
+  .craft-copy h2 { font-size: 3.2rem; }
+  .banner-cta h2 { font-size: 4rem; }
+  .gallery-grid { max-width: 1600px; grid-auto-rows: 330px; }
+  .pillars { max-width: min(1360px, calc(100% - 6rem)); }
+  .craft { max-width: 1360px; }
+  .craft-media { grid-template-columns: minmax(0, 360px) minmax(0, 520px); gap: 5rem; }
+  .products { max-width: 1360px; }
+  .pillar { padding: 4.5rem 3rem; }
+  .pillar p { font-size: 0.95rem; }
+  .product-card-body p { font-size: 0.9rem; }
+}
+
+/* ── REDUCED MOTION ──
+   design.html has carried this block for a while; index.html is the page with
+   the animations and had none. Note the hero elements below are not merely
+   animated: each sits at opacity 0 and is brought into view by fadeUp's
+   fill-mode. Switching the animation off without restoring opacity would leave
+   the hero blank, so the two are always set together. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero-logo,
+  .hero h1,
+  .hero-tagline,
+  .hero-divider,
+  .hero-sub,
+  .hero-feature,
+  .scroll-hint {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .scroll-hint span { animation: none; opacity: 0.8; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .scroll-hint-text,
+  .pillar,
+  .gallery-item img,
+  .gallery-item::after,
+  .product-card,
+  .product-card-img img,
+  .card-cta,
+  .btn-shop,
+  .banner-contact,
+  .footer-links a { transition: none; }
+  .btn-shop:hover { transform: none; }
+}
 </style>
 
 </head>
@@ -652,18 +797,29 @@ body::after {
   <div class="hero-feature">
     <img src="hero-horween.jpg" alt="Open bifold wallet in Horween leather beside a brass Famous Horween Leathers tag" width="840" height="756">
   </div>
-  <div class="scroll-hint">
+  <a class="scroll-hint" href="#craft">
     <p class="scroll-hint-text">Explore the craft</p>
     <span></span>
-  </div>
+  </a>
 </section>
 
 <!-- PROCESS VIDEO -->
-<section class="craft reveal" id="craft">
-  <div class="craft-media">
-    <p class="section-label">The Process</p>
+<!-- The section itself is deliberately not a .reveal: its label is what shows
+     above the fold as the cue that the page continues, and a .reveal sits at
+     opacity 0 until 15% of it has been scrolled into view — which a peeking
+     sliver never reaches, so the cue would render as blank black. The label
+     stays put and the block below it keeps the fade. -->
+<section class="craft" id="craft">
+  <p class="section-label">The Process</p>
+  <div class="craft-media reveal">
     <div class="video-wrapper">
       <iframe src="https://player.vimeo.com/video/1214378807?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title="Traders Point Leather — Process"></iframe>
+    </div>
+    <div class="craft-copy">
+      <h2>One Bench, One at a Time</h2>
+      <p>Nothing here comes off a line. Each piece is cut from full-grain hide on the bench, marked out, stitched and finished before the next one is started.</p>
+      <p>The edges are the tell. They are sanded, slicked and burnished by hand until they are smooth and closed &mdash; the slowest step in the whole build, and the first thing you notice when you pick one up.</p>
+      <p>That is why these take the time they do. It is also why they outlast the things they replace.</p>
     </div>
   </div>
 </section>
@@ -694,13 +850,17 @@ body::after {
 <section class="gallery-section reveal">
   <p class="section-label">The Details</p>
   <h2>Crafted with Care, Made to Last</h2>
+  <!-- The .featured and .wide spans below tile the four columns with no holes,
+       which only works in this order: 1 | 2(2x2) | 3 / 4 | [2] | 5 / 6(wide) | 7 | 8.
+       Reorder the items and the grid grows a gap. Both classes are cancelled
+       under 768px, where the grid is a plain two-up. -->
   <div class="gallery-grid">
     <div class="gallery-item"><img src="IMG_7465.jpeg" alt="Navy wallet edge profile" loading="lazy" width="800" height="533"></div>
-    <div class="gallery-item"><img src="IMG_2301.jpeg" class="crop-upper" alt="Hand-dyed green marbled vertical bifold wallet" loading="lazy" width="800" height="1200"></div>
+    <div class="gallery-item featured"><img src="IMG_2301.jpeg" class="crop-upper" alt="Hand-dyed green marbled vertical bifold wallet" loading="lazy" width="800" height="1200"></div>
     <div class="gallery-item"><img src="IMG_7076.jpeg" alt="Wallet color options" loading="lazy" width="800" height="533"></div>
     <div class="gallery-item"><img src="IMG_6991.jpg" alt="Leather belt" loading="lazy" width="533" height="800"></div>
     <div class="gallery-item"><img src="IMG_7374.jpg"  alt="Blue key fob" loading="lazy" width="800" height="533"></div>
-    <div class="gallery-item"><img src="IMG_0168.jpeg" alt="Leather collection" loading="lazy" width="800" height="600"></div>
+    <div class="gallery-item wide"><img src="IMG_0168.jpeg" alt="Leather collection" loading="lazy" width="800" height="600"></div>
     <div class="gallery-item"><img src="IMG_2302.jpeg" class="crop-upper" alt="Navy bifold wallet open, showing marbled interior and stamped logo" loading="lazy" width="800" height="1200"></div>
     <div class="gallery-item"><img src="IMG_7383.jpg"  alt="Wallet interior" loading="lazy" width="800" height="533"></div>
   </div>
