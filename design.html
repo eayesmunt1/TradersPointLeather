@@ -906,11 +906,21 @@ function slantedStitches(d, spacing, len, deg) {
    almost nothing left for a multiply to darken, and on real leather it is that
    catch of light that shows the letters at all.
 
-   All three copies are softened by a hair, and the rims sit about a fifth of a
-   stem width off centre rather than the two fifths this was first drawn at. A
-   heated die into pebbled veg-tan leaves no vector edge, and hard copies
-   thrown that far apart separate into three legible letters instead of merging
-   into one impression.
+   Each rim is drawn as a short run of copies walking in from the full offset
+   towards the letter, rather than as one copy blurred. Where they all overlap,
+   hard against the letter's edge, the rim is at full strength, and it steps
+   down to nothing out at the fringe that only the first copy reaches. That is
+   a soft edge made out of vector text, and it is drawn this way because the
+   obvious alternative is worse on a phone: a blur needs an SVG filter, and a
+   filter is rasterised once at whatever scale the page was laid out at, so
+   pinching to zoom enlarges that bitmap instead of redrawing it. The stamp
+   turns to mush while the stitching beside it stays sharp. Copies are ordinary
+   glyphs, and the browser redraws them at whatever scale they are looked at.
+
+   The rims sit about a fifth of a stem width off centre rather than the two
+   fifths this was first drawn at: a heated die into pebbled veg-tan leaves no
+   vector edge, and hard copies thrown that far apart separate into three
+   legible letters instead of merging into one impression.
 
    Set in Arial, uppercase — the die the shop stamps with, not a display face
    chosen for the page. What is typed is uppercased as it is taken, so the two
@@ -931,28 +941,29 @@ function monogramMarkup(g) {
   const x = g.closedX + g.closedW - g.stitchInset - 0.18 * u + ls;
   const y = g.top + g.height - g.stitchInset - 0.20 * u;
   const off = size * 0.028;
-  const blur = size * 0.018;      // about half the offset: soft, not smeared
   const n = (v) => v.toFixed(2);
   const layer = (dx, dy, fill, opacity, blend) => `
     <text x="${n(x + dx)}" y="${n(y + dy)}" text-anchor="end" fill="${fill}"
           font-family="Arial, Helvetica, sans-serif" font-weight="700"
-          font-size="${n(size)}" letter-spacing="${n(ls)}" filter="url(#dieEdge)"
+          font-size="${n(size)}" letter-spacing="${n(ls)}"
           style="mix-blend-mode:${blend};opacity:${opacity}">${state.monogram}</text>`;
+
+  /* The copies land evenly between the full offset and a third of it, and each
+     carries the share of the rim that stacks back up to the whole: n of them at
+     a apiece leave (1-a)^n of the leather showing through. */
+  const RIM_COPIES = 3;
+  const rim = (dx, dy, fill, total, blend) => {
+    const a = (1 - Math.pow(1 - total, 1 / RIM_COPIES)).toFixed(3);
+    return Array.from({ length: RIM_COPIES }, (_, i) => {
+      const k = 1 - i / RIM_COPIES;
+      return layer(dx * k, dy * k, fill, a, blend);
+    }).join('');
+  };
   return `
     <g id="monogram-stamp" aria-hidden="true"${state.monogram ? '' : ' style="display:none"'}>
-      <!-- Measured off the model's own scale like everything else here, so the
-           softening comes to the same fraction of a letter on both wallets.
-           The filter has to sit on each copy rather than on the group: a filter
-           on the group would isolate it, and the three copies would blend with
-           each other instead of with the leather. -->
-      <defs>
-        <filter id="dieEdge" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="${n(blur)}"/>
-        </filter>
-      </defs>
-      ${layer(-off, -off, '#000', 0.504, 'multiply')}
+      ${rim(-off, -off, '#000', 0.504, 'multiply')}
       ${layer(0, 0, '#000', 0.084, 'multiply')}
-      ${layer(off * 0.7, off * 0.7, '#f6e3c6', 0.20, 'screen')}
+      ${rim(off * 0.7, off * 0.7, '#f6e3c6', 0.20, 'screen')}
     </g>`;
 }
 
