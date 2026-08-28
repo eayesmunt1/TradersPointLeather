@@ -886,44 +886,73 @@ function slantedStitches(d, spacing, len, deg) {
    instead, which darkens the swatch photo without covering it: the grain still
    runs through the letters, because the letters are the hide.
 
-   Three copies sell the impression. The sheen lights the wallet from the upper
-   left, so the wall on that side of a depression turns away from the light and
-   the one opposite catches it — a dark copy offset up and left, the darkened
-   face itself, then a light copy offset down and right.
+   What shows a blind emboss is the rim, not the face. The die presses the
+   letter down, and the face at the bottom of that depression is the same hide
+   it always was — burnished, so a shade darker, but no more than that. Paint
+   the whole letter body dark and the stamp starts reading as ink again, so the
+   face carries almost nothing here and the two rims do the work.
 
-   That lit lip screens rather than multiplies, and it is what keeps the stamp
-   legible on plum and ink blue: those hides are already close to black, so
-   there is almost nothing left for a multiply to darken, and on real leather it
-   is the catch of light along the pressed edge that shows the letters at all.
+   The sheen lights the wallet from the upper left, so the wall on that side of
+   a depression turns away from the light and the one opposite catches it — a
+   dark copy offset up and left, the barely-there face, then a light copy
+   offset down and right. That lit copy is offset less than the shaded one and
+   set in a warm off-white rather than pure white: the catch of light along a
+   pressed edge is a thin, leather-coloured line, and a white one as wide as
+   the shadow reads instead as a drop shadow under raised type — the opposite
+   of what is being drawn.
+
+   It screens rather than multiplies, and it is what keeps the stamp legible on
+   plum and ink blue: those hides are already close to black, so there is
+   almost nothing left for a multiply to darken, and on real leather it is that
+   catch of light that shows the letters at all.
+
+   All three copies are softened by a hair, and the rims sit about a fifth of a
+   stem width off centre rather than the two fifths this was first drawn at. A
+   heated die into pebbled veg-tan leaves no vector edge, and hard copies
+   thrown that far apart separate into three legible letters instead of merging
+   into one impression.
 
    Set in Arial, uppercase — the die the shop stamps with, not a display face
    chosen for the page. What is typed is uppercased as it is taken, so the two
-   can't disagree.
+   can't disagree. Arial carries regular and bold and nothing between, so there
+   is no half-step to reach for when the stamp sits too heavy: it stays bold,
+   and is calmed down by being set smaller and tracked wider instead.
 
    Placed and sized in inches against the model's own scale, the way the stitch
    lengths above are, so the stamp sits the same distance in from the cut edges
    and reads the same size against the leather on either model. */
 function monogramMarkup(g) {
   const u = g.unitsPerInch;
-  const size = 0.26 * u;          // about a 0.18in cap height
-  const ls = 0.03 * u;
+  const size = 0.22 * u;          // about a 0.15in cap height
+  const ls = 0.05 * u;
   /* Anchored to the bottom right corner of the exterior, inside the seam. The
      spacing pads past the last letter as well, which walks an end-anchored run
      left by that much, so it is added back. */
   const x = g.closedX + g.closedW - g.stitchInset - 0.18 * u + ls;
   const y = g.top + g.height - g.stitchInset - 0.20 * u;
-  const off = size * 0.05;
+  const off = size * 0.028;
+  const blur = size * 0.018;      // about half the offset: soft, not smeared
   const n = (v) => v.toFixed(2);
   const layer = (dx, dy, fill, opacity, blend) => `
     <text x="${n(x + dx)}" y="${n(y + dy)}" text-anchor="end" fill="${fill}"
           font-family="Arial, Helvetica, sans-serif" font-weight="700"
-          font-size="${n(size)}" letter-spacing="${n(ls)}"
+          font-size="${n(size)}" letter-spacing="${n(ls)}" filter="url(#dieEdge)"
           style="mix-blend-mode:${blend};opacity:${opacity}">${state.monogram}</text>`;
   return `
     <g id="monogram-stamp" aria-hidden="true"${state.monogram ? '' : ' style="display:none"'}>
-      ${layer(-off, -off, '#000', 0.45, 'multiply')}
-      ${layer(0, 0, '#000', 0.28, 'multiply')}
-      ${layer(off * 1.2, off * 1.2, '#fff', 0.22, 'screen')}
+      <!-- Measured off the model's own scale like everything else here, so the
+           softening comes to the same fraction of a letter on both wallets.
+           The filter has to sit on each copy rather than on the group: a filter
+           on the group would isolate it, and the three copies would blend with
+           each other instead of with the leather. -->
+      <defs>
+        <filter id="dieEdge" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="${n(blur)}"/>
+        </filter>
+      </defs>
+      ${layer(-off, -off, '#000', 0.42, 'multiply')}
+      ${layer(0, 0, '#000', 0.07, 'multiply')}
+      ${layer(off * 0.7, off * 0.7, '#f6e3c6', 0.20, 'screen')}
     </g>`;
 }
 
