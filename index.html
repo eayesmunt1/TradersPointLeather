@@ -813,7 +813,7 @@ body::after {
   <p class="section-label">The Process</p>
   <div class="craft-media reveal">
     <div class="video-wrapper">
-      <iframe src="https://player.vimeo.com/video/1214378807?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title="Traders Point Leather — Process"></iframe>
+      <iframe src="https://player.vimeo.com/video/1214378807?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;controls=0&amp;loop=1&amp;autoplay=1&amp;muted=1&amp;title=0&amp;byline=0&amp;portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title="Traders Point Leather — Process"></iframe>
     </div>
     <div class="craft-copy">
       <h2>One Bench, One at a Time</h2>
@@ -834,13 +834,13 @@ body::after {
     <p>We source quality full-grain leathers — including Horween and Wickett &amp; Craig — many of which develop a rich pull-up effect that deepens and patinas with the use of the owner. Each piece gets better with age.</p>
   </div>
   <div class="pillar">
-    <div class="pillar-img"><iframe src="https://player.vimeo.com/video/1221760928?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" loading="lazy" title="Traders Point Leather — Saddle stitching by hand"></iframe></div>
+    <div class="pillar-img"><iframe src="https://player.vimeo.com/video/1221760928?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;controls=0&amp;loop=1&amp;autoplay=1&amp;muted=1&amp;title=0&amp;byline=0&amp;portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" loading="lazy" title="Traders Point Leather — Saddle stitching by hand"></iframe></div>
     <div class="pillar-num">02</div>
     <h3>Saddle-Stitched by Hand</h3>
     <p>Every seam is saddle-stitched by hand with bonded nylon or bonded polyester thread — the same materials used in heavy-duty industrial applications. It is the longest step in the build, and it is why one cut stitch stays put instead of running.</p>
   </div>
   <div class="pillar">
-    <div class="pillar-img"><iframe src="https://player.vimeo.com/video/1221758628?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" loading="lazy" title="Traders Point Leather — Hand burnishing edges"></iframe></div>
+    <div class="pillar-img"><iframe src="https://player.vimeo.com/video/1221758628?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;controls=0&amp;loop=1&amp;autoplay=1&amp;muted=1&amp;title=0&amp;byline=0&amp;portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" loading="lazy" title="Traders Point Leather — Hand burnishing edges"></iframe></div>
     <div class="pillar-num">03</div>
     <h3>Hand Burnished</h3>
     <p>Every piece has its edges hand-burnished to a glossy, polished finish. Next to the stitching it's the longest step in the build — and it's what separates a handcrafted piece from a factory one.</p>
@@ -937,6 +937,34 @@ body::after {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
   }, { threshold: 0.15 });
   reveals.forEach(el => observer.observe(el));
+</script>
+
+<script>
+  // A Vimeo video whose privacy settings do not clear this domain still loads its
+  // player, which then paints an opaque black "Sorry — we're having a little
+  // trouble" card over the layout. Ask Vimeo up front whether each video is
+  // embeddable here, and pull the ones that are not so the card falls back to its
+  // text rather than to an error screen.
+  //
+  // Only an explicit 403/404 from Vimeo counts as a failure. A blocked or dropped
+  // request rejects the fetch instead, and that is left alone: better to risk the
+  // error card than to pull a video that plays fine.
+  document.querySelectorAll('iframe[src*="player.vimeo.com/video/"]').forEach(frame => {
+    const src = new URL(frame.src);
+    const id = src.pathname.match(/\/video\/(\d+)/);
+    if (!id) return;
+    // Unlisted videos carry an ?h= hash that the lookup needs too.
+    const hash = src.searchParams.get('h');
+    const page = 'https://vimeo.com/' + id[1] + (hash ? '/' + hash : '');
+    fetch('https://vimeo.com/api/oembed.json?url=' + encodeURIComponent(page))
+      .then(res => {
+        if (res.status !== 403 && res.status !== 404) return;
+        // The whole section goes for the standalone video: a "The Process" label
+        // with nothing beneath it reads as broken in its own right.
+        (frame.closest('.pillar-img, .craft') || frame).remove();
+      })
+      .catch(() => {});
+  });
 </script>
 
 <script async data-uid="aeb2c16a21" src="https://traders-point-leather.kit.com/aeb2c16a21/index.js"></script>
