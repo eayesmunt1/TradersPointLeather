@@ -355,6 +355,18 @@ body {
   border: 0;
 }
 
+/* ── MID-PAGE CTA ──
+   The same pair of buttons as the banner at the foot of the page, lifted to
+   just above the gallery: not everyone scrolls as far as the banner, and this
+   is the point where the page turns from telling to showing. Kept to the row
+   alone — no heading, no background band — so it hands off between sections
+   instead of reading as a second banner. Vertical air comes from the pillars'
+   4rem bottom margin above and the gallery's 6rem top padding below. */
+.mid-cta {
+  padding: 0 2rem;
+  text-align: center;
+}
+
 /* ── GALLERY ── */
 .gallery-section {
   padding: 6rem 0;
@@ -665,7 +677,8 @@ body::after {
   /* Stacked full width rather than side by side: at 375px the two labels
      wrap mid-word if they share a line. */
   .banner-actions { flex-direction: column; align-items: stretch; }
-  .banner-cta .btn-shop { padding: 1.1rem 1rem; }
+  .banner-cta .btn-shop,
+  .mid-cta .btn-shop { padding: 1.1rem 1rem; }
   .footer-links { flex-direction: column; gap: 1rem; }
 }
 
@@ -844,6 +857,16 @@ body::after {
     <div class="pillar-num">03</div>
     <h3>Hand Burnished</h3>
     <p>Every piece has its edges hand-burnished to a glossy, polished finish. Next to the stitching it's the longest step in the build — and it's what separates a handcrafted piece from a factory one.</p>
+  </div>
+</div>
+
+<!-- MID-PAGE CTA -->
+<!-- Same two links as the banner at the foot of the page, repeated here for
+     visitors who never reach the bottom. Change one pair, change both. -->
+<div class="mid-cta reveal">
+  <div class="banner-actions">
+    <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener" class="btn-shop">Shop</a>
+    <a href="/design.html" class="btn-shop btn-design">Design Your Wallet</a>
   </div>
 </div>
 
