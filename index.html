@@ -793,6 +793,22 @@ body::after {
 }
 </style>
 
+<!-- Crisp live chat. Visitors' messages land in the Crisp app on the shop's
+     phone. Deferred to page load, like Clarity, so it never slows the first
+     paint. With no website ID set, nothing loads and the page's own chat
+     buttons stay hidden. -->
+<script>
+  window.CRISP_WEBSITE_ID = '555f5fde-3295-4ab0-9e41-d1ddb720f2e4';
+  window.$crisp = [];
+  if (window.CRISP_WEBSITE_ID) {
+    window.addEventListener('load', function () {
+      var s = document.createElement('script');
+      s.src = 'https://client.crisp.chat/l.js';
+      s.async = 1;
+      document.head.appendChild(s);
+    });
+  }
+</script>
 </head>
 <body>
 
