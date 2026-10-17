@@ -286,6 +286,22 @@ body {
   color: var(--tan);
 }
 
+/* The send button, kept in reach while the wallet is being chosen rather than
+   only at the foot of the page. Beside the preview on a wide screen, where that
+   column is pinned; in a bar along the bottom of a narrow one, where it is not.
+   Each is the same mailto link as the button in the spec section. */
+.preview-send {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 1.25rem;
+  text-align: center;
+}
+.preview-send .btn-shop { padding: 1rem 1.5rem; }
+.preview-send .spec-note { margin-top: 0; font-size: 0.75rem; }
+
+.send-bar { display: none; }
+
 /* ── REAL PIECES ── */
 .real-pieces { padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; text-align: center; }
 .real-pieces .section-label { text-align: center; }
@@ -377,7 +393,8 @@ body::after {
   .wallet-svg .leather-fill,
   .wallet-svg .stitch,
   .pieces-grid img,
-  .btn-shop { transition: none; }
+  .btn-shop,
+  .send-bar { transition: none; }
 }
 
 /* ── RESPONSIVE ── */
@@ -396,6 +413,31 @@ body::after {
   /* Static rather than sticky: pinned to the top of a single column it would
      sit over the options it is meant to sit beside. */
   .preview-col { position: static; }
+
+  .preview-send { display: none; }
+  .send-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 6;
+    padding: 0.75rem max(1.5rem, env(safe-area-inset-right, 0px))
+             calc(0.75rem + env(safe-area-inset-bottom, 0px))
+             max(1.5rem, env(safe-area-inset-left, 0px));
+    background: var(--bg-warm);
+    border-top: 1px solid rgba(196,168,130,0.18);
+    box-shadow: 0 -10px 24px rgba(0,0,0,0.45);
+    transition: transform 0.35s ease, visibility 0.35s;
+  }
+  /* Out of the way once the spec section, with its own button, is on screen. */
+  .send-bar.is-away { transform: translateY(110%); visibility: hidden; }
+  .send-bar .btn-shop { flex: none; padding: 0.95rem 1.75rem; }
+  .send-bar .spec-note { margin-top: 0; font-size: 0.75rem; }
+  /* Room at the foot of the options so the bar never covers the last of them. */
+  .configurator { padding-bottom: 7rem; }
 }
 
 @media (max-width: 768px) {
@@ -433,6 +475,8 @@ body::after {
   .view-toggle button { padding: 0.6rem 1.35rem; }
   .spec-section { padding: 3.5rem 1.5rem; }
   .btn-shop { width: 100%; padding: 1.1rem 1rem; }
+  .send-bar { flex-direction: column; gap: 0.45rem; text-align: center; }
+  .send-bar .btn-shop { width: 100%; padding: 0.9rem 1rem; }
   .real-pieces { padding: 4rem 1.5rem; }
   .pieces-grid { grid-template-columns: 1fr; gap: 1.5rem; }
   .footer-links { flex-direction: column; gap: 1rem; }
@@ -511,6 +555,11 @@ body::after {
         <button type="button" id="btn-open" aria-pressed="false">Open</button>
       </div>
     </div>
+
+    <div class="preview-send">
+      <a class="btn-shop" data-send href="#" aria-describedby="send-note-side">Send to the Shop</a>
+      <span class="spec-note" id="send-note-side">Opens an email to us with your full spec.</span>
+    </div>
   </div>
 
   <!-- Option groups are generated from the config block in the script below.
@@ -534,6 +583,11 @@ body::after {
   </div>
 </div>
 
+<div class="send-bar" id="send-bar">
+  <a class="btn-shop" data-send href="#" aria-describedby="send-note-bar">Send to the Shop</a>
+  <span class="spec-note" id="send-note-bar">Opens an email to us with your full spec.</span>
+</div>
+
 <!-- SPEC -->
 <section class="spec-section reveal">
   <div class="spec-inner">
@@ -541,8 +595,8 @@ body::after {
     <h2>The Spec</h2>
     <p>Everything we need to cut your wallet — sent straight to the bench.</p>
     <div class="spec-actions">
-      <a class="btn-shop" id="send-btn" href="#">Send the Spec</a>
-      <span class="spec-note">Opens a draft in your email app, addressed to us.</span>
+      <a class="btn-shop" id="send-btn" data-send href="#" aria-describedby="send-note">Send to the Shop</a>
+      <span class="spec-note" id="send-note">Opens a draft in your email app, addressed to us.</span>
     </div>
   </div>
 </section>
@@ -1213,7 +1267,7 @@ state.stash = STASH[0].id;
 const byId = (list, id) => list.find((x) => x.id === id) || list[0];
 
 const svg = document.getElementById('wallet');
-const sendBtn = document.getElementById('send-btn');
+const sendBtns = document.querySelectorAll('[data-send]');
 
 /* ── Build the SVG ──────────────────────────────────────────────────── */
 function buildWallet() {
@@ -1293,7 +1347,8 @@ function render() {
 
   document.querySelector('[data-opt="stash"]').hidden = !currentModel().offersStash;
 
-  sendBtn.href = buildMailtoHref();
+  const href = buildMailtoHref();
+  sendBtns.forEach((a) => { a.href = href; });
 }
 
 /* ── Options UI ─────────────────────────────────────────────────────── */
@@ -1522,6 +1577,13 @@ monoInput.addEventListener('input', () => {
     setView(false);
   }
 });
+
+// The bottom bar steps aside once the spec section is in view, and stays aside
+// below it, so it never sits over that section's own button or the footer.
+const sendBar = document.getElementById('send-bar');
+new IntersectionObserver(([e]) => {
+  sendBar.classList.toggle('is-away', e.isIntersecting || e.boundingClientRect.top < 0);
+}).observe(document.querySelector('.spec-section'));
 
 // Reveal on scroll
 const reveals = document.querySelectorAll('.reveal');
