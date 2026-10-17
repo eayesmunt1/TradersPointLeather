@@ -828,11 +828,16 @@ function panelOuterRun(x, y, w, h, r, side, oh, topStart) {
 }
 
 /* A panel's top seam where it is sewn on its own rather than as part of the
-   perimeter run: one straight line from past the spine edge out to the outer
-   seam's line, where it stops. It never turns the corner, and the outer run
-   starts well below it, so the two do not meet — as the open photo shows. */
-function panelTopSeam(x, y, w, side, oh) {
-  return side === 'left' ? `M${x + w + oh},${y} H${x}` : `M${x - oh},${y} H${x + w}`;
+   perimeter run: one straight line from past the spine edge towards the outer
+   edge. It stops one stitch short of where that edge starts to round, so it
+   never runs into the corner, and the outer run starts well below it, so the
+   two do not meet — as the open photo shows.
+
+   `x` and `w` are the panel's cut edges, `r` its corner radius, `gap` one
+   stitch, and `oh` how far the seam runs past the spine edge. */
+function panelTopSeam(x, y, w, r, side, oh, gap) {
+  return side === 'left' ? `M${x + w + oh},${y} H${x + r + gap}`
+                         : `M${x - oh},${y} H${x + w - r - gap}`;
 }
 
 function pocketPath(x0, x1, y, bottom, depth) {
@@ -1125,7 +1130,7 @@ function walletOpen(g) {
       <!-- Top, outer edge and bottom in one run where the model is stitched
            across its top outside too. Where it is not, the panel's top seam
            holds the panel alone, so it is sewn on its own: a straight line
-           that stops at the side, with the outer run starting below it at the
+           that stops a stitch short of the rounded corner, with the outer run starting below it at the
            pocket assembly, where the spine-edge seam starts. The spine edge is
            stitched separately either way, spanning only the pocket assembly
            rather than the full height. -->
@@ -1135,7 +1140,8 @@ function walletOpen(g) {
                                i + g.stitchOverhang,
                                g.topStitched ? null : g.innerStitchTop)}"/>
       ${g.topStitched ? '' : `<path class="stitch" ${STITCH} stroke="var(--c-thread)"
-            d="${panelTopSeam(p.x0 + i, y + i, pw - i * 2, p.side, i + g.stitchOverhang)}"/>`}
+            d="${panelTopSeam(p.x0, y + i, pw, g.radius, p.side, g.stitchOverhang,
+                              STITCH_GAP * g.unitsPerInch)}"/>`}
       <path class="stitch" ${STITCH} stroke="var(--c-thread)"
             d="M${p.side === 'left' ? p.x1 - i : p.x0 + i},${g.innerStitchTop}`
             + ` V${g.innerStitchBottom}"/>
