@@ -1240,8 +1240,8 @@ ${!stash ? '' : `
            it runs flush with the pocket edges below rather than out onto the
            spine. -->
       <path class="leather-fill" fill="none"
-            d="M${p.side === 'left' ? p.x1 - 1 : p.x0 + 1},${y} V${g.pocketUpper}"
-            stroke="var(--s-exterior)" stroke-width="2"/>`}
+            d="M${p.side === 'left' ? p.x1 - 0.5 : p.x0 + 0.5},${y} V${g.pocketUpper}"
+            stroke="var(--s-exterior)" stroke-width="1"/>`}
 
       <!-- Top, outer edge and bottom in one run where the model is stitched
            across its top outside too. Where it is not, the run stops short of
