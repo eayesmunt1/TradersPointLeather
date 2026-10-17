@@ -1231,6 +1231,17 @@ function walletOpen(g) {
       </g>
 
       <path d="${outline}" fill="url(#sheen)" opacity="0.45" style="pointer-events:none"/>
+${!stash ? '' : `
+      <!-- The stash pocket's mouth. Sewn across the top and down the outer
+           edge, the panel stands free along its spine edge above the pockets,
+           and that cut edge is the opening — burnished from the top of the
+           panel down to where the upper pocket covers it. Drawn before the
+           seams, so the stitches cross over it, and kept inside the panel, so
+           it runs flush with the pocket edges below rather than out onto the
+           spine. -->
+      <path class="leather-fill" fill="none"
+            d="M${p.side === 'left' ? p.x1 - 1 : p.x0 + 1},${y} V${g.pocketUpper}"
+            stroke="var(--s-exterior)" stroke-width="2"/>`}
 
       <!-- Top, outer edge and bottom in one run where the model is stitched
            across its top outside too. Where it is not, the run stops short of
@@ -1257,15 +1268,7 @@ function walletOpen(g) {
            line, so the panel meets the spine on colour and seam alone. -->
       <path class="leather-fill" fill="none"
             d="${panelOuterRun(p.x0, y, pw, h, g.radius, p.side, 0, null)}"
-            stroke="var(--s-exterior)" stroke-width="2.5"/>
-      ${!stash ? '' : `
-      <!-- The stash pocket's mouth. Sewn across the top and down the outer
-           edge, the panel stands free along its spine edge above the pockets,
-           and that cut edge is the opening — burnished like a pocket's, from
-           the top of the panel down to where the upper pocket covers it. -->
-      <path class="leather-fill" fill="none"
-            d="M${p.side === 'left' ? p.x1 : p.x0},${y} V${g.pocketUpper}"
-            stroke="var(--s-exterior)" stroke-width="2.5"/>`}`;
+            stroke="var(--s-exterior)" stroke-width="2.5"/>`;
   }).join('');
 
   return `
