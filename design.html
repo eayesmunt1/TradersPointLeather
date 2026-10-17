@@ -633,6 +633,14 @@ const TARGETS = [
     help: 'The two front pockets, closest to you.' },
 ];
 
+/* A stash pocket is the panel sewn across its top, which closes the space
+   between it and the body into a pocket opening at the spine. Only the classic
+   offers it: the vertical's panels are stitched right around regardless. */
+const STASH = [
+  { id: 'none',  name: 'None' },
+  { id: 'stash', name: 'Stash Pocket' },
+];
+
 /* How many letters a monogram may carry, and how many times any one of them
    may appear. Both are stamping limits rather than screen ones: four letters is
    what fits in the corner at a size worth pressing, and a third repeat of the
@@ -677,7 +685,7 @@ const VERTICAL_GEO = {
   innerStitchTop: 89,     // 0.147 of the height
   innerStitchBottom: 324, // 0.930
   stitchOverhang: 4,      // how far the outer run runs past the spine edge
-  topStitched: true,      // stitched right around each panel
+  topStitched: true,      // stitched across the top outside, too
   unitsPerInch: 66.7,     // the scale the stitch lengths are drawn at
   shadowDy: 16, shadowRy: 10,
 };
@@ -686,8 +694,8 @@ const VERTICAL_GEO = {
    pieces as the vertical: a spine of the body leather, a panel either side, two
    scooped pockets on each. It shares every path function above, including the
    fitted pocket edge; where it differs it says so in this table — the spine
-   shows its skin side rather than its flesh side, and the top edge is left
-   unstitched.
+   shows its skin side rather than its flesh side, and the outside top edge is
+   left unstitched.
 
    Read off the reference photos, closed and open, against the stated
    8.75 × 3.5 open, 4.4 × 3.5 closed. The open photo measures 2.50 along its
@@ -720,10 +728,14 @@ const CLASSIC_GEO = {
   innerStitchTop: 63,          // top + 0.151
   innerStitchBottom: 213,      // top + 0.932
   stitchOverhang: 4,           // an absolute run onto the suede, as above
-  /* The note compartment opens along the whole top edge, so that edge carries
-     no stitching: each seam runs from the bottom, up the outer edge, and stops
-     short of the top. The closed photo shows that edge bare, burnished but
-     unstitched, against the stitched edge and bottom beside it. */
+  /* The note compartment opens along the whole top edge, between each panel
+     and the body, so the body's top edge carries no stitching: the closed
+     view's seam runs from the bottom, up the outer edge, and stops short of
+     the top. The closed photo shows that edge bare, burnished but unstitched,
+     against the stitched edge and bottom beside it. Inside, the panel's seam
+     stops short of the top the same way, unless a stash pocket is chosen —
+     then the panel is sewn across its top on a seam of its own, through the
+     panel alone, as the open photo shows. */
   topStitched: false,
   /* How far below the top cut edge the outer seam stops. The seam holds the
      note compartment closed, so it ends where that compartment's mouth begins
@@ -805,12 +817,12 @@ function panelPath(x, y, w, h, r, side) {
    stopping short inside the panel. The burnished edge passes 0 and so stops
    square on the edge.
 
-   `topStart` is null on a model stitched across the top, which draws the top
-   edge and its corner as part of the run. On one whose note compartment opens
-   along that edge it is the y the run starts at: the seam comes up the outer
-   edge and stops there, short of the cut edge, leaving the top corner bare.
-   The burnished edge passes null either way, since it covers the three cut
-   sides whether or not they are stitched. */
+   `topStart` is null on a model whose panel seam turns the top corner, which
+   draws the top edge and its corner as part of the run. On one whose top is a
+   seam of its own (see panelTopSeam) it is the y the run starts at: the seam
+   comes up the outer edge and stops there, leaving the top corner bare.
+   The burnished edge passes null, since it covers the three cut sides
+   whether or not they are stitched. */
 function panelOuterRun(x, y, w, h, r, side, oh, topStart) {
   const outer = side === 'left'
     ? { sweep: 0, corner: x + r, edge: x, end: x + w + oh }
@@ -822,6 +834,19 @@ function panelOuterRun(x, y, w, h, r, side, oh, topStart) {
   }
   return `M${outer.end},${y} H${outer.corner}`
        + ` A${r},${r} 0 0 ${outer.sweep} ${outer.edge},${y + r}${down}`;
+}
+
+/* A panel's top seam where it is sewn on its own rather than as part of the
+   perimeter run: one straight line from past the spine edge towards the outer
+   edge. It stops one stitch short of where that edge starts to round, so it
+   never runs into the corner, and the outer run starts well below it, so the
+   two do not meet — as the open photo shows.
+
+   `x` and `w` are the panel's cut edges, `r` its corner radius, `gap` one
+   stitch, and `oh` how far the seam runs past the spine edge. */
+function panelTopSeam(x, y, w, r, side, oh, gap) {
+  return side === 'left' ? `M${x + w + oh},${y} H${x + r + gap}`
+                         : `M${x - oh},${y} H${x + w - r - gap}`;
 }
 
 function pocketPath(x0, x1, y, bottom, depth) {
@@ -1035,6 +1060,7 @@ function walletClosed(g) {
 }
 
 function walletOpen(g) {
+  const stash = !g.topStitched && hasStash();
   const x = g.openX, y = g.top, w = g.openW, h = g.height;
   const i = g.stitchInset;
   const bottom = y + h;
@@ -1111,15 +1137,23 @@ function walletOpen(g) {
 
       <path d="${outline}" fill="url(#sheen)" opacity="0.45" style="pointer-events:none"/>
 
-      <!-- Top, outer edge and bottom in one run — the top only where the model
-           is stitched across it, and where it is not, the run stops short of
-           the top edge — and the spine edge separately, spanning only the
-           pocket assembly rather than the full height. -->
+      <!-- Top, outer edge and bottom in one run where the model is stitched
+           across its top outside too. Where it is not, the run stops short of
+           the top edge — unless the wallet has a stash pocket, whose top seam
+           holds the panel alone, so it is sewn on its own: a straight line
+           that stops a stitch short of the rounded corner, with the outer run
+           starting below it at the pocket assembly, where the spine-edge seam
+           starts. The spine edge is stitched separately either way, spanning
+           only the pocket assembly rather than the full height. -->
       <path class="stitch" ${STITCH} stroke="var(--c-thread)"
             d="${panelOuterRun(p.x0 + i, y + i, pw - i * 2, h - i * 2,
                                Math.max(g.radius - 4, 2), p.side,
                                i + g.stitchOverhang,
-                               g.topStitched ? null : y + g.stitchTopGap)}"/>
+                               g.topStitched ? null
+                               : stash ? g.innerStitchTop : y + g.stitchTopGap)}"/>
+      ${!stash ? '' : `<path class="stitch" ${STITCH} stroke="var(--c-thread)"
+            d="${panelTopSeam(p.x0, y + i, pw, g.radius, p.side, g.stitchOverhang,
+                              STITCH_GAP * g.unitsPerInch)}"/>`}
       <path class="stitch" ${STITCH} stroke="var(--c-thread)"
             d="M${p.side === 'left' ? p.x1 - i : p.x0 + i},${g.innerStitchTop}`
             + ` V${g.innerStitchBottom}"/>
@@ -1150,6 +1184,7 @@ const MODELS = {
     detail: '4 card slots, 2 pockets',
     code: 'TPL-CB',
     geo: CLASSIC_GEO,
+    offersStash: true,
     closed: walletClosed,
     open: walletOpen,
   },
@@ -1165,6 +1200,7 @@ const MODELS = {
 const DEFAULT_MODEL = 'classic';
 const MODEL_LIST = Object.entries(MODELS).map(([id, m]) => ({ id, ...m }));
 const currentModel = () => MODELS[state.model] || MODELS[DEFAULT_MODEL];
+const hasStash = () => !!currentModel().offersStash && state.stash === 'stash';
 
 /* ── State ──────────────────────────────────────────────────────────── */
 const state = {};
@@ -1172,6 +1208,7 @@ TARGETS.forEach((t) => { state[t.key] = t.def; });
 state.thread = THREADS[0].id;
 state.model = DEFAULT_MODEL;
 state.monogram = '';
+state.stash = STASH[0].id;
 
 const byId = (list, id) => list.find((x) => x.id === id) || list[0];
 
@@ -1254,6 +1291,8 @@ function render() {
     el.tabIndex = on ? 0 : -1;
   });
 
+  document.querySelector('[data-opt="stash"]').hidden = !currentModel().offersStash;
+
   sendBtn.href = buildMailtoHref();
 }
 
@@ -1283,6 +1322,7 @@ function modelChip(m) {
 function swatchMarkup(group, item, kind) {
   const chip = kind === 'model'
     ? `<span class="swatch-chip chip-shape" aria-hidden="true">${modelChip(item)}</span>`
+    : kind === 'option' ? ''
     : `<span class="swatch-chip" aria-hidden="true" style="${
         kind === 'leather' && item.tex ? `background-image:url('${item.tex}')`
                                        : `background-color:${item.hex}`}"></span>`;
@@ -1308,12 +1348,17 @@ function buildOptions() {
     key: t.key, label: t.label, help: t.help, items: LEATHERS, kind: 'leather',
   }));
   groups.push({
+    key: 'stash', label: 'Stash Pocket', kind: 'option', items: STASH,
+    help: 'Each inside panel sewn across its top, closing the space behind the card '
+        + 'pockets into a hidden pocket that opens at the fold.',
+  });
+  groups.push({
     key: 'thread', label: 'Stitching', help: 'The thread colour running around every seam.',
     items: THREADS, kind: 'thread',
   });
 
   document.getElementById('options').innerHTML = groups.map((grp) => `
-    <div class="opt-group">
+    <div class="opt-group" data-opt="${grp.key}">
       <h2 id="lbl-${grp.key}">${grp.label}</h2>
       <p class="opt-help">${grp.help}</p>
       <div class="swatch-row" role="radiogroup" aria-labelledby="lbl-${grp.key}" data-group="${grp.key}">
@@ -1343,14 +1388,17 @@ function buildOptions() {
 }
 
 /* Changing a leather never touches the DOM — every fill is a custom property
-   on the <svg>, so render() alone is enough. Changing the style is different:
-   the geometry is different, so the drawing has to be rebuilt. The properties
+   on the <svg>, so render() alone is enough. Changing the style or the stash
+   pocket is different: the geometry or the seams are different, so the drawing
+   has to be rebuilt. The stash pocket is only seen inside, so choosing it opens
+   the wallet, as typing a monogram closes it. The properties
    live on the <svg> itself rather than on the paths, so the new markup comes
    up already wearing the leathers that were chosen. */
 function choose(group, value) {
   const changed = state[group] !== value;
   state[group] = value;
-  if (changed && group === 'model') buildWallet();
+  if (changed && (group === 'model' || group === 'stash')) buildWallet();
+  if (changed && group === 'stash') setView(true);
   render();
 }
 
@@ -1396,6 +1444,7 @@ function buildSpec() {
     return `${t.label}: ${l.line} ${l.name}`;
   });
   rows.push(`Stitching: ${byId(THREADS, state.thread).name}`);
+  if (currentModel().offersStash) rows.push(`Stash Pocket: ${hasStash() ? 'Yes' : 'No'}`);
   /* Written out even when there isn't one: a row saying None tells whoever cuts
      the wallet that no stamp was wanted, rather than leaving them to wonder
      whether it was left off by mistake. It carries further in an email than it
@@ -1406,6 +1455,7 @@ function buildSpec() {
   const code = [m.code]
     .concat(TARGETS.map((t) => `${t.code}:${state[t.key]}`))
     .concat(`THR:${state.thread}`)
+    .concat(currentModel().offersStash ? [`STASH:${hasStash() ? 'yes' : 'no'}`] : [])
     .concat(`MON:${state.monogram || 'none'}`)
     .join(' / ');
 
