@@ -808,16 +808,31 @@ function panelPath(x, y, w, h, r, side) {
    stopping short inside the panel. The burnished edge passes 0 and so stops
    square on the edge.
 
-   Every model stitches a panel across its top, so the run always includes it.
-   Only the closed view's seam can stop short of the top — see stitchClosed. */
-function panelOuterRun(x, y, w, h, r, side, oh) {
+   `topStart` is null on a model whose panel seam turns the top corner, which
+   draws the top edge and its corner as part of the run. On one whose top is a
+   seam of its own (see panelTopSeam) it is the y the run starts at: the seam
+   comes up the outer edge and stops there, leaving the top corner bare.
+   The burnished edge passes null, since it covers the three cut sides
+   whether or not they are stitched. */
+function panelOuterRun(x, y, w, h, r, side, oh, topStart) {
   const outer = side === 'left'
     ? { sweep: 0, corner: x + r, edge: x, end: x + w + oh }
     : { sweep: 1, corner: x + w - r, edge: x + w, end: x - oh };
+  const down = ` V${y + h - r} A${r},${r} 0 0 ${outer.sweep} ${outer.corner},${y + h}`
+             + ` H${outer.end}`;
+  if (topStart !== null && topStart !== undefined) {
+    return `M${outer.edge},${topStart}${down}`;
+  }
   return `M${outer.end},${y} H${outer.corner}`
-       + ` A${r},${r} 0 0 ${outer.sweep} ${outer.edge},${y + r}`
-       + ` V${y + h - r} A${r},${r} 0 0 ${outer.sweep} ${outer.corner},${y + h}`
-       + ` H${outer.end}`;
+       + ` A${r},${r} 0 0 ${outer.sweep} ${outer.edge},${y + r}${down}`;
+}
+
+/* A panel's top seam where it is sewn on its own rather than as part of the
+   perimeter run: one straight line from past the spine edge out to the outer
+   seam's line, where it stops. It never turns the corner, and the outer run
+   starts well below it, so the two do not meet — as the open photo shows. */
+function panelTopSeam(x, y, w, side, oh) {
+  return side === 'left' ? `M${x + w + oh},${y} H${x}` : `M${x - oh},${y} H${x + w}`;
 }
 
 function pocketPath(x0, x1, y, bottom, depth) {
@@ -1107,15 +1122,20 @@ function walletOpen(g) {
 
       <path d="${outline}" fill="url(#sheen)" opacity="0.45" style="pointer-events:none"/>
 
-      <!-- Top, outer edge and bottom in one run, on every model — the top seam
-           holds the panel, not the note compartment, so the classic carries it
-           here though its outside top edge is bare — and the spine edge
-           separately, spanning only the pocket assembly rather than the full
-           height. -->
+      <!-- Top, outer edge and bottom in one run where the model is stitched
+           across its top outside too. Where it is not, the panel's top seam
+           holds the panel alone, so it is sewn on its own: a straight line
+           that stops at the side, with the outer run starting below it at the
+           pocket assembly, where the spine-edge seam starts. The spine edge is
+           stitched separately either way, spanning only the pocket assembly
+           rather than the full height. -->
       <path class="stitch" ${STITCH} stroke="var(--c-thread)"
             d="${panelOuterRun(p.x0 + i, y + i, pw - i * 2, h - i * 2,
                                Math.max(g.radius - 4, 2), p.side,
-                               i + g.stitchOverhang)}"/>
+                               i + g.stitchOverhang,
+                               g.topStitched ? null : g.innerStitchTop)}"/>
+      ${g.topStitched ? '' : `<path class="stitch" ${STITCH} stroke="var(--c-thread)"
+            d="${panelTopSeam(p.x0 + i, y + i, pw - i * 2, p.side, i + g.stitchOverhang)}"/>`}
       <path class="stitch" ${STITCH} stroke="var(--c-thread)"
             d="M${p.side === 'left' ? p.x1 - i : p.x0 + i},${g.innerStitchTop}`
             + ` V${g.innerStitchBottom}"/>
@@ -1123,7 +1143,7 @@ function walletOpen(g) {
       <!-- Burnished along the three cut edges only. The spine edge carries no
            line, so the panel meets the spine on colour and seam alone. -->
       <path class="leather-fill" fill="none"
-            d="${panelOuterRun(p.x0, y, pw, h, g.radius, p.side, 0)}"
+            d="${panelOuterRun(p.x0, y, pw, h, g.radius, p.side, 0, null)}"
             stroke="var(--s-exterior)" stroke-width="2.5"/>`;
   }).join('');
 
