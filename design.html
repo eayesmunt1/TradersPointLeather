@@ -299,23 +299,6 @@ body {
 }
 .preview-send .btn-shop { padding: 1rem 1.5rem; }
 
-/* Chat sits beside Send as the quieter of the two: outlined, not filled. */
-.btn-chat {
-  display: inline-block;
-  padding: 0.95rem 1.5rem;
-  background: none;
-  color: var(--tan);
-  border: 1px solid rgba(196,168,130,0.45);
-  font-family: 'Jost', sans-serif;
-  font-size: 0.8rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  font-weight: 500;
-  cursor: pointer;
-  transition: border-color 0.3s, color 0.3s;
-}
-.btn-chat:hover { border-color: var(--tan-light); color: var(--tan-light); }
-.btn-chat:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 3px; }
 .send-actions { display: flex; gap: 0.6rem; }
 .preview-send .spec-note { margin-top: 0; font-size: 0.75rem; }
 
@@ -454,7 +437,6 @@ body::after {
   /* Out of the way once the spec section, with its own button, is on screen. */
   .send-bar.is-away { transform: translateY(110%); visibility: hidden; }
   .send-bar .btn-shop { flex: none; padding: 0.95rem 1.75rem; }
-  .send-bar .btn-chat { flex: none; padding: 0.9rem 1.1rem; }
   .send-bar .spec-note { margin-top: 0; font-size: 0.75rem; }
   /* Room at the foot of the options so the bar never covers the last of them. */
   .configurator { padding-bottom: 7rem; }
@@ -595,8 +577,7 @@ body::after {
 
     <div class="preview-send">
       <a class="btn-shop" data-send href="#" aria-describedby="send-note-side">Send to the Shop</a>
-      <span class="spec-note" id="send-note-side">Opens an email to us with your full spec.</span>
-      <button type="button" class="btn-chat" data-chat hidden>Chat with the Maker</button>
+      <span class="spec-note" id="send-note-side">Opens a chat with the shop and sends your full spec.</span>
     </div>
   </div>
 
@@ -624,9 +605,8 @@ body::after {
 <div class="send-bar" id="send-bar">
   <div class="send-actions">
     <a class="btn-shop" data-send href="#" aria-describedby="send-note-bar">Send to the Shop</a>
-    <button type="button" class="btn-chat" data-chat aria-label="Chat with the maker" hidden>Chat</button>
   </div>
-  <span class="spec-note" id="send-note-bar">Opens an email to us with your full spec.</span>
+  <span class="spec-note" id="send-note-bar">Opens a chat with the shop and sends your full spec.</span>
 </div>
 
 <!-- SPEC -->
@@ -637,7 +617,7 @@ body::after {
     <p>Everything we need to cut your wallet — sent straight to the bench.</p>
     <div class="spec-actions">
       <a class="btn-shop" id="send-btn" data-send href="#" aria-describedby="send-note">Send to the Shop</a>
-      <span class="spec-note" id="send-note">Opens a draft in your email app, addressed to us.</span>
+      <span class="spec-note" id="send-note">Opens a chat with the shop and sends your full spec.</span>
     </div>
   </div>
 </section>
@@ -1637,12 +1617,16 @@ new IntersectionObserver(([e]) => {
   sendBar.classList.toggle('is-away', e.isIntersecting || e.boundingClientRect.top < 0);
 }).observe(document.querySelector('.spec-section'));
 
-/* ── Chat ───────────────────────────────────────────────────────────
+/* ── Send, by chat ──────────────────────────────────────────────────
+   Send to the Shop opens Crisp and sends the spec as the visitor's first
+   message, so it reaches the shop's phone in full and the visitor can carry
+   on the conversation under it. The build code is attached to the session as
+   well. If Crisp never loaded (no ID, or a blocker stopped it), the click is
+   left alone and the button's mailto href opens an email draft instead.
+
    Crisp's own launcher floats bottom-right. On a wide screen it has that
    corner to itself; on a narrow one the send bar is there, so the launcher is
-   hidden and the bar's Chat button opens the window instead, which hides
-   again when closed. Either way the chat carries the current build code, so
-   the conversation starts on the wallet being asked about. */
+   hidden and Send opens the window instead, which hides again when closed. */
 if (window.CRISP_WEBSITE_ID) {
   const narrow = window.matchMedia('(max-width: 1024px)');
   const tuck = () => { if (narrow.matches) $crisp.push(['do', 'chat:hide']); };
@@ -1650,16 +1634,17 @@ if (window.CRISP_WEBSITE_ID) {
   tuck();
   $crisp.push(['on', 'chat:closed', tuck]);
 
-  document.querySelectorAll('[data-chat]').forEach((btn) => {
-    btn.hidden = false;
-    btn.addEventListener('click', () => {
-      const code = buildSpec().split('\n').pop().replace('Build code: ', '');
-      $crisp.push(['set', 'session:data', [[['build_code', code]]]]);
-      $crisp.push(['set', 'message:text', [`Hi, a question about my build: ${code}\n\n`]]);
-      $crisp.push(['do', 'chat:show']);
-      $crisp.push(['do', 'chat:open']);
-    });
-  });
+  sendBtns.forEach((btn) => btn.addEventListener('click', (e) => {
+    // Until Crisp has loaded, $crisp is still the plain queue array.
+    if (typeof $crisp.is !== 'function') return;
+    e.preventDefault();
+    const spec = buildSpec();
+    const code = spec.split('\n').pop().replace('Build code: ', '');
+    $crisp.push(['set', 'session:data', [[['build_code', code]]]]);
+    $crisp.push(['do', 'chat:show']);
+    $crisp.push(['do', 'chat:open']);
+    $crisp.push(['do', 'message:send', ['text', spec]]);
+  }));
 }
 
 // Reveal on scroll
