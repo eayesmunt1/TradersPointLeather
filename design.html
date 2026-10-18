@@ -217,10 +217,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.06em;
   /* Letter-spacing pads to the right of the last letter, which drags centred
      text off centre by that much. Half of it back as indent re-centres it. */
-  text-indent: 0.22em;
+  text-indent: 0.06em;
   text-align: center;
   text-transform: uppercase;
   padding: 0.6rem 0.5rem;
@@ -588,7 +588,7 @@ body::after {
     <div id="options"></div>
 
     <div class="opt-group">
-      <h2><label for="monogram">Monogram</label></h2>
+      <h2><label for="monogram">Initials</label></h2>
       <p class="opt-help">Up to four letters, blind-embossed low on the outside back —
         no ink and no foil, just the hide pressed darker. Letters only, and no letter
         more than twice.</p>
@@ -1055,7 +1055,8 @@ function slantedStitches(d, spacing, len, deg) {
    chosen for the page. What is typed is uppercased as it is taken, so the two
    can't disagree. Arial carries regular and bold and nothing between, so there
    is no half-step to reach for when the stamp sits too heavy: it stays bold,
-   and is calmed down by being set smaller and tracked wider instead.
+   and is calmed down by being set smaller instead. Tracked only a touch, so
+   the initials read as one set rather than letters spaced apart.
 
    Placed and sized in inches against the model's own scale, the way the stitch
    lengths above are, so the stamp sits the same distance in from the cut edges
@@ -1063,7 +1064,7 @@ function slantedStitches(d, spacing, len, deg) {
 function monogramMarkup(g) {
   const u = g.unitsPerInch;
   const size = 0.22 * u;          // about a 0.15in cap height
-  const ls = 0.05 * u;
+  const ls = 0.012 * u;           // close-set, as the letters sit on the die
   /* Anchored to the bottom right corner of the exterior, inside the seam. The
      spacing pads past the last letter as well, which walks an end-anchored run
      left by that much, so it is added back. */
@@ -1536,7 +1537,7 @@ function buildSpec() {
      the wallet that no stamp was wanted, rather than leaving them to wonder
      whether it was left off by mistake. It carries further in an email than it
      did in a box of text on the page. */
-  rows.push(`Monogram: ${state.monogram || 'None'}`);
+  rows.push(`Initials: ${state.monogram || 'None'}`);
 
   const m = currentModel();
   const code = [m.code]
