@@ -334,6 +334,12 @@ body {
   margin: 0 auto;
 }
 .pieces-grid figure { margin: 0; }
+/* An odd one out sits centred under the rest at the same size, not alone at the left. */
+.pieces-grid figure:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: calc(50% - 2px);
+}
 .pieces-grid figcaption {
   margin-top: 0.6rem;
   font-size: 0.8rem;
@@ -659,7 +665,7 @@ body::after {
   <p class="pieces-intro">The leathers on offer, as they look made up into a wallet.</p>
   <!-- One frame per leather the configurator offers, captioned with the same
        name its swatch carries, so a choice above can be matched to a real
-       wallet here. Plum has no photograph yet; add it as a fifth figure. -->
+       wallet here. -->
   <div class="pieces-grid">
     <figure>
       <div class="img-wrap"><img src="piece-brown-in-hand.jpg" style="object-position: center 55%" alt="A hand holding a closed whiskey bifold wallet over a studded metal trunk, the stitching running down its outside edge" loading="lazy" width="1200" height="1800"></div>
@@ -672,6 +678,10 @@ body::after {
     <figure>
       <div class="img-wrap"><img src="IMG_7465.jpeg" alt="An open vertical bifold in Ink Blue, its card pockets either side of a blue suede spine" loading="lazy" width="800" height="533"></div>
       <figcaption>Ink Blue</figcaption>
+    </figure>
+    <figure>
+      <div class="img-wrap"><img src="piece-plum.jpg" alt="An open classic bifold with a London Bus Red inside and near-black Plum card pockets, stitched in a dark thread" loading="lazy" width="1105" height="730"></div>
+      <figcaption>Plum pockets, London Bus Red inside</figcaption>
     </figure>
     <figure>
       <div class="img-wrap"><img src="IMG_7383.jpg" alt="An open vertical bifold with a whiskey body and Ink Blue card pockets" loading="lazy" width="800" height="533"></div>
@@ -712,13 +722,13 @@ body::after {
             in the preview. Leave it off and the hex is used.
    ══════════════════════════════════════════════════════════════════════ */
 const LEATHERS = [
-  { id: 'whiskey', name: 'Whiskey',         line: 'Horween Cavalier', hex: '#704d29', shade: '#412c18',
+  { id: 'whiskey', name: 'Whiskey',         line: 'Horween Cavalier', hex: '#5e331c', shade: '#361d10',
     tex: 'leather-whiskey.jpg' },
-  { id: 'redbus',  name: 'London Bus Red',  line: 'Horween Cavalier', hex: '#652124', shade: '#3b1315',
+  { id: 'redbus',  name: 'London Bus Red',  line: 'Horween Cavalier', hex: '#4c1820', shade: '#2c0e13',
     tex: 'leather-redbus.jpg' },
-  { id: 'ink',     name: 'Ink Blue',        line: 'Horween Cavalier', hex: '#122a42', shade: '#0a1826',
+  { id: 'ink',     name: 'Ink Blue',        line: 'Horween Cavalier', hex: '#0a2339', shade: '#061422',
     tex: 'leather-ink.jpg' },
-  { id: 'plum',    name: 'Plum',            line: 'Horween Cavalier', hex: '#3a292b', shade: '#211819',
+  { id: 'plum',    name: 'Plum',            line: 'Horween Cavalier', hex: '#2a2833', shade: '#18171e',
     tex: 'leather-plum.jpg' },
 ];
 
