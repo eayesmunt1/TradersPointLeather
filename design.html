@@ -603,9 +603,9 @@ body::after {
     <div class="preview-send">
       <div class="send-actions">
         <a class="btn-shop" data-buy href="https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00" aria-describedby="send-note-side">Buy — $145</a>
-        <a class="btn-shop btn-ghost" data-send href="#" aria-describedby="send-note-side">Send to the Shop</a>
+        <a class="btn-shop btn-ghost" data-send href="#" aria-describedby="send-note-side">Discuss Your Build</a>
       </div>
-      <span class="spec-note" id="send-note-side">$145, every option included. Checkout by Stripe, or send your spec with a question first.</span>
+      <span class="spec-note" id="send-note-side">$145, every option included. Secure checkout by Stripe.</span>
     </div>
   </div>
 
@@ -633,9 +633,9 @@ body::after {
 <div class="send-bar" id="send-bar">
   <div class="send-actions">
     <a class="btn-shop" data-buy href="https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00" aria-describedby="send-note-bar">Buy — $145</a>
-    <a class="btn-shop btn-ghost" data-send href="#" aria-describedby="send-note-bar">Send</a>
+    <a class="btn-shop btn-ghost" data-send href="#" aria-describedby="send-note-bar">Discuss Your Build</a>
   </div>
-  <span class="spec-note" id="send-note-bar">$145, every option included. Checkout by Stripe, or send your spec with a question first.</span>
+  <span class="spec-note" id="send-note-bar">$145, every option included. Secure checkout by Stripe.</span>
 </div>
 
 <!-- SPEC -->
@@ -647,9 +647,9 @@ body::after {
     <div class="spec-actions">
       <div class="send-actions">
         <a class="btn-shop" data-buy href="https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00" aria-describedby="send-note">Buy — $145</a>
-        <a class="btn-shop btn-ghost" id="send-btn" data-send href="#" aria-describedby="send-note">Send to the Shop</a>
+        <a class="btn-shop btn-ghost" id="send-btn" data-send href="#" aria-describedby="send-note">Discuss Your Build</a>
       </div>
-      <span class="spec-note" id="send-note">$145, every option included. Checkout by Stripe, or send your spec with a question first.</span>
+      <span class="spec-note" id="send-note">$145, every option included. Secure checkout by Stripe.</span>
     </div>
   </div>
 </section>
@@ -668,7 +668,7 @@ body::after {
       <figcaption>Whiskey</figcaption>
     </figure>
     <figure>
-      <div class="img-wrap tall"><img src="piece-plum.jpg" alt="An open classic bifold in Plum with a London Bus Red inside, its near-black Plum card pockets stitched in a dark thread" loading="lazy" width="730" height="1105"></div>
+      <div class="img-wrap tall"><img src="piece-plum.jpg" alt="An open classic bifold in Plum with a London Bus Red inside, its near-black Plum card pockets stitched in a dark thread" loading="lazy" width="1195" height="1800"></div>
       <figcaption>Plum outside and pockets, London Bus Red inside</figcaption>
     </figure>
     <figure>
@@ -750,9 +750,9 @@ const TARGETS = [
   { key: 'interior',    code: 'INT', label: 'Inside',             def: 'whiskey',
     help: 'The inside panels the pockets are sewn to, and what shows behind them. '
         + 'It follows the outside until you choose a different leather here.' },
-  { key: 'pocketUpper', code: 'PU',  label: 'Upper Card Pockets', def: 'ink',
+  { key: 'pocketUpper', code: 'PU',  label: 'Upper Card Pockets', def: 'whiskey',
     help: 'The two pockets sitting higher on each side.' },
-  { key: 'pocketLower', code: 'PL',  label: 'Lower Card Pockets', def: 'redbus',
+  { key: 'pocketLower', code: 'PL',  label: 'Lower Card Pockets', def: 'whiskey',
     help: 'The two front pockets, closest to you.' },
 ];
 
@@ -1696,7 +1696,7 @@ new IntersectionObserver(([e]) => {
 }).observe(document.querySelector('.spec-section'));
 
 /* ── Send, by chat ──────────────────────────────────────────────────
-   Send to the Shop opens Crisp and sends the spec as the visitor's first
+   Discuss Your Build opens Crisp and sends the spec as the visitor's first
    message, so it reaches the shop's phone in full and the visitor can carry
    on the conversation under it. The build code is attached to the session as
    well. If Crisp never loaded (no ID, or a blocker stopped it), the click is
@@ -1704,7 +1704,7 @@ new IntersectionObserver(([e]) => {
 
    Crisp's own launcher floats bottom-right. On a wide screen it has that
    corner to itself; on a narrow one the send bar is there, so the launcher is
-   hidden and Send opens the window instead, which hides again when closed. */
+   hidden and Discuss Your Build opens the window instead, which hides again when closed. */
 if (window.CRISP_WEBSITE_ID) {
   const narrow = window.matchMedia('(max-width: 1024px)');
   const tuck = () => { if (narrow.matches) $crisp.push(['do', 'chat:hide']); };
