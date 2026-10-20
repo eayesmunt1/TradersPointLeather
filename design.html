@@ -322,20 +322,34 @@ body {
   color: var(--white);
   margin-bottom: 3rem;
 }
-/* Portrait frames, two to a row: the photographs stand the wallet up the
-   frame, so a landscape crop would cut both ends off it. Narrower than the
-   section around them so the grid does not run the full 1200px. The pictures
-   carry no captions, so the same 4px gutter runs both ways and the four sit
-   as one block, corners taken off at the 4px the page rounds its other
-   panels to. */
+/* Landscape frames, two to a row: most of the photographs are landscape, and
+   the one portrait shot is cropped to the wallet in hand. Narrower than the
+   section around them so the grid does not run the full 1200px. Each is
+   captioned with its leather's swatch name, so the rows get room for it. */
 .pieces-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
+  gap: 1.75rem 4px;
   max-width: 860px;
   margin: 0 auto;
 }
-.pieces-grid .img-wrap { aspect-ratio: 3/4; overflow: hidden; border-radius: 4px; }
+.pieces-grid figure { margin: 0; }
+.pieces-grid figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tan-light);
+}
+.pieces-intro {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--tan-light);
+  margin: -2rem auto 2.5rem;
+  max-width: 560px;
+}
+.pieces-grid .img-wrap { aspect-ratio: 3/2; overflow: hidden; border-radius: 4px; }
 .pieces-grid img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
 .pieces-grid .img-wrap:hover img { transform: scale(1.05); }
 
@@ -642,13 +656,27 @@ body::after {
 <section class="real-pieces reveal">
   <p class="section-label">The Real Thing</p>
   <h2>Pieces We've Built</h2>
+  <p class="pieces-intro">The leathers on offer, as they look made up into a wallet.</p>
+  <!-- One frame per leather the configurator offers, captioned with the same
+       name its swatch carries, so a choice above can be matched to a real
+       wallet here. Plum has no photograph yet; add it as a fifth figure. -->
   <div class="pieces-grid">
-    <!-- No captions under these: the alt text still describes each one for a
-         screen reader, which is the reading that cannot see the picture. -->
-    <div class="img-wrap"><img src="piece-brown-in-hand.jpg" alt="A hand holding a closed brown bifold wallet over a studded metal trunk, the stitching running down its outside edge" loading="lazy" width="1200" height="1800"></div>
-    <div class="img-wrap"><img src="piece-brown-exterior.jpg" alt="A tan bifold wallet lying open with its outside facing up, stitched right around the edge and creased down the fold" loading="lazy" width="1200" height="1800"></div>
-    <div class="img-wrap"><img src="piece-brown-detail.jpg" alt="Close view along the edge of an open brown wallet, the saddle stitching running down the burnished edge and the Traders Point Leather mark pressed into the panel beside it" loading="lazy" width="1200" height="1800"></div>
-    <div class="img-wrap"><img src="piece-tan-cards.jpg" alt="A tan bifold wallet open, two scooped card slots on each panel either side of the fold and the Traders Point Leather mark embossed into the upper panel" loading="lazy" width="1200" height="1800"></div>
+    <figure>
+      <div class="img-wrap"><img src="piece-brown-in-hand.jpg" style="object-position: center 55%" alt="A hand holding a closed whiskey bifold wallet over a studded metal trunk, the stitching running down its outside edge" loading="lazy" width="1200" height="1800"></div>
+      <figcaption>Whiskey</figcaption>
+    </figure>
+    <figure>
+      <div class="img-wrap"><img src="IMG_7868.jpg" alt="A closed vertical bifold in London Bus Red, the pull-up showing lighter streaks across the outside" loading="lazy" width="699" height="487"></div>
+      <figcaption>London Bus Red</figcaption>
+    </figure>
+    <figure>
+      <div class="img-wrap"><img src="IMG_7465.jpeg" alt="An open vertical bifold in Ink Blue, its card pockets either side of a blue suede spine" loading="lazy" width="800" height="533"></div>
+      <figcaption>Ink Blue</figcaption>
+    </figure>
+    <figure>
+      <div class="img-wrap"><img src="IMG_7383.jpg" alt="An open vertical bifold with a whiskey body and Ink Blue card pockets" loading="lazy" width="800" height="533"></div>
+      <figcaption>Whiskey body, Ink Blue pockets</figcaption>
+    </figure>
   </div>
 </section>
 
