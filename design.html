@@ -278,6 +278,13 @@ body {
 }
 .btn-shop:hover { background: var(--tan-light); transform: translateY(-2px); }
 .btn-shop:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 3px; }
+/* Send sits beside Buy as the quieter of the two: outlined, not filled. */
+.btn-shop.btn-ghost {
+  background: transparent;
+  color: var(--tan-light);
+  box-shadow: inset 0 0 0 1px var(--tan);
+}
+.btn-shop.btn-ghost:hover { background: rgba(196,168,130,0.12); }
 .spec-note {
   display: block;
   margin-top: 1.1rem;
@@ -289,7 +296,7 @@ body {
 /* The send button, kept in reach while the wallet is being chosen rather than
    only at the foot of the page. Beside the preview on a wide screen, where that
    column is pinned; in a bar along the bottom of a narrow one, where it is not.
-   Each is the same mailto link as the button in the spec section. */
+   Each pair is the same Buy and Send as the buttons in the spec section. */
 .preview-send {
   display: flex;
   flex-direction: column;
@@ -300,6 +307,8 @@ body {
 .preview-send .btn-shop { padding: 1rem 1.5rem; }
 
 .send-actions { display: flex; gap: 0.6rem; }
+.preview-send .send-actions { flex-direction: column; }
+.spec-actions .send-actions { justify-content: center; flex-wrap: wrap; }
 .preview-send .spec-note { margin-top: 0; font-size: 0.75rem; }
 
 .send-bar { display: none; }
@@ -436,7 +445,7 @@ body::after {
   }
   /* Out of the way once the spec section, with its own button, is on screen. */
   .send-bar.is-away { transform: translateY(110%); visibility: hidden; }
-  .send-bar .btn-shop { flex: none; padding: 0.95rem 1.75rem; }
+  .send-bar .btn-shop { flex: none; padding: 0.95rem 1.5rem; }
   .send-bar .spec-note { margin-top: 0; font-size: 0.75rem; }
   /* Room at the foot of the options so the bar never covers the last of them. */
   .configurator { padding-bottom: 7rem; }
@@ -576,8 +585,11 @@ body::after {
     </div>
 
     <div class="preview-send">
-      <a class="btn-shop" data-send href="#" aria-describedby="send-note-side">Send to the Shop</a>
-      <span class="spec-note" id="send-note-side">Opens a chat with the shop and sends your full spec.</span>
+      <div class="send-actions">
+        <a class="btn-shop" data-buy href="https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00" aria-describedby="send-note-side">Buy — $145</a>
+        <a class="btn-shop btn-ghost" data-send href="#" aria-describedby="send-note-side">Send to the Shop</a>
+      </div>
+      <span class="spec-note" id="send-note-side">$145, every option included. Checkout by Stripe, or send your spec with a question first.</span>
     </div>
   </div>
 
@@ -604,9 +616,10 @@ body::after {
 
 <div class="send-bar" id="send-bar">
   <div class="send-actions">
-    <a class="btn-shop" data-send href="#" aria-describedby="send-note-bar">Send to the Shop</a>
+    <a class="btn-shop" data-buy href="https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00" aria-describedby="send-note-bar">Buy — $145</a>
+    <a class="btn-shop btn-ghost" data-send href="#" aria-describedby="send-note-bar">Send</a>
   </div>
-  <span class="spec-note" id="send-note-bar">Opens a chat with the shop and sends your full spec.</span>
+  <span class="spec-note" id="send-note-bar">$145, every option included. Checkout by Stripe, or send your spec with a question first.</span>
 </div>
 
 <!-- SPEC -->
@@ -616,8 +629,11 @@ body::after {
     <h2>The Spec</h2>
     <p>Everything we need to cut your wallet — sent straight to the bench.</p>
     <div class="spec-actions">
-      <a class="btn-shop" id="send-btn" data-send href="#" aria-describedby="send-note">Send to the Shop</a>
-      <span class="spec-note" id="send-note">Opens a chat with the shop and sends your full spec.</span>
+      <div class="send-actions">
+        <a class="btn-shop" data-buy href="https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00" aria-describedby="send-note">Buy — $145</a>
+        <a class="btn-shop btn-ghost" id="send-btn" data-send href="#" aria-describedby="send-note">Send to the Shop</a>
+      </div>
+      <span class="spec-note" id="send-note">$145, every option included. Checkout by Stripe, or send your spec with a question first.</span>
     </div>
   </div>
 </section>
@@ -1301,6 +1317,7 @@ const byId = (list, id) => list.find((x) => x.id === id) || list[0];
 
 const svg = document.getElementById('wallet');
 const sendBtns = document.querySelectorAll('[data-send]');
+const buyBtns = document.querySelectorAll('[data-buy]');
 
 /* ── Build the SVG ──────────────────────────────────────────────────── */
 function buildWallet() {
@@ -1382,6 +1399,8 @@ function render() {
 
   const href = buildMailtoHref();
   sendBtns.forEach((a) => { a.href = href; });
+  const buy = buildBuyHref();
+  buyBtns.forEach((a) => { a.href = buy; });
 }
 
 /* ── Options UI ─────────────────────────────────────────────────────── */
@@ -1573,6 +1592,20 @@ function buildMailtoHref() {
   ].join('\n');
   return `mailto:${CONTACT}?subject=${encodeURIComponent(subject)}`
        + `&body=${encodeURIComponent(body)}`;
+}
+
+/* One flat price, so one Stripe Payment Link for every build. The build code
+   rides along as the checkout's client_reference_id, which shows on the
+   payment in the Stripe dashboard. Stripe takes only letters, digits, - and _
+   there, up to 200 characters, so the code's separators are swapped:
+     TPL-CB / EXT:whiskey / MON:abc   ->   TPL-CB__EXT-whiskey__MON-abc */
+const BUY_URL = 'https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00';
+
+function buildBuyHref() {
+  const code = buildSpec().split('\n').pop().replace('Build code: ', '');
+  const ref = code.replace(/ \/ /g, '__').replace(/:/g, '-')
+    .replace(/[^A-Za-z0-9_-]/g, '').slice(0, 200);
+  return `${BUY_URL}?client_reference_id=${ref}`;
 }
 
 /* ── View toggle ────────────────────────────────────────────────────── */
