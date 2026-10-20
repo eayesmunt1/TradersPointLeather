@@ -669,7 +669,7 @@ body::after {
     </figure>
     <figure>
       <div class="img-wrap tall"><img src="piece-plum.jpg" alt="An open classic bifold in Plum with a London Bus Red inside, its near-black Plum card pockets stitched in a dark thread" loading="lazy" width="730" height="1105"></div>
-      <figcaption>Plum, London Bus Red inside</figcaption>
+      <figcaption>Plum outside and pockets, London Bus Red inside</figcaption>
     </figure>
     <figure>
       <div class="img-wrap"><img src="IMG_7868.jpg" alt="A closed vertical bifold in London Bus Red, the pull-up showing lighter streaks across the outside" loading="lazy" width="699" height="487"></div>
@@ -1540,7 +1540,8 @@ function choose(group, value) {
   // The inside matches the outside, as a one-leather wallet does, until it is
   // chosen on its own.
   if (group === 'exterior' && state.interiorLinked) state.interior = value;
-  if (group === 'interior') state.interiorLinked = false;
+  // Choosing the outside's own leather here joins them back up.
+  if (group === 'interior') state.interiorLinked = value === state.exterior;
   if (changed && (group === 'model' || group === 'stash')) buildWallet();
   if (changed && (group === 'stash' || group === 'interior')) setView(true);
   render();
@@ -1580,6 +1581,18 @@ function sanitizeMonogram(raw) {
 }
 
 /* ── Spec ───────────────────────────────────────────────────────────── */
+/* The one-line build code: the spec's last line, the Stripe reference and the
+   Crisp session data all take it from here. */
+function buildCode() {
+  const m = currentModel();
+  return [m.code]
+    .concat(TARGETS.map((t) => `${t.code}:${state[t.key]}`))
+    .concat(`THR:${state.thread}`)
+    .concat(m.offersStash ? [`STASH:${hasStash() ? 'yes' : 'no'}`] : [])
+    .concat(`MON:${state.monogram || 'none'}`)
+    .join(' / ');
+}
+
 function buildSpec() {
   // Plain `Label: value` rows — the spec is read in a mail client now, where a
   // proportional font would tear any column alignment apart.
@@ -1596,12 +1609,7 @@ function buildSpec() {
   rows.push(`Initials: ${state.monogram || 'None'}`);
 
   const m = currentModel();
-  const code = [m.code]
-    .concat(TARGETS.map((t) => `${t.code}:${state[t.key]}`))
-    .concat(`THR:${state.thread}`)
-    .concat(currentModel().offersStash ? [`STASH:${hasStash() ? 'yes' : 'no'}`] : [])
-    .concat(`MON:${state.monogram || 'none'}`)
-    .join(' / ');
+  const code = buildCode();
 
   return [
     'TRADERS POINT LEATHER — CUSTOM WALLET',
@@ -1639,8 +1647,7 @@ function buildMailtoHref() {
 const BUY_URL = 'https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00';
 
 function buildBuyHref() {
-  const code = buildSpec().split('\n').pop().replace('Build code: ', '');
-  const ref = code.replace(/ \/ /g, '__').replace(/:/g, '-')
+  const ref = buildCode().replace(/ \/ /g, '__').replace(/:/g, '-')
     .replace(/[^A-Za-z0-9_-]/g, '').slice(0, 200);
   return `${BUY_URL}?client_reference_id=${ref}`;
 }
@@ -1710,8 +1717,7 @@ if (window.CRISP_WEBSITE_ID) {
     if (typeof $crisp.is !== 'function') return;
     e.preventDefault();
     const spec = buildSpec();
-    const code = spec.split('\n').pop().replace('Build code: ', '');
-    $crisp.push(['set', 'session:data', [[['build_code', code]]]]);
+    $crisp.push(['set', 'session:data', [[['build_code', buildCode()]]]]);
     $crisp.push(['do', 'chat:show']);
     $crisp.push(['do', 'chat:open']);
     $crisp.push(['do', 'message:send', ['text', spec]]);

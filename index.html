@@ -418,6 +418,8 @@ body {
   transition: opacity 0.4s;
 }
 .gallery-item:hover::after { opacity: 0; }
+/* Drawn inside the frame: overflow:hidden would clip an outline set outside it. */
+.gallery-item:focus-visible { outline: 2px solid var(--tan-light); outline-offset: -2px; }
 
 /* ── CRAFT: process video ── */
 .craft {
@@ -896,7 +898,7 @@ body::after {
        Reorder the items and the grid grows a gap. Both classes are cancelled
        under 768px, where the grid is a plain two-up. -->
   <div class="gallery-grid">
-    <a class="gallery-item" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" target="_blank" rel="noopener"><img src="IMG_7465.jpeg" alt="Navy wallet edge profile" loading="lazy" width="800" height="533"></a>
+    <a class="gallery-item" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" target="_blank" rel="noopener"><img src="IMG_7465.jpeg" alt="Open Ink Blue vertical bifold wallet with a blue suede spine" loading="lazy" width="800" height="533"></a>
     <a class="gallery-item featured" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" target="_blank" rel="noopener"><img src="IMG_2301.jpeg" class="crop-upper" alt="Hand-dyed green marbled vertical bifold wallet" loading="lazy" width="800" height="1200"></a>
     <a class="gallery-item" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" target="_blank" rel="noopener"><img src="IMG_7076.jpeg" alt="Wallet color options" loading="lazy" width="800" height="533"></a>
     <a class="gallery-item" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58173348" target="_blank" rel="noopener"><img src="IMG_6991.jpg" alt="Leather belt" loading="lazy" width="533" height="800"></a>
