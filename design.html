@@ -322,8 +322,8 @@ body {
   color: var(--white);
   margin-bottom: 3rem;
 }
-/* Landscape frames, two to a row: most of the photographs are landscape, and
-   the one portrait shot is cropped to the wallet in hand. Narrower than the
+/* Two to a row, the two portrait photographs together above the two
+   landscape ones, so each row's frames are one height. Narrower than the
    section around them so the grid does not run the full 1200px. Each is
    captioned with its leather's swatch name, so the rows get room for it. */
 .pieces-grid {
@@ -334,12 +334,8 @@ body {
   margin: 0 auto;
 }
 .pieces-grid figure { margin: 0; }
-/* An odd one out sits centred under the rest at the same size, not alone at the left. */
-.pieces-grid figure:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-  justify-self: center;
-  width: calc(50% - 2px);
-}
+/* The two portrait photographs share the first row, upright. */
+.pieces-grid .img-wrap.tall { aspect-ratio: 2/3; }
 .pieces-grid figcaption {
   margin-top: 0.6rem;
   font-size: 0.8rem;
@@ -668,8 +664,12 @@ body::after {
        wallet here. -->
   <div class="pieces-grid">
     <figure>
-      <div class="img-wrap"><img src="piece-brown-in-hand.jpg" style="object-position: center 55%" alt="A hand holding a closed whiskey bifold wallet over a studded metal trunk, the stitching running down its outside edge" loading="lazy" width="1200" height="1800"></div>
+      <div class="img-wrap tall"><img src="piece-brown-in-hand.jpg" alt="A hand holding a closed whiskey bifold wallet over a studded metal trunk, the stitching running down its outside edge" loading="lazy" width="1200" height="1800"></div>
       <figcaption>Whiskey</figcaption>
+    </figure>
+    <figure>
+      <div class="img-wrap tall"><img src="piece-plum.jpg" alt="An open classic bifold in Plum with a London Bus Red inside, its near-black Plum card pockets stitched in a dark thread" loading="lazy" width="730" height="1105"></div>
+      <figcaption>Plum, London Bus Red inside</figcaption>
     </figure>
     <figure>
       <div class="img-wrap"><img src="IMG_7868.jpg" alt="A closed vertical bifold in London Bus Red, the pull-up showing lighter streaks across the outside" loading="lazy" width="699" height="487"></div>
@@ -678,10 +678,6 @@ body::after {
     <figure>
       <div class="img-wrap"><img src="IMG_7465.jpeg" alt="An open vertical bifold in Ink Blue, its card pockets either side of a blue suede spine" loading="lazy" width="800" height="533"></div>
       <figcaption>Ink Blue</figcaption>
-    </figure>
-    <figure>
-      <div class="img-wrap"><img src="piece-plum.jpg" alt="An open classic bifold with a London Bus Red inside and near-black Plum card pockets, stitched in a dark thread" loading="lazy" width="1105" height="730"></div>
-      <figcaption>Plum pockets, London Bus Red inside</figcaption>
     </figure>
   </div>
 </section>
@@ -749,9 +745,11 @@ const THREADS = [
 /* The parts of the wallet a customer picks a leather for. `def` is the
    default selection — it must be an id from LEATHERS above. */
 const TARGETS = [
-  { key: 'exterior',    code: 'EXT', label: 'Body',               def: 'whiskey',
-    help: 'The wallet body — outside, and the inside face it folds around. '
-        + 'There is no separate lining, so this is what shows behind the pockets.' },
+  { key: 'exterior',    code: 'EXT', label: 'Outside',            def: 'whiskey',
+    help: 'The outside of the wallet — all that shows when it is closed.' },
+  { key: 'interior',    code: 'INT', label: 'Inside',             def: 'whiskey',
+    help: 'The inside panels the pockets are sewn to, and what shows behind them. '
+        + 'It follows the outside until you choose a different leather here.' },
   { key: 'pocketUpper', code: 'PU',  label: 'Upper Card Pockets', def: 'ink',
     help: 'The two pockets sitting higher on each side.' },
   { key: 'pocketLower', code: 'PL',  label: 'Lower Card Pockets', def: 'redbus',
@@ -1202,11 +1200,11 @@ function walletOpen(g) {
   /* The strip of the body leather showing between the two panels. Which side of
      it faces up is a property of the model, and the two are not subtle.
 
-     On the vertical it is the flesh side: a bright, matte nap against the grain
-     either side of it, so it is lightened and given a heavy grain with no
-     sheen.
+     On the vertical it is the flesh side of the outside leather: a bright,
+     matte nap against the grain either side of it, so it is lightened and
+     given a heavy grain with no sheen.
 
-     On the classic it is the skin side — the same face as the exterior, smooth,
+     On the classic it is the inside leather's skin side — smooth,
      with the grain's own wrinkles and highlight, reading continuous with the
      panels rather than as a contrasting band. Only the panels' burnished cut
      edges and the seams either side separate the three pieces, so the spine is
@@ -1219,9 +1217,9 @@ function walletOpen(g) {
        <path d="${spineRect}" fill="#fff" opacity="0.22"/>
        <path d="${spineRect}" fill="#000" opacity="0.42" filter="url(#grain)"
              style="mix-blend-mode:overlay"/>`
-    : `<path class="leather-fill" d="${spineRect}" fill="var(--tex-exterior)"/>
+    : `<path class="leather-fill" d="${spineRect}" fill="var(--tex-interior)"/>
        <path d="${spineRect}" fill="#000" filter="url(#grain)"
-             style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
+             style="mix-blend-mode:overlay;opacity:var(--grain-interior)"/>
        <path d="${spineRect}" fill="url(#sheen)" opacity="0.45"/>
        <!-- It lies in the valley of the fold, a little shaded by the panels
             standing either side of it. -->
@@ -1252,9 +1250,9 @@ function walletOpen(g) {
     return `
       <clipPath id="${clipId}"><path d="${outline}"/></clipPath>
 
-      <path class="leather-fill" d="${outline}" fill="var(--tex-exterior)"/>
+      <path class="leather-fill" d="${outline}" fill="var(--tex-interior)"/>
       <path d="${outline}" fill="#000" filter="url(#grain)"
-            style="mix-blend-mode:overlay;opacity:var(--grain-exterior)"/>
+            style="mix-blend-mode:overlay;opacity:var(--grain-interior)"/>
 
       <g clip-path="url(#${clipId})">
         ${layer(p, g.pocketUpper, 'pocket-upper')}
@@ -1272,7 +1270,7 @@ ${!stash ? '' : `
            spine. -->
       <path class="leather-fill" fill="none"
             d="M${p.side === 'left' ? p.x1 - 0.5 : p.x0 + 0.5},${y} V${g.pocketUpper}"
-            stroke="var(--s-exterior)" stroke-width="1"/>`}
+            stroke="var(--s-interior)" stroke-width="1"/>`}
 
       <!-- Top, outer edge and bottom in one run where the model is stitched
            across its top outside too. Where it is not, the run stops short of
@@ -1299,7 +1297,7 @@ ${!stash ? '' : `
            line, so the panel meets the spine on colour and seam alone. -->
       <path class="leather-fill" fill="none"
             d="${panelOuterRun(p.x0, y, pw, h, g.radius, p.side, 0, null)}"
-            stroke="var(--s-exterior)" stroke-width="2.5"/>`;
+            stroke="var(--s-interior)" stroke-width="2.5"/>`;
   }).join('');
 
   return `
@@ -1346,6 +1344,7 @@ state.thread = THREADS[0].id;
 state.model = DEFAULT_MODEL;
 state.monogram = '';
 state.stash = STASH[0].id;
+state.interiorLinked = true;
 
 const byId = (list, id) => list.find((x) => x.id === id) || list[0];
 
@@ -1538,8 +1537,12 @@ function buildOptions() {
 function choose(group, value) {
   const changed = state[group] !== value;
   state[group] = value;
+  // The inside matches the outside, as a one-leather wallet does, until it is
+  // chosen on its own.
+  if (group === 'exterior' && state.interiorLinked) state.interior = value;
+  if (group === 'interior') state.interiorLinked = false;
   if (changed && (group === 'model' || group === 'stash')) buildWallet();
-  if (changed && group === 'stash') setView(true);
+  if (changed && (group === 'stash' || group === 'interior')) setView(true);
   render();
 }
 
