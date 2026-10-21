@@ -524,6 +524,36 @@ body {
   margin-bottom: 1rem;
 }
 .craft-copy p:last-child { margin-bottom: 0; }
+.video-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--bg-warm);
+  cursor: pointer;
+}
+.video-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.video-play {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 64px; height: 64px;
+  margin: -32px 0 0 -32px;
+  border-radius: 50%;
+  background: rgba(15,13,11,0.65);
+  box-shadow: inset 0 0 0 2px var(--tan);
+}
+.video-play::after {
+  content: '';
+  position: absolute;
+  top: 20px; left: 26px;
+  border-style: solid;
+  border-width: 12px 0 12px 20px;
+  border-color: transparent transparent transparent var(--tan);
+}
+.video-poster:hover .video-play { background: rgba(15,13,11,0.85); }
+.video-poster:focus-visible { outline: 2px solid var(--tan-light); outline-offset: -4px; }
 .video-wrapper {
   position: relative;
   width: 100%;
@@ -1006,7 +1036,7 @@ body::after {
   <p class="section-label">The Process</p>
   <div class="craft-media reveal">
     <div class="video-wrapper">
-      <iframe src="https://player.vimeo.com/video/1214378807?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title="Traders Point Leather — Process"></iframe>
+      <iframe src="https://player.vimeo.com/video/1214378807?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;controls=0&amp;loop=1&amp;autoplay=1&amp;muted=1&amp;title=0&amp;byline=0&amp;portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" title="Traders Point Leather — Process"></iframe>
     </div>
     <div class="craft-copy">
       <h2>One Bench, One at a Time</h2>
@@ -1027,13 +1057,13 @@ body::after {
     <p>We source quality full-grain leathers — including Horween and Wickett &amp; Craig — many of which develop a rich pull-up effect that deepens and patinas with the use of the owner. Each piece gets better with age.</p>
   </div>
   <div class="pillar">
-    <div class="pillar-img"><iframe src="https://player.vimeo.com/video/1221760928?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" loading="lazy" title="Traders Point Leather — Saddle stitching by hand"></iframe></div>
+    <div class="pillar-img"><button class="video-poster" type="button" data-vimeo="1221760928" aria-label="Play video: Saddle stitching by hand"><img src="poster-stitching.jpg" alt="" loading="lazy" width="1280" height="720"><span class="video-play" aria-hidden="true"></span></button></div>
     <div class="pillar-num">02</div>
     <h3>Saddle-Stitched by Hand</h3>
     <p>Every seam is saddle-stitched by hand with bonded nylon or bonded polyester thread — the same materials used in heavy-duty industrial applications. It is the longest step in the build, and it is why one cut stitch stays put instead of running.</p>
   </div>
   <div class="pillar">
-    <div class="pillar-img"><iframe src="https://player.vimeo.com/video/1221758628?badge=0&autopause=0&player_id=0&app_id=58479&controls=0&loop=1&autoplay=1&muted=1&title=0&byline=0&portrait=0" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" loading="lazy" title="Traders Point Leather — Hand burnishing edges"></iframe></div>
+    <div class="pillar-img"><button class="video-poster" type="button" data-vimeo="1221758628" aria-label="Play video: Hand burnishing edges"><img src="poster-burnish.jpg" alt="" loading="lazy" width="1280" height="720"><span class="video-play" aria-hidden="true"></span></button></div>
     <div class="pillar-num">03</div>
     <h3>Hand Burnished</h3>
     <p>Every piece has its edges hand-burnished to a glossy, polished finish. Next to the stitching it's the longest step in the build — and it's what separates a handcrafted piece from a factory one.</p>
@@ -1156,7 +1186,7 @@ body::after {
 
 <!-- FOOTER -->
 <footer id="contact">
-  <img src="logo.png" alt="Traders Point Leather" width="100" height="100" style="height:100px;width:auto;margin-bottom:1rem;opacity:0.6;">
+  <img src="logo.png" alt="Traders Point Leather" width="100" height="100" loading="lazy" style="height:100px;width:auto;margin-bottom:1rem;opacity:0.6;">
   <div class="footer-brand">Traders Point Leather</div>
   <div class="footer-loc">Handcrafted in Indiana</div>
   <div class="footer-links">
@@ -1184,6 +1214,19 @@ body::after {
       if (e.key === 'Escape' && nav.classList.contains('open')) { setOpen(false); btn.focus(); }
     });
   })();
+
+  // Click-to-play videos: the Vimeo embed loads only when asked for
+  document.querySelectorAll('.video-poster').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var f = document.createElement('iframe');
+      f.src = 'https://player.vimeo.com/video/' + btn.dataset.vimeo +
+        '?badge=0&autopause=0&player_id=0&app_id=58479&controls=1&loop=1&autoplay=1&title=0&byline=0&portrait=0';
+      f.allow = 'autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media';
+      f.title = btn.getAttribute('aria-label').replace('Play video: ', 'Traders Point Leather — ');
+      f.setAttribute('frameborder', '0');
+      btn.replaceWith(f);
+    });
+  });
 
   // Reviews: render only the entries that have text
   (function () {
