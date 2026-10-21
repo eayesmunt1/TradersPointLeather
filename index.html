@@ -86,7 +86,7 @@
           "offers": {
             "@type": "Offer",
             "url": "https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4401934583&section_id=58176763",
-            "price": "95.00",
+            "price": "65.00",
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "seller": { "@type": "Organization", "name": "Traders Point Leather" }
@@ -109,7 +109,7 @@
           "offers": {
             "@type": "Offer",
             "url": "https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4419228681&section_id=58173348",
-            "price": "60.00",
+            "price": "95.00",
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "seller": { "@type": "Organization", "name": "Traders Point Leather" }
@@ -524,6 +524,21 @@ body {
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
+.product-card-body .card-price {
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+.product-note {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
 .card-cta {
   display: inline-block;
   font-size: 0.75rem;
@@ -921,6 +936,7 @@ body::after {
       <div class="product-card-body">
         <h3>Bifold Wallets</h3>
         <p>4 card slots and 2 pockets for extra cards and folded cash. Full-grain leather, saddle-stitched by hand with bonded nylon or polyester thread. Available in multiple colors.</p>
+        <p class="card-price">From $65</p>
         <span class="card-cta">Shop Wallets &rarr;</span>
       </div>
     </a>
@@ -931,6 +947,7 @@ body::after {
       <div class="product-card-body">
         <h3>Leather Belts</h3>
         <p>Solid brass hardware on a single piece of thick full-grain leather. No layers, no filler. This belt will outlast everything else in your closet.</p>
+        <p class="card-price">$95</p>
         <span class="card-cta">Shop Belts &rarr;</span>
       </div>
     </a>
@@ -945,6 +962,7 @@ body::after {
       </div>
     </a>
   </div>
+  <p class="product-note">Free shipping (US) &middot; Ships in 1&ndash;3 business days, arrives in 5&ndash;7 days in the lower 48 &middot; 30-day returns if undamaged (buyer pays return shipping)</p>
 </section>
 
 <!-- BANNER CTA -->
