@@ -137,13 +137,85 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 
 body {
   font-family: 'Jost', sans-serif;
   background: var(--bg);
   color: var(--cream);
   overflow-x: hidden;
+}
+
+/* ── SITE HEADER ──
+   Fixed rather than sticky so it takes no height from the hero, whose size is
+   tuned against the fold. The hero's top padding below leaves room for it. */
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 max(1.25rem, env(safe-area-inset-right)) 0 max(1.25rem, env(safe-area-inset-left));
+  background: var(--bg);
+  border-bottom: 1px solid rgba(196,168,130,0.12);
+}
+.site-header-logo { display: flex; align-items: center; min-height: 44px; }
+.site-header-logo img { height: 44px; width: auto; display: block; }
+.site-nav { display: flex; align-items: center; gap: 0.25rem; }
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.85rem;
+  color: var(--cream);
+  text-decoration: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+.site-nav a:hover { color: var(--tan); }
+.site-header a:focus-visible,
+.nav-toggle:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 2px; }
+.nav-toggle {
+  display: none;
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  border: 0;
+  color: var(--tan);
+  cursor: pointer;
+}
+.nav-toggle span,
+.nav-toggle span::before,
+.nav-toggle span::after {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: currentColor;
+  position: relative;
+  margin: 0 auto;
+  content: '';
+}
+.nav-toggle span::before { position: absolute; top: -7px; left: 0; }
+.nav-toggle span::after { position: absolute; top: 7px; left: 0; }
+@media (max-width: 719px) {
+  .nav-toggle { display: block; }
+  .site-nav {
+    display: none;
+    position: absolute;
+    top: 64px; left: 0; right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0.5rem 1.25rem 1rem;
+    background: var(--bg);
+    border-bottom: 1px solid rgba(196,168,130,0.12);
+  }
+  .site-nav.open { display: flex; }
+  .site-nav a { padding: 0 0.25rem; font-size: 0.85rem; }
 }
 
 /* ── HERO ── */
@@ -158,7 +230,7 @@ body {
   /* Extra bottom padding reserves the band occupied by .scroll-hint, which is
      absolutely positioned and so takes no part in this flex layout. Without it,
      centred content grows downward into the hint instead of growing the hero. */
-  padding: 2rem 2rem 8rem;
+  padding: 5rem 2rem 8rem;
   overflow: hidden;
 }
 .hero::before {
@@ -682,7 +754,7 @@ body::after {
   /* Centred rather than top-aligned: without the shop button the hero content
      is short enough to centre without overflowing, and top-aligning it would
      leave a dead band above the pinned scroll hint. */
-  .hero { padding-top: 2rem; justify-content: center; padding-bottom: 8rem; }
+  .hero { padding-top: 5rem; justify-content: center; padding-bottom: 8rem; }
   .hero-logo { width: 90px; height: 90px; margin-bottom: 1.5rem; }
   .pillars { grid-template-columns: 1fr; }
   .pillar { padding: 3rem 2rem; }
@@ -830,6 +902,20 @@ body::after {
 </head>
 <body>
 
+<!-- HEADER -->
+<header class="site-header">
+  <a class="site-header-logo" href="#" aria-label="Traders Point Leather, back to top"><img src="logo.png" alt="" width="44" height="44"></a>
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu"><span></span></button>
+  <nav class="site-nav" id="site-nav" aria-label="Main">
+    <a href="#craft">Process</a>
+    <a href="#details">Details</a>
+    <a href="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" target="_blank" rel="noopener">Wallets</a>
+    <a href="https://www.etsy.com/shop/TradersPointLeather?section_id=58173348" target="_blank" rel="noopener">Belts</a>
+    <a href="/design.html">Design Your Wallet</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
 <!-- HERO -->
 <section class="hero">
   <div class="hero-logo">
@@ -905,7 +991,7 @@ body::after {
 </div>
 
 <!-- GALLERY -->
-<section class="gallery-section reveal">
+<section class="gallery-section reveal" id="details">
   <p class="section-label">The Details</p>
   <h2>Crafted with Care, Made to Last</h2>
   <!-- The .featured and .wide spans below tile the four columns with no holes,
@@ -977,7 +1063,7 @@ body::after {
 </section>
 
 <!-- FOOTER -->
-<footer>
+<footer id="contact">
   <img src="logo.png" alt="Traders Point Leather" width="100" height="100" style="height:100px;width:auto;margin-bottom:1rem;opacity:0.6;">
   <div class="footer-brand">Traders Point Leather</div>
   <div class="footer-loc">Handcrafted in Indiana</div>
@@ -991,6 +1077,22 @@ body::after {
 </footer>
 
 <script>
+  // Header menu (phones)
+  (function () {
+    var btn = document.querySelector('.nav-toggle');
+    var nav = document.getElementById('site-nav');
+    function setOpen(open) {
+      nav.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+      btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    }
+    btn.addEventListener('click', function () { setOpen(!nav.classList.contains('open')); });
+    nav.addEventListener('click', function (e) { if (e.target.closest('a')) setOpen(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && nav.classList.contains('open')) { setOpen(false); btn.focus(); }
+    });
+  })();
+
   // Reveal on scroll
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
