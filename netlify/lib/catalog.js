@@ -23,6 +23,14 @@ function shape(price) {
     currency: price.currency,
     images: p.images || [],
     type: m.type || "",
+    // Spec lines shown on the product page; many products have these but no description.
+    details: [
+      ["Capacity", m.capacity],
+      ["Size", m.size],
+      ["Thread", m.thread],
+      ["Hardware", m.hardware],
+      ["Features", m.features],
+    ].filter(([, v]) => v),
     leather: m.leather || "",
     etsyListing: m.etsy_listing || "",
     oneOfAKind: m.one_of_a_kind === "true",

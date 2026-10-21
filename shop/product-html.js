@@ -63,7 +63,8 @@ export function productHtml(p, { photos = [], monogram = null } = {}) {
     <h1>${esc(p.name)}</h1>
     ${p.leather ? `<p class="leather">${esc(p.leather)}</p>` : ""}
     <div class="price">${money(p.amount)}</div>
-    <p class="desc">${esc(p.description)}</p>
+    ${p.description ? `<p class="desc">${esc(p.description)}</p>` : ""}
+    ${(p.details || []).length ? `<dl class="specs">${p.details.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>` : ""}
     ${p.readyToShip ? `<p class="notice">Ready to ship.</p>` : ""}
     ${p.oneOfAKind ? `<p class="notice">One of a kind: once it is sold, it is gone.</p>` : ""}
     <form id="add-form" method="post" action="/api/checkout">

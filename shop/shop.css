@@ -94,6 +94,9 @@ h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 0.5rem; }
 .product .leather { color: var(--text-muted); font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; }
 .product .price { font-size: 1.3rem; margin: 0.5rem 0 1.25rem; }
 .product .desc { color: var(--text-muted); line-height: 1.8; margin-bottom: 1.5rem; white-space: pre-line; }
+.specs { display: grid; grid-template-columns: auto 1fr; gap: 0.4rem 1.25rem; margin: 0 0 1.5rem; font-size: 0.9rem; line-height: 1.5; }
+.specs dt { color: var(--text-muted); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; padding-top: 0.15rem; }
+.specs dd { margin: 0; color: var(--cream); }
 .field { margin-bottom: 1rem; }
 .field label { display: block; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.4rem; }
 .field select, .field input { width: 100%; min-height: 46px; padding: 0 0.75rem; background: var(--bg-warm); color: var(--cream); border: 1px solid rgba(196,168,130,0.3); font: inherit; font-size: 1rem; }
