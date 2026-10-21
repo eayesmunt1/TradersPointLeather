@@ -20,7 +20,10 @@ so there is no `package.json`.
 
 The catalog lives in Stripe: each Product has one Price whose `lookup_key` is the slug. Product
 metadata drives the pages (`one_of_a_kind`, `stock`, `monogram`, `options_color`,
-`options_thread`, `options_size`, `size_input`, `size_label`, `needs_review`). The `monogram`
+`options_thread`, `options_size`, `size_input`, `size_label`, `needs_review`, `ready_to_ship`). Everything ships in 1–2 weeks unless its product has
+`ready_to_ship=true`, which switches it to 1–3 business days and adds a "Ready to ship" badge;
+a cart gets the faster estimate only when every item is ready. "Made to order" is dropped from
+product names on display, since every piece is made to order by default. The `monogram`
 product is the $10 add-on. Stripe sandbox and live are separate catalogs: use the sandbox key
 until launch, then recreate the catalog in live mode.
 

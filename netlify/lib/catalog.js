@@ -11,7 +11,13 @@ function shape(price) {
     slug,
     priceId: price.id,
     productId: p.id,
-    name: p.name,
+    // Every piece is made to order by default, so the phrase adds nothing to a name.
+    name: p.name
+      .replace(/\s*\(\s*made[\s-]to[\s-]order\s*\)/i, "")
+      .replace(/[\s,\-–—]*\bmade[\s-]to[\s-]order\b/i, " ")
+      .replace(/\s+/g, " ")
+      .replace(/[\s,\-–—]+$/, "")
+      .trim(),
     description: p.description || "",
     amount: price.unit_amount,
     currency: price.currency,
@@ -20,6 +26,7 @@ function shape(price) {
     leather: m.leather || "",
     etsyListing: m.etsy_listing || "",
     oneOfAKind: m.one_of_a_kind === "true",
+    readyToShip: m.ready_to_ship === "true", // default ship time is 1-2 weeks
     stock: m.stock ? Number(m.stock) : null,
     monogram: m.monogram === "true",
     options: {

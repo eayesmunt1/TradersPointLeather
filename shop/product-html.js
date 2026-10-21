@@ -3,8 +3,11 @@
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 export const money = (cents) => "$" + (cents / 100).toFixed(2).replace(/\.00$/, "");
 export const TYPES = { wallet: "Wallets", belt: "Belts", collar: "Collars" };
-export const RETURNS =
-  "Free shipping (US) · Ships in 1–3 business days, arrives in 5–7 days in the lower 48 · 30-day returns if undamaged (buyer pays return shipping)";
+// Everything ships in 1-2 weeks unless the product carries ready_to_ship=true in Stripe.
+export const shipLine = (ready) =>
+  "Free shipping (US) \u00b7 " +
+  (ready ? "Ready to ship: ships in 1\u20133 business days" : "Ships in 1\u20132 weeks") +
+  ", arrives 5\u20137 days after shipping in the lower 48 \u00b7 30-day returns if undamaged (buyer pays return shipping)";
 
 function select(id, label, list) {
   return `<div class="field"><label for="${id}">${esc(label)}</label>
@@ -61,6 +64,7 @@ export function productHtml(p, { photos = [], monogram = null } = {}) {
     ${p.leather ? `<p class="leather">${esc(p.leather)}</p>` : ""}
     <div class="price">${money(p.amount)}</div>
     <p class="desc">${esc(p.description)}</p>
+    ${p.readyToShip ? `<p class="notice">Ready to ship.</p>` : ""}
     ${p.oneOfAKind ? `<p class="notice">One of a kind: once it is sold, it is gone.</p>` : ""}
     <form id="add-form" method="post" action="/api/checkout">
       <input type="hidden" name="slug" value="${esc(p.slug)}">
@@ -69,7 +73,7 @@ export function productHtml(p, { photos = [], monogram = null } = {}) {
       <p class="error" role="alert"></p>
     </form>
     <noscript><p class="hint">Without JavaScript this button goes straight to checkout for this item.</p></noscript>
-    <p class="terms">${esc(RETURNS)}</p>
+    <p class="terms">${esc(shipLine(p.readyToShip))}</p>
   </div>
 </div>`;
 }

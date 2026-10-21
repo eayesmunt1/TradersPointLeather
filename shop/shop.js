@@ -5,7 +5,11 @@
   'use strict';
 
   var KEY = 'tpl-cart-v1';
-  var RETURNS = 'Free shipping (US) · Ships in 1–3 business days, arrives in 5–7 days in the lower 48 · 30-day returns if undamaged (buyer pays return shipping)';
+  // Matches shipLine() in product-html.js: 1-2 weeks unless every piece is ready to ship.
+  function shipText(ready) {
+    return 'Free shipping (US) \u00b7 ' + (ready ? 'Ready to ship: ships in 1\u20133 business days' : 'Ships in 1\u20132 weeks') +
+      ', arrives 5\u20137 days after shipping in the lower 48 \u00b7 30-day returns if undamaged (buyer pays return shipping)';
+  }
   var memory = null; // used when localStorage is unavailable
   var catalog = null;
   var manifest = {}; // /img/manifest.json: local photos per slug, [{src, color?}]
@@ -138,7 +142,7 @@
     box.append(ul, el('div', { class: 'cart-summary' }, [
       el('div', { class: 'row subtotal' }, [el('span', { text: 'Subtotal' }), el('span', { text: money(subtotal) })]),
       el('div', { class: 'row muted' }, [el('span', { text: 'Shipping' }), el('span', { text: 'Free' })]),
-      el('p', { class: 'terms', text: RETURNS }),
+      el('p', { class: 'terms', text: shipText(items.every(function (i) { var p = product(i.slug); return p && p.readyToShip; })) }),
       btn, err,
     ]));
   }
@@ -274,6 +278,7 @@
         var ul = el('ul', { class: 'grid' });
         ps.forEach(function (p) {
           var badges = [];
+          if (p.readyToShip) badges.push('Ready to ship');
           if (p.oneOfAKind) badges.push('One of a kind');
           else if (p.stock) badges.push('Only ' + p.stock + ' left');
           if (p.options.color.length > 1) badges.push(p.options.color.length + ' colours');
@@ -325,7 +330,7 @@
           var ul = el('ul', {});
           (o.details.length ? o.details : o.items.map(function (i) { return i.name + ' x' + i.quantity; })).forEach(function (t) { ul.append(el('li', { text: t })); });
           box.append(
-            el('p', { class: 'lede', text: 'A receipt is on its way to ' + (o.email || 'your email') + '. Orders ship within 1–3 business days.' }),
+            el('p', { class: 'lede', text: 'A receipt is on its way to ' + (o.email || 'your email') + '. Orders ship within 1\u20132 weeks; ready-to-ship pieces sooner.' }),
             ul,
             el('p', { class: 'cart-summary subtotal', text: 'Total: ' + money(o.total) }),
             o.shipTo ? el('p', { class: 'muted', text: 'Shipping to ' + o.shipTo.name + ', ' + o.shipTo.lines.join(', ') }) : null,
