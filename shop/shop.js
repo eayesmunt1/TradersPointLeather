@@ -196,18 +196,47 @@
   function hydrate(box, slug) {
     var form = box.querySelector('#add-form');
     if (!form) return;
-    var main = box.querySelector('.gallery-main');
+    var strip = box.querySelector('.slides');
+    var slides = [].slice.call(box.querySelectorAll('.slide'));
     var thumbs = [].slice.call(box.querySelectorAll('.thumbs button'));
-    function show(btn) {
-      main.replaceChildren(el('img', { src: btn.dataset.src, alt: '' }));
-      thumbs.forEach(function (t) { t.setAttribute('aria-current', String(t === btn)); });
+    var count = box.querySelector('.gallery-nav .count');
+    var shown = slides.slice(), current = 0;
+    function mark(i) {
+      current = i;
+      thumbs.forEach(function (t, j) { t.setAttribute('aria-current', String(slides[j] === shown[i])); });
+      if (count) count.textContent = (i + 1) + ' / ' + shown.length;
     }
-    thumbs.forEach(function (t) { t.addEventListener('click', function () { show(t); }); });
+    function go(i) {
+      if (!shown.length) return;
+      i = (i + shown.length) % shown.length;
+      strip.scrollTo({ left: shown[i].offsetLeft - strip.offsetLeft, behavior: 'smooth' });
+      mark(i);
+    }
+    var t0;
+    if (strip) strip.addEventListener('scroll', function () {
+      clearTimeout(t0);
+      t0 = setTimeout(function () { mark(Math.round(strip.scrollLeft / strip.clientWidth)); }, 80);
+    });
+    thumbs.forEach(function (t, j) { t.addEventListener('click', function () { var k = shown.indexOf(slides[j]); if (k > -1) go(k); }); });
+    var prev = box.querySelector('.gallery-nav .prev'), next = box.querySelector('.gallery-nav .next');
+    if (prev) prev.addEventListener('click', function () { go(current - 1); });
+    if (next) next.addEventListener('click', function () { go(current + 1); });
+    if (strip) strip.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(current - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(current + 1); }
+    });
+    // Picking a colour narrows the photos to that colour, when there are any.
     var colorSel = form.querySelector('[name="color"]');
     if (colorSel) colorSel.addEventListener('change', function () {
-      var match = thumbs.filter(function (t) { return t.dataset.color === colorSel.value; });
-      thumbs.forEach(function (t) { t.hidden = match.length > 0 && t.dataset.color !== colorSel.value; });
-      if (match.length) show(match[0]);
+      var match = slides.filter(function (sl) { return sl.dataset.color === colorSel.value; });
+      shown = match.length ? match : slides.slice();
+      slides.forEach(function (sl, j) {
+        var on = shown.indexOf(sl) > -1;
+        sl.hidden = !on;
+        if (thumbs[j]) thumbs[j].hidden = !on;
+      });
+      strip.scrollTo({ left: 0, behavior: 'instant' });
+      mark(0);
     });
     var err = form.querySelector('.error');
     form.addEventListener('submit', function (e) {
@@ -225,16 +254,38 @@
   var pages = {
     list: function () {
       var box = document.getElementById('listing');
+      var LABELS = { wallet: 'Wallets', belt: 'Belts', collar: 'Collars' };
       catalogPromise.then(function (c) {
-        var type = new URLSearchParams(location.search).get('type');
-        var ps = c.products.filter(visible).filter(function (p) { return !type || p.type === type; });
+        var all = c.products.filter(visible);
+        var type = new URLSearchParams(location.search).get('type') || '';
+        var ps = all.filter(function (p) { return !type || p.type === type; });
         box.replaceChildren();
-        if (!ps.length) { box.append(el('p', { class: 'muted', text: 'Nothing in the shop right now.' })); return; }
+        // Filter tabs: plain links, so Back and shared URLs keep the filter.
+        var types = Object.keys(LABELS).filter(function (t) { return all.some(function (p) { return p.type === t; }); });
+        var nav = el('nav', { class: 'filters', 'aria-label': 'Filter products' });
+        [''].concat(types).forEach(function (t) {
+          var n = all.filter(function (p) { return !t || p.type === t; }).length;
+          var a = el('a', { href: t ? '/shop?type=' + t : '/shop' }, [document.createTextNode(t ? LABELS[t] : 'All'), el('span', { class: 'n', text: String(n) })]);
+          if (t === type) a.setAttribute('aria-current', 'page');
+          nav.append(a);
+        });
+        box.append(nav);
+        if (!ps.length) { box.append(el('p', { class: 'muted', text: 'Nothing here right now.' })); return; }
         var ul = el('ul', { class: 'grid' });
         ps.forEach(function (p) {
+          var badges = [];
+          if (p.oneOfAKind) badges.push('One of a kind');
+          else if (p.stock) badges.push('Only ' + p.stock + ' left');
+          if (p.options.color.length > 1) badges.push(p.options.color.length + ' colours');
+          var ph = photos(p)[0];
           ul.append(el('li', {}, [el('a', { class: 'card', href: '/shop/' + encodeURIComponent(p.slug) }, [
-            el('div', { class: 'card-img' }, [photos(p)[0] ? el('img', { src: photos(p)[0].src, alt: '', loading: 'lazy' }) : el('span', { text: 'Photos coming soon' })]),
-            el('div', { class: 'card-body' }, [el('h2', { text: p.name }), el('div', { class: 'price', text: money(p.amount) })]),
+            el('div', { class: 'card-img' }, [ph ? el('img', { src: ph.src, alt: '', loading: 'lazy' }) : el('span', { text: 'Photos coming soon' })]),
+            badges.length ? el('div', { class: 'badges' }, badges.map(function (b) { return el('span', { class: 'badge', text: b }); })) : null,
+            el('div', { class: 'card-body' }, [
+              el('h2', { text: p.name }),
+              p.leather ? el('p', { class: 'leather', text: p.leather }) : null,
+              el('div', { class: 'price', text: money(p.amount) }),
+            ]),
           ])]));
         });
         box.append(ul);
