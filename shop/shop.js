@@ -111,7 +111,10 @@
     items.forEach(function (i, idx) {
       var p = product(i.slug); if (!p) return;
       var total = lineTotal(i, p); subtotal += total;
-      var thumb = photos(p)[0] ? el('img', { src: photos(p)[0].src, alt: '', width: '72', height: '72' }) : el('div', { class: 'ph' });
+      // Prefer a photo in the colour the buyer chose.
+      var ph = photos(p), color = (i.options || {}).color;
+      var pick = ph.filter(function (x) { return x.color && x.color === color; })[0] || ph[0];
+      var thumb = pick ? el('img', { src: pick.src, alt: '', width: '72', height: '72' }) : el('div', { class: 'ph' });
       var minus = el('button', { type: 'button', 'aria-label': 'Decrease quantity of ' + p.name, text: '−' });
       var plus = el('button', { type: 'button', 'aria-label': 'Increase quantity of ' + p.name, text: '+' });
       if (i.qty >= maxQty(p)) plus.disabled = true;
