@@ -1,0 +1,38 @@
+import { json, stripe } from "../lib/stripe.js";
+
+// Order summary for the thanks page, looked up server-side by Checkout Session id.
+export async function handler(event) {
+  const id = event.queryStringParameters?.session_id || "";
+  if (!/^cs_(test|live)_[A-Za-z0-9]+$/.test(id)) return json(400, { error: "Invalid session." });
+  try {
+    const s = await stripe("GET", `/checkout/sessions/${id}`, { expand: ["line_items"] });
+    if (s.payment_status !== "paid") return json(200, { paid: false });
+    const addr = s.shipping_details?.address || {};
+    return json(
+      200,
+      {
+        paid: true,
+        email: s.customer_details?.email || "",
+        items: s.line_items.data.map((l) => ({
+          name: l.description,
+          quantity: l.quantity,
+          total: l.amount_total,
+        })),
+        details: Object.entries(s.metadata || {})
+          .filter(([k]) => k.startsWith("item_"))
+          .map(([, v]) => v),
+        total: s.amount_total,
+        currency: s.currency,
+        shipTo: s.shipping_details
+          ? {
+              name: s.shipping_details.name,
+              lines: [addr.line1, addr.line2, [addr.city, addr.state, addr.postal_code].filter(Boolean).join(" ")].filter(Boolean),
+            }
+          : null,
+      },
+      { "cache-control": "no-store" }
+    );
+  } catch {
+    return json(404, { error: "Order not found." });
+  }
+}

@@ -1,3 +1,6 @@
 User-agent: *
 Allow: /
 Sitemap: https://traderspointleather.com/sitemap.xml
+Disallow: /shop
+Disallow: /cart
+Disallow: /order

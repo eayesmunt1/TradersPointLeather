@@ -3,3 +3,31 @@
 
 [functions]
   node_bundler = "esbuild"
+
+# On-site shop. /shop/<slug> is one template filled from the Stripe catalog.
+# The old shop.html (an Etsy API check page) would otherwise answer /shop.
+[[redirects]]
+  from = "/shop"
+  to = "/shop/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/shop/*"
+  to = "/shop/product.html"
+  status = 200
+
+[[redirects]]
+  from = "/cart"
+  to = "/cart.html"
+  status = 200
+
+[[redirects]]
+  from = "/order/thanks"
+  to = "/order-thanks.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200

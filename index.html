@@ -1259,6 +1259,33 @@ body::after {
   reveals.forEach(el => observer.observe(el));
 </script>
 
+<script src="/shop-config.js"></script>
+<script>
+  // On-site shop: invisible until SHOP_PUBLIC is true in shop-config.js. Then the
+  // shop becomes the primary path and Etsy the secondary one.
+  if (window.SHOP_PUBLIC) {
+    document.querySelectorAll('.btn-shop[href*="etsy.com"]').forEach(function (a) {
+      var etsy = a.cloneNode(false);
+      a.textContent = 'Shop';
+      a.href = '/shop';
+      a.removeAttribute('target');
+      a.removeAttribute('rel');
+      etsy.className = 'link-secondary';
+      etsy.textContent = 'Also on Etsy \u2192';
+      a.after(etsy);
+    });
+    var nav = document.getElementById('site-nav');
+    var shop = document.createElement('a');
+    shop.href = '/shop';
+    shop.textContent = 'Shop';
+    nav.insertBefore(shop, nav.firstChild);
+    var links = document.querySelector('.footer-links');
+    var fl = document.createElement('a');
+    fl.href = '/shop';
+    fl.textContent = 'Shop';
+    links.insertBefore(fl, links.firstChild);
+  }
+</script>
 <script async data-uid="aeb2c16a21" src="https://traders-point-leather.kit.com/aeb2c16a21/index.js"></script>
 
 
