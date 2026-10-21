@@ -676,6 +676,47 @@ body {
 .link-secondary:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 3px; }
 .mid-cta .banner-actions { align-items: center; gap: 0.5rem 2rem; }
 
+/* ── REVIEWS ── */
+.reviews {
+  padding: 2rem 2rem 6rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+.reviews h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+.proof-line { color: var(--tan-light); font-size: 0.9rem; letter-spacing: 0.08em; margin-bottom: 2.5rem; }
+.proof-line a { color: inherit; text-decoration: none; border-bottom: 1px solid rgba(196,168,130,0.4); }
+.proof-line a:hover { border-bottom-color: var(--tan); }
+.proof-line a:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 3px; }
+.review-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+.review-list:empty { display: none; }
+.review {
+  background: var(--bg-warm);
+  border: 1px solid rgba(196,168,130,0.08);
+  padding: 2rem;
+}
+.review-stars { color: var(--accent); letter-spacing: 0.2em; margin-bottom: 1rem; }
+.review blockquote {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--cream);
+  margin-bottom: 1rem;
+}
+.review figcaption { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); }
+
 /* ── TWO PATHS ── */
 .paths {
   display: grid;
@@ -1070,6 +1111,26 @@ body::after {
   <p class="product-note">Free shipping (US) &middot; Ships in 1&ndash;3 business days, arrives in 5&ndash;7 days in the lower 48 &middot; 30-day returns if undamaged (buyer pays return shipping)</p>
 </section>
 
+<!-- REVIEWS -->
+<section class="reviews reveal" id="reviews">
+  <p class="section-label">Reviews</p>
+  <h2>What Buyers Say</h2>
+  <p class="proof-line"><a href="https://www.etsy.com/shop/TradersPointLeather/reviews" target="_blank" rel="noopener">&#9733; Etsy Star Seller &middot; 4.9 from 34 reviews</a></p>
+  <div class="review-list" id="review-list"></div>
+  <a class="link-secondary" href="https://www.etsy.com/shop/TradersPointLeather/reviews" target="_blank" rel="noopener">Read all reviews on Etsy &rarr;</a>
+</section>
+
+<!-- Review quotes live in this one block. Paste each review's text VERBATIM from
+     the shop's Etsy reviews tab, with the date, and attribute by first initial
+     only. An entry with empty text is skipped, so nothing unfinished is shown. -->
+<script type="application/json" id="review-data">
+[
+  { "text": "", "name": "C.", "date": "Aug 1, 2026" },
+  { "text": "", "name": "A.", "date": "Aug 31, 2026" },
+  { "text": "", "name": "R.", "date": "Sep 7, 2026" }
+]
+</script>
+
 <!-- TWO PATHS -->
 <section class="paths reveal" aria-label="Two ways to buy">
   <div class="path">
@@ -1121,6 +1182,29 @@ body::after {
     nav.addEventListener('click', function (e) { if (e.target.closest('a')) setOpen(false); });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && nav.classList.contains('open')) { setOpen(false); btn.focus(); }
+    });
+  })();
+
+  // Reviews: render only the entries that have text
+  (function () {
+    var list = document.getElementById('review-list');
+    var data;
+    try { data = JSON.parse(document.getElementById('review-data').textContent); } catch (e) { return; }
+    data.forEach(function (r) {
+      if (!r.text || !r.text.trim()) return;
+      var fig = document.createElement('figure');
+      fig.className = 'review';
+      var stars = document.createElement('div');
+      stars.className = 'review-stars';
+      stars.setAttribute('role', 'img');
+      stars.setAttribute('aria-label', '5 out of 5 stars');
+      stars.textContent = '\u2605\u2605\u2605\u2605\u2605';
+      var q = document.createElement('blockquote');
+      q.textContent = r.text;
+      var cap = document.createElement('figcaption');
+      cap.textContent = r.name + ' \u00b7 ' + r.date;
+      fig.append(stars, q, cap);
+      list.appendChild(fig);
     });
   })();
 
