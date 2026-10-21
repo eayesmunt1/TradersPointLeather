@@ -9,21 +9,40 @@ const clean = (v, n = 40) => String(v ?? "").replace(/[\r\n]+/g, " ").trim().sli
 export async function handler(event) {
   if (event.httpMethod !== "POST") return json(405, { error: "POST only" });
 
+  // The cart posts JSON. A product page form submitted without JavaScript posts
+  // form fields instead: one item, and the answer is a redirect or an HTML page.
+  const isForm = (event.headers["content-type"] || "").includes("application/x-www-form-urlencoded");
+  const reply = (status, body) =>
+    !isForm
+      ? json(status, body)
+      : body.url
+        ? { statusCode: 303, headers: { location: body.url }, body: "" }
+        : {
+            statusCode: status,
+            headers: { "content-type": "text/html; charset=utf-8" },
+            body: `<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>Checkout</title><body style="font-family:sans-serif;padding:2rem"><p>${String(body.error).replace(/</g, "&lt;")}</p><p><a href="javascript:history.back()">Go back</a></p>`,
+          };
+
   let items;
   try {
-    items = JSON.parse(event.body || "{}").items;
+    if (isForm) {
+      const f = Object.fromEntries(new URLSearchParams(event.isBase64Encoded ? Buffer.from(event.body, "base64").toString() : event.body));
+      items = [{ slug: f.slug, qty: Number(f.qty || 1), initials: f.initials, options: { color: f.color, thread: f.thread, size: f.size, sizeText: f.sizeText } }];
+    } else {
+      items = JSON.parse(event.body || "{}").items;
+    }
   } catch {
-    return json(400, { error: "Invalid request." });
+    return reply(400, { error: "Invalid request." });
   }
   if (!Array.isArray(items) || !items.length || items.length > MAX_LINES) {
-    return json(400, { error: "Your cart is empty or too large." });
+    return reply(400, { error: "Your cart is empty or too large." });
   }
 
   let catalog;
   try {
     catalog = await loadCatalog();
   } catch {
-    return json(502, { error: "The shop is unavailable right now. Please try again." });
+    return reply(502, { error: "The shop is unavailable right now. Please try again." });
   }
 
   const lineItems = [];
@@ -112,7 +131,7 @@ export async function handler(event) {
     metadata[`item_${i + 1}`] = `${slug} x${qty}${description ? ` | ${description}` : ""}`.slice(0, 500);
   });
 
-  if (problems.length) return json(400, { error: [...new Set(problems)].join(" ") });
+  if (problems.length) return reply(400, { error: [...new Set(problems)].join(" ") });
 
   const origin = process.env.SITE_URL || process.env.URL || event.headers.origin;
   const now = Math.floor(Date.now() / 1000);
@@ -141,8 +160,8 @@ export async function handler(event) {
       cancel_url: `${origin}/cart`,
       ...(process.env.STRIPE_TAX === "true" ? { automatic_tax: { enabled: true } } : {}),
     });
-    return json(200, { url: session.url });
+    return reply(200, { url: session.url });
   } catch (e) {
-    return json(502, { error: "Could not start checkout. Please try again." });
+    return reply(502, { error: "Could not start checkout. Please try again." });
   }
 }

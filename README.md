@@ -12,6 +12,7 @@ so there is no `package.json`.
 
 | Path | Function | Purpose |
 | --- | --- | --- |
+| `/shop/<slug>` | `netlify/functions/shop-page.js` | Product page rendered on the server (works without JavaScript); real 404 for unknown slugs |
 | `/api/catalog` | `netlify/functions/catalog.js` | Read-only catalog from Stripe |
 | `/api/checkout` | `netlify/functions/checkout.js` | Validates the cart, creates the Session |
 | `/api/order` | `netlify/functions/order.js` | Order summary for the thanks page |
@@ -22,6 +23,14 @@ metadata drives the pages (`one_of_a_kind`, `stock`, `monogram`, `options_color`
 `options_thread`, `options_size`, `size_input`, `size_label`, `needs_review`). The `monogram`
 product is the $10 add-on. Stripe sandbox and live are separate catalogs: use the sandbox key
 until launch, then recreate the catalog in live mode.
+
+### Photos
+
+`img/<slug>/` holds web-sized photos from the owner's TPL-photos folder; `img/manifest.json` maps each
+slug to its photos (made-to-order products tag each photo with its colour, and picking a colour on the
+product page shows just those). Products with no folder fall back to Stripe's product images, then to
+"Photos coming soon". `img/details/` has the TanneryStamp detail shots, not yet placed on a page.
+Without JavaScript a product page's button posts straight to checkout for that one item.
 
 ### Environment variables (Netlify, never committed)
 
@@ -41,7 +50,7 @@ the cart button exists only on shop pages, and every shop page has `noindex, nof
 To launch, set `SHOP_PUBLIC = true`, then also (these are static files, not driven by the flag):
 
 1. Remove the `<meta name="robots">` tag from `shop/index.html`, `shop/product.html`, `cart.html` and `order-thanks.html`.
-2. Remove the three `Disallow` lines from `robots.txt`.
+2. `robots.txt` deliberately does not mention the shop: a blocked crawler never sees `noindex`. Nothing to change.
 3. Add `/shop` and each product page to `sitemap.xml`.
 4. Point `offers.url` in the `index.html` Product JSON-LD at the on-site pages.
 5. Products with `needs_review` in Stripe stay hidden once the flag is true. Approve each description, then delete that metadata key.

@@ -8,6 +8,7 @@
   var RETURNS = 'Free shipping (US) · Ships in 1–3 business days, arrives in 5–7 days in the lower 48 · 30-day returns if undamaged (buyer pays return shipping)';
   var memory = null; // used when localStorage is unavailable
   var catalog = null;
+  var manifest = {}; // /img/manifest.json: local photos per slug, [{src, color?}]
   var notice = '';
 
   /* ── storage ── */
@@ -49,15 +50,19 @@
   function optionText(i) {
     var o = i.options || {}, parts = [];
     ['color', 'thread', 'size'].forEach(function (k) { if (o[k]) parts.push(k[0].toUpperCase() + k.slice(1) + ': ' + o[k]); });
-    if (o.sizeText) parts.push(o.sizeLabel + ': ' + o.sizeText);
+    if (o.sizeText) parts.push((o.sizeLabel || 'Size') + ': ' + o.sizeText);
     if (i.initials) parts.push('Initials: ' + i.initials);
     return parts.join(' · ');
   }
 
   /* ── catalog ── */
-  var catalogPromise = fetch('/api/catalog')
-    .then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); })
-    .then(function (c) { catalog = c; prune(); return c; });
+  var catalogPromise = Promise.all([
+    fetch('/api/catalog').then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }),
+    fetch('/img/manifest.json').then(function (r) { return r.json(); }).catch(function () { return {}; }),
+  ]).then(function (res) { catalog = res[0]; manifest = res[1]; prune(); return catalog; });
+
+  // Our own photos first, then whatever Stripe holds for the product.
+  function photos(p) { return manifest[p.slug] || p.images.map(function (src) { return { src: src }; }); }
 
   // Drop anything sold out or removed since it was added, and say so.
   function prune() {
@@ -106,7 +111,7 @@
     items.forEach(function (i, idx) {
       var p = product(i.slug); if (!p) return;
       var total = lineTotal(i, p); subtotal += total;
-      var thumb = p.images[0] ? el('img', { src: p.images[0], alt: '', width: '72', height: '72' }) : el('div', { class: 'ph' });
+      var thumb = photos(p)[0] ? el('img', { src: photos(p)[0].src, alt: '', width: '72', height: '72' }) : el('div', { class: 'ph' });
       var minus = el('button', { type: 'button', 'aria-label': 'Decrease quantity of ' + p.name, text: '−' });
       var plus = el('button', { type: 'button', 'aria-label': 'Increase quantity of ' + p.name, text: '+' });
       if (i.qty >= maxQty(p)) plus.disabled = true;
@@ -184,17 +189,48 @@
   }
 
   /* ── pages ── */
+  // Wires up a rendered product page: photo gallery, colour-matched photos, add to cart.
+  function hydrate(box, slug) {
+    var form = box.querySelector('#add-form');
+    if (!form) return;
+    var main = box.querySelector('.gallery-main');
+    var thumbs = [].slice.call(box.querySelectorAll('.thumbs button'));
+    function show(btn) {
+      main.replaceChildren(el('img', { src: btn.dataset.src, alt: '' }));
+      thumbs.forEach(function (t) { t.setAttribute('aria-current', String(t === btn)); });
+    }
+    thumbs.forEach(function (t) { t.addEventListener('click', function () { show(t); }); });
+    var colorSel = form.querySelector('[name="color"]');
+    if (colorSel) colorSel.addEventListener('change', function () {
+      var match = thumbs.filter(function (t) { return t.dataset.color === colorSel.value; });
+      thumbs.forEach(function (t) { t.hidden = match.length > 0 && t.dataset.color !== colorSel.value; });
+      if (match.length) show(match[0]);
+    });
+    var err = form.querySelector('.error');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      err.textContent = '';
+      var p = product(slug);
+      if (!p) { err.textContent = 'The shop is unavailable right now. Please try again.'; return; }
+      var f = new FormData(form), options = {};
+      ['color', 'thread', 'size'].forEach(function (k) { if (f.get(k)) options[k] = f.get(k); });
+      if (p.sizeInput) { options.sizeText = String(f.get('sizeText') || '').trim(); options.sizeLabel = p.sizeInput.label; }
+      add({ slug: p.slug, qty: Number(f.get('qty') || 1), options: options, initials: String(f.get('initials') || '').trim().toUpperCase() });
+    });
+  }
+
   var pages = {
     list: function () {
       var box = document.getElementById('listing');
       catalogPromise.then(function (c) {
-        var ps = c.products.filter(visible);
+        var type = new URLSearchParams(location.search).get('type');
+        var ps = c.products.filter(visible).filter(function (p) { return !type || p.type === type; });
         box.replaceChildren();
         if (!ps.length) { box.append(el('p', { class: 'muted', text: 'Nothing in the shop right now.' })); return; }
         var ul = el('ul', { class: 'grid' });
         ps.forEach(function (p) {
           ul.append(el('li', {}, [el('a', { class: 'card', href: '/shop/' + encodeURIComponent(p.slug) }, [
-            el('div', { class: 'card-img' }, [p.images[0] ? el('img', { src: p.images[0], alt: '', loading: 'lazy' }) : el('span', { text: 'Photos coming soon' })]),
+            el('div', { class: 'card-img' }, [photos(p)[0] ? el('img', { src: photos(p)[0].src, alt: '', loading: 'lazy' }) : el('span', { text: 'Photos coming soon' })]),
             el('div', { class: 'card-body' }, [el('h2', { text: p.name }), el('div', { class: 'price', text: money(p.amount) })]),
           ])]));
         });
@@ -205,76 +241,19 @@
     product: function () {
       var box = document.getElementById('product');
       var slug = decodeURIComponent(location.pathname.replace(/^\/shop\//, '').replace(/\/$/, ''));
-      catalogPromise.then(function (c) {
+      // The server renders the page; only when it did not (local preview) is it built here.
+      var ready = box.hasAttribute('data-ssr') ? Promise.resolve() : catalogPromise.then(function (c) {
         var p = product(slug);
-        box.replaceChildren();
         if (!p || !visible(p)) {
-          box.append(el('h1', { text: 'Not available' }), el('p', { class: 'lede', text: 'This piece is sold out or no longer listed.' }), el('a', { href: '/shop', text: 'Back to the shop' }));
-          return;
+          box.innerHTML = '<h1>Not available</h1><p class="lede">This piece is sold out or no longer listed.</p><a href="/shop">Back to the shop</a>';
+          return Promise.reject('missing');
         }
-        document.title = p.name + ' — Traders Point Leather';
-        var main = el('div', { class: 'gallery-main' });
-        function show(src) { main.replaceChildren(src ? el('img', { src: src, alt: p.name }) : el('span', { text: 'Photos coming soon' })); }
-        show(p.images[0]);
-        var thumbs = el('div', { class: 'thumbs' });
-        if (p.images.length > 1) p.images.forEach(function (src, i) {
-          var b = el('button', { type: 'button', 'aria-label': 'Show photo ' + (i + 1), 'aria-current': i === 0 ? 'true' : 'false' }, [el('img', { src: src, alt: '' })]);
-          b.addEventListener('click', function () {
-            show(src);
-            thumbs.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-current', 'false'); });
-            b.setAttribute('aria-current', 'true');
-          });
-          thumbs.append(b);
+        return import('/shop/product-html.js').then(function (m) {
+          box.innerHTML = m.productHtml(p, { photos: photos(p), monogram: c.monogram });
+          document.title = p.name + ' \u2014 Traders Point Leather';
         });
-
-        var form = el('form', { novalidate: '' });
-        function field(id, label, control, hint) {
-          form.append(el('div', { class: 'field' }, [el('label', { for: id, text: label }), control, hint ? el('p', { class: 'hint', text: hint }) : null]));
-        }
-        function select(id, list) {
-          var s = el('select', { id: id, required: '' }, [el('option', { value: '', text: 'Choose…' })]);
-          list.forEach(function (v) { s.append(el('option', { value: v, text: v })); });
-          return s;
-        }
-        ['color', 'thread', 'size'].forEach(function (k) {
-          if (p.options[k].length) field('opt-' + k, k[0].toUpperCase() + k.slice(1), select('opt-' + k, p.options[k]));
-        });
-        if (p.sizeInput) field('opt-sizeText', p.sizeInput.label, el('input', { id: 'opt-sizeText', type: 'text', required: '', maxlength: '20', autocomplete: 'off' }));
-        if (p.monogram && c.monogram) field('initials', 'Monogram initials (optional, +' + money(c.monogram.amount) + ')',
-          el('input', { id: 'initials', type: 'text', maxlength: '4', pattern: '[A-Za-z]{1,4}', autocomplete: 'off' }), 'Up to 4 letters.');
-        var cap = maxQty(p);
-        if (cap > 1) {
-          var q = el('select', { id: 'qty' });
-          for (var n = 1; n <= cap; n++) q.append(el('option', { value: String(n), text: String(n) }));
-          field('qty', 'Quantity', q);
-        }
-        var err = el('p', { class: 'error', role: 'alert' });
-        var btn = el('button', { type: 'submit', class: 'btn', text: 'Add to cart' });
-        form.append(btn, err);
-        form.addEventListener('submit', function (e) {
-          e.preventDefault();
-          err.textContent = '';
-          var bad = form.querySelector(':invalid');
-          if (bad) { err.textContent = 'Please complete the highlighted option.'; bad.focus(); return; }
-          var g = function (id) { var n = document.getElementById(id); return n ? n.value : ''; };
-          var options = {};
-          ['color', 'thread', 'size'].forEach(function (k) { if (p.options[k].length) options[k] = g('opt-' + k); });
-          if (p.sizeInput) { options.sizeText = g('opt-sizeText').trim(); options.sizeLabel = p.sizeInput.label; }
-          add({ slug: p.slug, qty: Number(g('qty') || 1), options: options, initials: g('initials').trim().toUpperCase() });
-        });
-
-        box.append(el('div', { class: 'product' }, [
-          el('div', {}, [main, thumbs]),
-          el('div', {}, [
-            el('h1', { text: p.name }),
-            el('div', { class: 'price', text: money(p.amount) }),
-            el('p', { class: 'desc', text: p.description }),
-            p.oneOfAKind ? el('p', { class: 'notice', text: 'One of a kind: once it is sold, it is gone.' }) : null,
-            form,
-            el('p', { class: 'terms', text: RETURNS }),
-          ]),
-        ]));
-      }).catch(function () { box.textContent = 'The shop is unavailable right now. Please try again shortly.'; });
+      });
+      ready.then(function () { return catalogPromise.catch(function () {}); }).then(function () { hydrate(box, slug); }, function () {});
     },
 
     cart: function () { /* rendered by renderAll once the catalog loads */ },

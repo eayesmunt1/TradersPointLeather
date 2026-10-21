@@ -4,7 +4,7 @@
 [functions]
   node_bundler = "esbuild"
 
-# On-site shop. /shop/<slug> is one template filled from the Stripe catalog.
+# On-site shop. /shop/<slug> is rendered by shop-page.js from the Stripe catalog (404 if unknown).
 # The old shop.html (an Etsy API check page) would otherwise answer /shop.
 [[redirects]]
   from = "/shop"
@@ -14,7 +14,7 @@
 
 [[redirects]]
   from = "/shop/*"
-  to = "/shop/product.html"
+  to = "/.netlify/functions/shop-page"
   status = 200
 
 [[redirects]]
