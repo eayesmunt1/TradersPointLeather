@@ -2,7 +2,10 @@
 // so the page works without JavaScript, and by shop.js when it has to render in the browser.
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 export const money = (cents) => "$" + (cents / 100).toFixed(2).replace(/\.00$/, "");
-export const TYPES = { wallet: "Wallets", belt: "Belts", collar: "Collars" };
+export const CONTACT = "customer-support@traderspointleather.com";
+// What a sold Ready to Ship piece asks the owner for. Crisp sends it as the first chat message;
+// without Crisp the button is a mailto link carrying the same text.
+export const mtoMessage = (p) => `I'd like a ${p.name} built to order. It shows as sold.`;
 // Ready to Ship pieces (section=ready in Stripe) ship in 1-3 business days; Made to Order in 1-2 weeks.
 export const shipLine = (ready) =>
   "Free shipping (US) \u00b7 " +
@@ -17,8 +20,10 @@ function select(id, label, list) {
 }
 
 // photos: [{src, color?}]. monogram: {amount} or null.
-export function productHtml(p, { photos = [], monogram = null } = {}) {
+export function productHtml(p, { photos: allPhotos = [], monogram = null } = {}) {
   const cap = p.section === "made" ? 1 : p.soldOut ? 0 : p.stock !== null ? Math.min(p.stock, 10) : p.oneOfAKind ? 1 : 10;
+  // A page with a pre-built color shows that color's photos when there are any.
+  const photos = p.build.color && allPhotos.some((ph) => ph.color === p.build.color) ? allPhotos.filter((ph) => ph.color === p.build.color) : allPhotos;
   // Photos are shown whole (mostly 2:3 portrait) in a swipeable strip; thumbnails jump to one.
   const slides = photos.length
     ? photos
@@ -39,12 +44,10 @@ export function productHtml(p, { photos = [], monogram = null } = {}) {
       )
       .join("")}</div>` : ""}
   </div>`;
-  const section = TYPES[p.type];
-  const crumbs = `<nav class="crumbs" aria-label="Breadcrumb"><a href="/shop">\u2190 All products</a>${
-    section ? ` <span aria-hidden="true">/</span> <a href="/shop?type=${esc(p.type)}">${section}</a>` : ""
-  }</nav>`;
+  const ready = p.section === "ready";
+  const crumbs = `<nav class="crumbs" aria-label="Breadcrumb"><a href="/shop">\u2190 All products</a> <span aria-hidden="true">/</span> <a href="/shop#${ready ? "ready-to-ship" : "made-to-order"}">${ready ? "Ready to Ship" : "Made to Order"}</a></nav>`;
   const fields = [
-    ...["color", "thread", "size"]
+    ...Object.keys(p.options)
       .filter((k) => p.options[k].length)
       .map((k) => select(`opt-${k}`, k[0].toUpperCase() + k.slice(1), p.options[k])),
     p.sizeInput
@@ -62,19 +65,26 @@ export function productHtml(p, { photos = [], monogram = null } = {}) {
   <div class="product-info">
     <h1>${esc(p.name)}</h1>
     ${p.leather ? `<p class="leather">${esc(p.leather)}</p>` : ""}
+    ${[p.build.color && `Color: ${p.build.color}`, p.build.thread && `Thread: ${p.build.thread}`].filter(Boolean).length ? `<p class="leather">${esc([p.build.color && `Color: ${p.build.color}`, p.build.thread && `Thread: ${p.build.thread}`].filter(Boolean).join(" \u00b7 "))}</p>` : ""}
     <div class="price">${money(p.amount)}</div>
     ${p.description ? `<p class="desc">${esc(p.description)}</p>` : ""}
     ${(p.details || []).length ? `<dl class="specs">${p.details.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>` : ""}
-    ${p.readyToShip ? `<p class="notice">Ready to ship.</p>` : ""}
-    ${p.oneOfAKind ? `<p class="notice">One of a kind: once it is sold, it is gone.</p>` : ""}
+    ${p.needsReview ? `<p class="notice">Draft preview: this piece is not visible to the public yet.</p>` : ""}
+    ${
+      p.soldOut
+        ? `<p class="notice">Sold. We can make another one for you.</p>
+    <a class="btn" id="mto-request" href="mailto:${CONTACT}?subject=${encodeURIComponent("Made to Order: " + p.name)}&body=${encodeURIComponent(mtoMessage(p))}" data-message="${esc(mtoMessage(p))}">Request MTO build</a>`
+        : `${ready ? `<p class="notice">Ready to ship${p.stock > 1 ? `. Only ${p.stock} left` : ""}.</p>` : `<p class="notice">Built for you after you order.</p>`}
     <form id="add-form" method="post" action="/api/checkout">
       <input type="hidden" name="slug" value="${esc(p.slug)}">
       ${fields}
       <button type="submit" class="btn">Add to cart</button>
       <p class="error" role="alert"></p>
     </form>
-    <noscript><p class="hint">Without JavaScript this button goes straight to checkout for this item.</p></noscript>
-    <p class="terms">${esc(shipLine(p.readyToShip))}</p>
+    <noscript><p class="hint">Without JavaScript this button goes straight to checkout for this item.</p></noscript>`
+    }
+    ${ready ? "" : `<p class="hint">Want something different? <a href="/design">Open the designer</a>.</p>`}
+    <p class="terms">${esc(shipLine(ready))}</p>
   </div>
 </div>`;
 }

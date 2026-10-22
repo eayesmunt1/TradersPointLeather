@@ -10,6 +10,20 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/shop/shop.css">
+<!-- Crisp live chat, copied from index.html. Loaded on page load; its launcher stays hidden and
+     opens only when a buyer asks for a Made to Order build. -->
+<script>
+  window.CRISP_WEBSITE_ID = '555f5fde-3295-4ab0-9e41-d1ddb720f2e4';
+  window.$crisp = [['do', 'chat:hide']];
+  if (window.CRISP_WEBSITE_ID) {
+    window.addEventListener('load', function () {
+      var s = document.createElement('script');
+      s.src = 'https://client.crisp.chat/l.js';
+      s.async = 1;
+      document.head.appendChild(s);
+    });
+  }
+</script>
 <script src="/shop-config.js"></script>
 <script src="/shop/shop.js" defer></script>
 </head>
@@ -20,7 +34,7 @@
 </header>
 <main>
   <h1>Shop</h1>
-  <p class="lede">Handmade in Indiana, one at a time. Free shipping in the US.</p>
+  <p class="lede">Ready to Ship pieces leave in 1&ndash;3 business days. Made to Order pieces are built to your choices.</p>
   <div id="listing" aria-live="polite"><p class="muted">Loading…</p></div>
   <noscript><p class="notice">The shop listing needs JavaScript. Email <a href="mailto:customer-support@traderspointleather.com">customer-support@traderspointleather.com</a> to order.</p></noscript>
 </main>

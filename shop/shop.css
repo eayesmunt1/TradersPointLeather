@@ -139,3 +139,7 @@ dialog.drawer::backdrop { background: rgba(0,0,0,0.6); }
 .thanks li { margin-bottom: 0.5rem; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* Listing sections */
+.section-title { font-size: clamp(1.3rem, 3vw, 1.7rem); margin: 2.5rem 0 1.25rem; }
+#listing > section:first-child .section-title { margin-top: 0; }

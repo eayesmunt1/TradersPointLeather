@@ -48,12 +48,18 @@
     for (var i = 0; i < catalog.products.length; i++) if (catalog.products[i].slug === slug) return catalog.products[i];
     return null;
   }
-  // During launch review, products whose Stripe description is still a draft stay out of public view.
-  function visible(p) { return !(window.SHOP_PUBLIC && p.needsReview); }
+  // ?drafts=1 previews products still flagged needs_review; the server leaves them out otherwise.
+  var DRAFTS = new URLSearchParams(location.search).get('drafts') === '1';
+  if (DRAFTS) {
+    var noindex = document.createElement('meta');
+    noindex.name = 'robots'; noindex.content = 'noindex, nofollow';
+    document.head.append(noindex);
+  }
+  function visible(p) { return true; }
   function maxQty(p) { return p.section === 'made' ? 1 : p.soldOut ? 0 : p.stock !== null ? Math.min(p.stock, 10) : p.oneOfAKind ? 1 : 10; }
   function optionText(i) {
     var o = i.options || {}, parts = [];
-    ['color', 'thread', 'size'].forEach(function (k) { if (o[k]) parts.push(k[0].toUpperCase() + k.slice(1) + ': ' + o[k]); });
+    ['color', 'thread', 'size', 'snap'].forEach(function (k) { if (o[k]) parts.push(k[0].toUpperCase() + k.slice(1) + ': ' + o[k]); });
     if (o.sizeText) parts.push((o.sizeLabel || 'Size') + ': ' + o.sizeText);
     if (i.initials) parts.push('Initials: ' + i.initials);
     return parts.join(' · ');
@@ -61,7 +67,7 @@
 
   /* ── catalog ── */
   var catalogPromise = Promise.all([
-    fetch('/api/catalog').then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }),
+    fetch('/api/catalog' + (DRAFTS ? '?drafts=1' : '')).then(function (r) { if (!r.ok) throw new Error('catalog'); return r.json(); }),
     fetch('/img/manifest.json').then(function (r) { return r.json(); }).catch(function () { return {}; }),
   ]).then(function (res) { catalog = res[0]; manifest = res[1]; prune(); return catalog; });
 
@@ -152,7 +158,7 @@
     btn.disabled = true; btn.textContent = 'One moment…';
     var items = readCart().map(function (i) {
       var o = i.options || {};
-      return { slug: i.slug, qty: i.qty, initials: i.initials || '', options: { color: o.color, thread: o.thread, size: o.size, sizeText: o.sizeText } };
+      return { slug: i.slug, qty: i.qty, initials: i.initials || '', options: { color: o.color, thread: o.thread, size: o.size, snap: o.snap, sizeText: o.sizeText } };
     });
     fetch('/api/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ items: items }) })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
@@ -198,8 +204,16 @@
   /* ── pages ── */
   // Wires up a rendered product page: photo gallery, colour-matched photos, add to cart.
   function hydrate(box, slug) {
-    var form = box.querySelector('#add-form');
-    if (!form) return;
+    var request = box.querySelector('#mto-request');
+    // Opens Crisp with the request as the first message; without Crisp the mailto link does the job.
+    if (request) request.addEventListener('click', function (e) {
+      if (!window.$crisp || typeof $crisp.is !== 'function') return;
+      e.preventDefault();
+      $crisp.push(['do', 'chat:show']);
+      $crisp.push(['do', 'chat:open']);
+      $crisp.push(['do', 'message:send', ['text', request.dataset.message]]);
+    });
+    var form = box.querySelector('#add-form'); // a sold-out piece has no form
     var strip = box.querySelector('.slides');
     var slides = [].slice.call(box.querySelectorAll('.slide'));
     var thumbs = [].slice.call(box.querySelectorAll('.thumbs button'));
@@ -230,7 +244,7 @@
       if (e.key === 'ArrowRight') { e.preventDefault(); go(current + 1); }
     });
     // Picking a colour narrows the photos to that colour, when there are any.
-    var colorSel = form.querySelector('[name="color"]');
+    var colorSel = form && form.querySelector('[name="color"]');
     if (colorSel) colorSel.addEventListener('change', function () {
       var match = slides.filter(function (sl) { return sl.dataset.color === colorSel.value; });
       shown = match.length ? match : slides.slice();
@@ -242,6 +256,7 @@
       strip.scrollTo({ left: 0, behavior: 'instant' });
       mark(0);
     });
+    if (!form) return;
     var err = form.querySelector('.error');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -249,7 +264,7 @@
       var p = product(slug);
       if (!p) { err.textContent = 'The shop is unavailable right now. Please try again.'; return; }
       var f = new FormData(form), options = {};
-      ['color', 'thread', 'size'].forEach(function (k) { if (f.get(k)) options[k] = f.get(k); });
+      ['color', 'thread', 'size', 'snap'].forEach(function (k) { if (f.get(k)) options[k] = f.get(k); });
       if (p.sizeInput) { options.sizeText = String(f.get('sizeText') || '').trim(); options.sizeLabel = p.sizeInput.label; }
       add({ slug: p.slug, qty: Number(f.get('qty') || 1), options: options, initials: String(f.get('initials') || '').trim().toUpperCase() });
     });
@@ -258,42 +273,38 @@
   var pages = {
     list: function () {
       var box = document.getElementById('listing');
-      var LABELS = { wallet: 'Wallets', belt: 'Belts', collar: 'Collars' };
+      // Ready to Ship pieces that sold stay off the grid; their pages stay up.
+      function card(p) {
+        var ready = p.section === 'ready', badges = [];
+        if (p.needsReview) badges.push('Draft');
+        if (ready && p.stock > 1) badges.push('Only ' + p.stock + ' left');
+        var ph = photos(p)[0];
+        return el('li', {}, [el('a', { class: 'card', href: '/shop/' + encodeURIComponent(p.slug) + (DRAFTS ? '?drafts=1' : '') }, [
+          el('div', { class: 'card-img' }, [ph ? el('img', { src: ph.src, alt: '', loading: 'lazy' }) : el('span', { text: 'Photos coming soon' })]),
+          badges.length ? el('div', { class: 'badges' }, badges.map(function (b) { return el('span', { class: 'badge', text: b }); })) : null,
+          el('div', { class: 'card-body' }, [
+            el('h2', { text: p.name }),
+            el('div', { class: 'price', text: money(p.amount) }),
+            ready ? null : el('p', { class: 'leather', text: 'Built for you, ships in 1\u20132 weeks' }),
+          ]),
+        ])]);
+      }
+      function section(id, title, items) {
+        return el('section', { id: id, 'aria-labelledby': id + '-title' }, [
+          el('h2', { id: id + '-title', class: 'section-title', text: title }),
+          el('ul', { class: 'grid' }, items.map(card)),
+        ]);
+      }
       catalogPromise.then(function (c) {
-        var all = c.products.filter(visible);
-        var type = new URLSearchParams(location.search).get('type') || '';
-        var ps = all.filter(function (p) { return !type || p.type === type; });
+        var all = c.products.filter(function (p) { return p.slug !== 'monogram'; });
+        var ready = all.filter(function (p) { return p.section === 'ready' && !p.soldOut; });
+        var made = all.filter(function (p) { return p.section === 'made'; });
         box.replaceChildren();
-        // Filter tabs: plain links, so Back and shared URLs keep the filter.
-        var types = Object.keys(LABELS).filter(function (t) { return all.some(function (p) { return p.type === t; }); });
-        var nav = el('nav', { class: 'filters', 'aria-label': 'Filter products' });
-        [''].concat(types).forEach(function (t) {
-          var n = all.filter(function (p) { return !t || p.type === t; }).length;
-          var a = el('a', { href: t ? '/shop?type=' + t : '/shop' }, [document.createTextNode(t ? LABELS[t] : 'All'), el('span', { class: 'n', text: String(n) })]);
-          if (t === type) a.setAttribute('aria-current', 'page');
-          nav.append(a);
-        });
-        box.append(nav);
-        if (!ps.length) { box.append(el('p', { class: 'muted', text: 'Nothing here right now.' })); return; }
-        var ul = el('ul', { class: 'grid' });
-        ps.forEach(function (p) {
-          var badges = [];
-          if (p.readyToShip) badges.push('Ready to ship');
-          if (p.oneOfAKind) badges.push('One of a kind');
-          else if (p.stock) badges.push('Only ' + p.stock + ' left');
-          if (p.options.color.length > 1) badges.push(p.options.color.length + ' colours');
-          var ph = photos(p)[0];
-          ul.append(el('li', {}, [el('a', { class: 'card', href: '/shop/' + encodeURIComponent(p.slug) }, [
-            el('div', { class: 'card-img' }, [ph ? el('img', { src: ph.src, alt: '', loading: 'lazy' }) : el('span', { text: 'Photos coming soon' })]),
-            badges.length ? el('div', { class: 'badges' }, badges.map(function (b) { return el('span', { class: 'badge', text: b }); })) : null,
-            el('div', { class: 'card-body' }, [
-              el('h2', { text: p.name }),
-              p.leather ? el('p', { class: 'leather', text: p.leather }) : null,
-              el('div', { class: 'price', text: money(p.amount) }),
-            ]),
-          ])]));
-        });
-        box.append(ul);
+        if (ready.length) box.append(section('ready-to-ship', 'Ready to Ship', ready));
+        if (made.length) box.append(section('made-to-order', 'Made to Order', made));
+        if (!ready.length && !made.length) box.append(el('p', { class: 'muted', text: 'Nothing here right now.' }));
+        // Scroll to #ready-to-ship or #made-to-order once the sections exist.
+        if (location.hash) { var t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
       }).catch(function () { box.textContent = 'The shop is unavailable right now. Please try again shortly.'; });
     },
 
