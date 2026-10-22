@@ -801,10 +801,11 @@ const THREADS = [
    default selection — it must be an id from LEATHERS above. */
 const TARGETS = [
   { key: 'exterior',    code: 'EXT', label: 'Outside',            def: 'whiskey',
-    help: 'The outside of the wallet — all that shows when it is closed.' },
+    help: 'The outside of the wallet — all that shows when it is closed. Choose this first: '
+        + 'the whole wallet takes this leather, and you can then change any part below on its own.' },
   { key: 'interior',    code: 'INT', label: 'Inside',             def: 'whiskey',
     help: 'The inside panels the pockets are sewn to, and what shows behind them. '
-        + 'It follows the outside until you choose a different leather here.' },
+        + 'Starts matching the outside; change it here on its own.' },
   { key: 'pocketUpper', code: 'PU',  label: 'Upper Card Pockets', def: 'whiskey',
     help: 'The two pockets sitting higher on each side.' },
   { key: 'pocketLower', code: 'PL',  label: 'Lower Card Pockets', def: 'whiskey',
@@ -1407,7 +1408,9 @@ state.thread = THREADS[0].id;
 state.model = DEFAULT_MODEL;
 state.monogram = '';
 state.stash = STASH[0].id;
-state.interiorLinked = true;
+/* The first leather chosen for any part sets the whole wallet when it is the outside;
+   after that every part changes on its own. */
+state.seeded = false;
 state.family = LEATHER_LINES[0].id;
 
 const byId = (list, id) => list.find((x) => x.id === id) || list[0];
@@ -1647,13 +1650,14 @@ function choose(group, value) {
   if (group === 'family' && changed) {
     const def = LEATHER_LINES.find((l) => l.id === value).def;
     TARGETS.forEach((t) => { state[t.key] = def; });
-    state.interiorLinked = true;
+    state.seeded = false;
   }
-  // The inside matches the outside, as a one-leather wallet does, until it is
-  // chosen on its own.
-  if (group === 'exterior' && state.interiorLinked) state.interior = value;
-  // Choosing the outside's own leather here joins them back up.
-  if (group === 'interior') state.interiorLinked = value === state.exterior;
+  if (TARGETS.some((t) => t.key === group) && !state.seeded) {
+    // The first leather chosen defines the wallet: when it is the outside, every part matches it.
+    // A part chosen first leaves the others as they are. Either way, from here each part is its own.
+    state.seeded = true;
+    if (group === 'exterior') TARGETS.forEach((t) => { state[t.key] = value; });
+  }
   if (stashLocked()) state.stash = 'stash';
   const stashChanged = state.stash !== stashBefore;
   if ((changed && group === 'model') || stashChanged) buildWallet();
