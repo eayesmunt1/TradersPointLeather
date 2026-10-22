@@ -69,6 +69,10 @@ const PLAN = {
   // Made to Order: one pre-built page each
   "cygnet-horween-cavalier-mto": { section: "made", desc: "cygnetCavalier", meta: { capacity: "8-12 cards, 4 slots, cash pocket" } },
   "cygnet-newbury-balmoral-mto": { section: "made", desc: "cygnetNewbury" },
+  // One Made to Order listing per photographed color, each with its own page and photos.
+  "cygnet-newbury-balmoral-cognac": { section: "made", desc: "cygnetNewbury" },
+  "cygnet-newbury-balmoral-sunflower": { section: "made", desc: "cygnetNewbury" },
+  "cygnet-newbury-balmoral-antique-copper": { section: "made", desc: "cygnetNewbury" },
   "sparrow-horween-cavalier-mto": { section: "made", desc: "sparrow" },
   "sparrow-newbury-balmoral-mto": { section: "made", desc: "sparrow" },
   "jonas-horween-cavalier": { section: "made" },
@@ -130,7 +134,8 @@ for (const [lookup, plan] of Object.entries(PLAN)) {
 
   const meta = { ...(plan.meta || {}) };
   if (plan.section) meta.section = plan.section;
-  if (plan.section === "ready" && plan.stock !== undefined) meta.stock = String(plan.stock);
+  // Stock is only ever seeded. Once a product has a count, the webhook owns it, and a re-run must not undo a sale.
+  if (plan.section === "ready" && plan.stock !== undefined && product.metadata?.stock === undefined) meta.stock = String(plan.stock);
 
   const changes = [];
   const params = {};

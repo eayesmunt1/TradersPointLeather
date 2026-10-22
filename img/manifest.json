@@ -101,100 +101,6 @@
    "src": "/img/cygnet-horween-cavalier-sunflower/14.jpg"
   }
  ],
- "cygnet-newbury-balmoral-mto": [
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/02.jpg",
-   "color": "Antique Copper"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/01.jpg",
-   "color": "Antique Copper"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/03.jpg",
-   "color": "Antique Copper"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/04.jpg",
-   "color": "Antique Copper"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/05.jpg",
-   "color": "Antique Copper"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/06.jpg",
-   "color": "Antique Copper"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/07.jpg",
-   "color": "Antique Copper"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/08.jpg",
-   "color": "Antique Copper"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/cognac/08.jpg",
-   "color": "Cognac"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/cognac/01.jpg",
-   "color": "Cognac"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/cognac/02.jpg",
-   "color": "Cognac"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/cognac/03.jpg",
-   "color": "Cognac"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/cognac/04.jpg",
-   "color": "Cognac"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/cognac/05.jpg",
-   "color": "Cognac"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/cognac/06.jpg",
-   "color": "Cognac"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/cognac/07.jpg",
-   "color": "Cognac"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/sunflower/07.jpg",
-   "color": "Sunflower"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/sunflower/01.jpg",
-   "color": "Sunflower"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/sunflower/02.jpg",
-   "color": "Sunflower"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/sunflower/03.jpg",
-   "color": "Sunflower"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/sunflower/04.jpg",
-   "color": "Sunflower"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/sunflower/05.jpg",
-   "color": "Sunflower"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/sunflower/06.jpg",
-   "color": "Sunflower"
-  }
- ],
  "cygnet-newbury-balmoral-navy": [
   {
    "src": "/img/cygnet-newbury-balmoral-navy/06.jpg"
@@ -454,6 +360,130 @@
   },
   {
    "src": "/img/siah-horween-cavalier/06.jpg"
+  }
+ ],
+ "cygnet-newbury-balmoral-cognac": [
+  {
+   "src": "/img/cygnet-newbury-balmoral-cognac/08.jpg",
+   "color": "Cognac"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-cognac/01.jpg",
+   "color": "Cognac"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-cognac/02.jpg",
+   "color": "Cognac"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-cognac/03.jpg",
+   "color": "Cognac"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-cognac/04.jpg",
+   "color": "Cognac"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-cognac/05.jpg",
+   "color": "Cognac"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-cognac/06.jpg",
+   "color": "Cognac"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-cognac/07.jpg",
+   "color": "Cognac"
+  }
+ ],
+ "cygnet-newbury-balmoral-sunflower": [
+  {
+   "src": "/img/cygnet-newbury-balmoral-sunflower/07.jpg",
+   "color": "Sunflower"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-sunflower/01.jpg",
+   "color": "Sunflower"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-sunflower/02.jpg",
+   "color": "Sunflower"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-sunflower/03.jpg",
+   "color": "Sunflower"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-sunflower/04.jpg",
+   "color": "Sunflower"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-sunflower/05.jpg",
+   "color": "Sunflower"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-sunflower/06.jpg",
+   "color": "Sunflower"
+  }
+ ],
+ "cygnet-newbury-balmoral-antique-copper": [
+  {
+   "src": "/img/cygnet-newbury-balmoral-antique-copper/02.jpg",
+   "color": "Antique Copper"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-antique-copper/01.jpg",
+   "color": "Antique Copper"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-antique-copper/03.jpg",
+   "color": "Antique Copper"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-antique-copper/04.jpg",
+   "color": "Antique Copper"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-antique-copper/05.jpg",
+   "color": "Antique Copper"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-antique-copper/06.jpg",
+   "color": "Antique Copper"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-antique-copper/07.jpg",
+   "color": "Antique Copper"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-antique-copper/08.jpg",
+   "color": "Antique Copper"
+  }
+ ],
+ "cygnet-newbury-balmoral-mto": [
+  {
+   "src": "/img/cygnet-newbury-balmoral-navy/06.jpg"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-navy/01.jpg"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-navy/02.jpg"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-navy/03.jpg"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-navy/04.jpg"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-navy/05.jpg"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-navy/07.jpg"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-navy/08.jpg"
   }
  ]
 }
