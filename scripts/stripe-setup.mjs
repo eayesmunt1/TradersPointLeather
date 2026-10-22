@@ -42,25 +42,33 @@ if (/_live_/.test(key) && !LIVE) {
 // Descriptions come from the owner's product files, unchanged. Only products whose
 // description is empty receive one; an existing description is never overwritten.
 const DESCRIPTIONS = {
-  cygnet:
-    "Made one at a time in Traders Point, Indiana.\n\nThis traditional bifold has burnished edges and 4 card pockets. It holds 8-12 cards, or 12-16 with the optional two stash pockets.",
+  // The Cavalier build has no stash pockets (the designer adds them); Newbury always has two.
+  cygnetCavalier:
+    "Made one at a time in Traders Point, Indiana.\n\nThis traditional bifold has burnished edges and 4 card pockets. It holds 8-12 cards.",
+  cygnetNewbury:
+    "Made one at a time in Traders Point, Indiana.\n\nThis traditional bifold has burnished edges, 4 card pockets and two stash pockets. It holds 12-16 cards.",
   sparrow:
     "Made one at a time in Traders Point, Indiana.\n\nThis vertical bifold has a cash flap, three interior card pockets, and one exterior card pocket. It holds 9-10 cards.",
 };
+
+// The shared Cygnet text this script wrote earlier. A description is replaced only when it is empty or
+// still exactly this, so text the owner has edited is never overwritten.
+const OLD_CYGNET =
+  "Made one at a time in Traders Point, Indiana.\n\nThis traditional bifold has burnished edges and 4 card pockets. It holds 8-12 cards, or 12-16 with the optional two stash pockets.";
 
 // Keyed by Price lookup_key. `meta` is merged into the product's metadata; a value
 // of "" removes that key. `stock` applies to Ready to Ship pieces only.
 const PLAN = {
   // Ready to Ship
-  "cygnet-horween-cavalier-plum": { section: "ready", stock: 2, desc: "cygnet", meta: { one_of_a_kind: "false" } },
+  "cygnet-horween-cavalier-plum": { section: "ready", stock: 2, desc: "cygnetCavalier", meta: { one_of_a_kind: "false" } },
   "cygnet-horween-cavalier-rts": { archive: "duplicate of cygnet-horween-cavalier-plum (the two Plum pieces are one listing, stock 2)" },
   "cygnet-horween-cavalier-sunflower": { section: "ready", stock: 1 },
-  "cygnet-newbury-balmoral-navy": { section: "ready", stock: 1, desc: "cygnet" },
+  "cygnet-newbury-balmoral-navy": { section: "ready", stock: 1, desc: "cygnetNewbury" },
   "sparrow-horween-cavalier-two-tone": { section: "ready", stock: 2, desc: "sparrow" },
   "cygnus-shell-cordovan-marbled": { section: "ready", stock: 1 },
   // Made to Order: one pre-built page each
-  "cygnet-horween-cavalier-mto": { section: "made", desc: "cygnet" },
-  "cygnet-newbury-balmoral-mto": { section: "made", desc: "cygnet" },
+  "cygnet-horween-cavalier-mto": { section: "made", desc: "cygnetCavalier", meta: { capacity: "8-12 cards, 4 slots, cash pocket" } },
+  "cygnet-newbury-balmoral-mto": { section: "made", desc: "cygnetNewbury" },
   "sparrow-horween-cavalier-mto": { section: "made", desc: "sparrow" },
   "sparrow-newbury-balmoral-mto": { section: "made", desc: "sparrow" },
   "jonas-horween-cavalier": { section: "made" },
@@ -136,9 +144,10 @@ for (const [lookup, plan] of Object.entries(PLAN)) {
   }
   if (Object.keys(metadata).length) params.metadata = metadata;
 
-  if (!product.description && plan.desc) {
-    params.description = DESCRIPTIONS[plan.desc];
-    changes.push(`description: empty -> ${plan.desc} text`);
+  const wanted = plan.desc && DESCRIPTIONS[plan.desc];
+  if (wanted && product.description !== wanted && (!product.description || product.description === OLD_CYGNET)) {
+    params.description = wanted;
+    changes.push(`description: ${product.description ? "old shared Cygnet text" : "empty"} -> ${plan.desc} text`);
   }
 
   console.log(`${changes.length ? "UPDATE " : "ok     "}  ${product.name}  [${lookup}]`);
