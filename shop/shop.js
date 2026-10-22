@@ -278,13 +278,25 @@
   var pages = {
     list: function () {
       var box = document.getElementById('listing');
-      // Ready to Ship pieces that sold stay off the grid; their pages stay up.
+      var path = location.pathname.replace(/\/$/, '');
+      var drafts = DRAFTS ? '?drafts=1' : '';
+      // The three pages under /shop. Belts are made to order too, but have a page of their own.
+      var CATS = [
+        { slug: 'ready-to-ship', title: 'Ready to Ship', lede: 'Finished pieces that leave in 1\u20133 business days.',
+          has: function (p) { return p.section === 'ready' && !p.soldOut && p.type !== 'belt'; }, empty: 'Nothing is ready to ship right now. Everything on the Made to Order page is built for you.' },
+        { slug: 'made-to-order', title: 'Made to Order', lede: 'Built after you order, and shipped in 1\u20132 weeks.',
+          has: function (p) { return p.section === 'made' && p.type !== 'belt'; }, empty: 'Nothing here right now.' },
+        { slug: 'belts', title: 'Belts', lede: 'Made to your length after you order, and shipped in 1\u20132 weeks.',
+          has: function (p) { return p.type === 'belt'; }, empty: 'Nothing here right now.' },
+      ];
+      var cat = CATS.filter(function (c) { return path === '/shop/' + c.slug; })[0] || null;
+
       function card(p) {
         var ready = p.section === 'ready', badges = [];
         if (p.needsReview) badges.push('Draft');
         if (ready && p.stock > 1) badges.push('Only ' + p.stock + ' left');
         var ph = photos(p)[0];
-        return el('li', {}, [el('a', { class: 'card', href: '/shop/' + encodeURIComponent(p.slug) + (DRAFTS ? '?drafts=1' : '') }, [
+        return el('li', {}, [el('a', { class: 'card', href: '/shop/' + encodeURIComponent(p.slug) + drafts }, [
           el('div', { class: 'card-img' }, [ph ? el('img', { src: ph.src, alt: '', loading: 'lazy' }) : el('span', { text: 'Photos coming soon' })]),
           badges.length ? el('div', { class: 'badges' }, badges.map(function (b) { return el('span', { class: 'badge', text: b }); })) : null,
           el('div', { class: 'card-body' }, [
@@ -293,22 +305,53 @@
           ]),
         ])]);
       }
-      function section(id, title, items) {
-        return el('section', { id: id, 'aria-labelledby': id + '-title' }, [
-          el('h2', { id: id + '-title', class: 'section-title', text: title }),
-          el('ul', { class: 'grid' }, items.map(card)),
-        ]);
+      // A tile for a whole category, on the /shop landing page.
+      function tile(c, items) {
+        // Lead with a wallet where there is one, so Made to Order is not introduced by the collar.
+        var lead = items.filter(function (p) { return p.type === 'wallet'; })[0] || items[0];
+        var ph = lead ? photos(lead)[0] : null;
+        return el('li', {}, [el('a', { class: 'card', href: '/shop/' + c.slug + drafts }, [
+          el('div', { class: 'card-img' }, [ph ? el('img', { src: ph.src, alt: '', loading: 'lazy' }) : el('span', { text: 'Coming soon' })]),
+          el('div', { class: 'card-body' }, [
+            el('h2', { text: c.title }),
+            el('p', { class: 'leather', text: c.lede }),
+            el('div', { class: 'price', text: items.length + (items.length === 1 ? ' piece' : ' pieces') }),
+          ]),
+        ])]);
       }
+
+      // The same tabs on every shop page, so a visitor can move between the three.
+      var tabs = document.getElementById('shop-tabs');
+      [{ slug: '', title: 'All' }].concat(CATS).forEach(function (c) {
+        var href = '/shop' + (c.slug ? '/' + c.slug : '');
+        var a = el('a', { href: href + drafts, text: c.title });
+        if (path === href) a.setAttribute('aria-current', 'page');
+        tabs.append(a);
+      });
+      tabs.hidden = false;
+
+      // The header link for this page: Wallets for Made to Order, Belts for Belts, Shop otherwise.
+      var navHref = cat && cat.slug === 'made-to-order' ? '/shop/made-to-order' : cat && cat.slug === 'belts' ? '/shop/belts' : '/shop';
+      document.querySelectorAll('.site-nav a').forEach(function (a) { a.removeAttribute('aria-current'); });
+      var cur = [].filter.call(document.querySelectorAll('.site-nav a'), function (a) { return a.getAttribute('href') === navHref; })[0];
+      if (cur) cur.setAttribute('aria-current', 'page');
+
+      if (cat) {
+        document.title = cat.title + ' \u2014 Traders Point Leather';
+        document.getElementById('shop-title').textContent = cat.title;
+        document.getElementById('shop-lede').textContent = cat.lede;
+      }
+
       catalogPromise.then(function (c) {
         var all = c.products.filter(function (p) { return p.slug !== 'monogram'; });
-        var ready = all.filter(function (p) { return p.section === 'ready' && !p.soldOut; });
-        var made = all.filter(function (p) { return p.section === 'made'; });
         box.replaceChildren();
-        if (ready.length) box.append(section('ready-to-ship', 'Ready to Ship', ready));
-        if (made.length) box.append(section('made-to-order', 'Made to Order', made));
-        if (!ready.length && !made.length) box.append(el('p', { class: 'muted', text: 'Nothing here right now.' }));
-        // Scroll to #ready-to-ship or #made-to-order once the sections exist.
-        if (location.hash) { var t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
+        if (cat) {
+          var items = all.filter(cat.has);
+          if (!items.length) { box.append(el('p', { class: 'muted', text: cat.empty })); return; }
+          box.append(el('ul', { class: 'grid' }, items.map(card)));
+        } else {
+          box.append(el('ul', { class: 'grid' }, CATS.map(function (k) { return tile(k, all.filter(k.has)); })));
+        }
       }).catch(function () { box.textContent = 'The shop is unavailable right now. Please try again shortly.'; });
     },
 

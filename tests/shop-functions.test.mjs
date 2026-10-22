@@ -246,6 +246,7 @@ test("the sitemap lists only the static pages while the shop is hidden", async (
 test("the sitemap lists the shop and every published product, sold ones included", async () => {
   const xml = await sitemapFor(true);
   assert.match(xml, /traderspointleather\.com\/shop<\/loc>/);
+  for (const page of ["ready-to-ship", "made-to-order", "belts"]) assert.match(xml, new RegExp(`/shop/${page}</loc>`));
   assert.match(xml, /\/shop\/plum</);
   assert.match(xml, /\/shop\/gone</); // sold out, page stays up
   assert.doesNotMatch(xml, /\/shop\/draft</);

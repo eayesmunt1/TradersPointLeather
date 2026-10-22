@@ -44,8 +44,8 @@ test("home, shop, product and cart carry the same header", async () => {
     assert.deepEqual(s.links, seen[0].links, `${s.path} menu differs from the home page`);
   }
   assert.deepEqual(seen[0].links, [
-    "Process -> /#craft", "Details -> /#details", "Shop -> /shop", "Wallets -> /shop#made-to-order",
-    "Belts -> /shop#made-to-order", "Design Your Wallet -> /design.html", "Contact -> /#contact",
+    "Process -> /#craft", "Details -> /#details", "Shop -> /shop", "Wallets -> /shop/made-to-order",
+    "Belts -> /shop/belts", "Design Your Wallet -> /design.html", "Contact -> /#contact",
   ]);
 });
 

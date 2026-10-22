@@ -12,6 +12,7 @@ so there is no `package.json`.
 
 | Path | Function | Purpose |
 | --- | --- | --- |
+| `/shop`, `/shop/ready-to-ship`, `/shop/made-to-order`, `/shop/belts` | `shop/index.html` + `shop/shop.js` | One static shell. `/shop` is a landing page with a tile per page; the three pages list Ready to Ship pieces in stock, Made to Order wallets and the collar, and belts. `shop.js` picks which from the address. |
 | `/shop/<slug>` | `netlify/functions/shop-page.js` | Product page rendered on the server (works without JavaScript); real 404 for unknown slugs |
 | `/api/catalog` | `netlify/functions/catalog.js` | Read-only catalog from Stripe |
 | `/api/checkout` | `netlify/functions/checkout.js` | Validates the cart, creates the Session |
@@ -62,6 +63,8 @@ Without JavaScript a product page's button posts straight to checkout for that o
 
 Locally, `npx netlify-cli dev --offline` serves the site with the functions. `python3 -m http.server`
 serves the home page and the designer but not `/shop` or `/api/*`.
+
+`ready-to-ship`, `made-to-order` and `belts` are reserved: no product's lookup key may be one of them, or its page would be hidden by the category page.
 
 ### Known limits
 

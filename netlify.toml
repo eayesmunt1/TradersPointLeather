@@ -12,6 +12,25 @@
   status = 200
   force = true
 
+# Category pages: the same shell as /shop; shop.js picks what to show from the address.
+[[redirects]]
+  from = "/shop/ready-to-ship"
+  to = "/shop/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/shop/made-to-order"
+  to = "/shop/index.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/shop/belts"
+  to = "/shop/index.html"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/shop/*"
   to = "/.netlify/functions/shop-page"

@@ -45,7 +45,9 @@ export function productHtml(p, { photos: allPhotos = [], monogram = null } = {})
       .join("")}</div>` : ""}
   </div>`;
   const ready = p.section === "ready";
-  const crumbs = `<nav class="crumbs" aria-label="Breadcrumb"><a href="/shop">\u2190 All products</a> <span aria-hidden="true">/</span> <a href="/shop#${ready ? "ready-to-ship" : "made-to-order"}">${ready ? "Ready to Ship" : "Made to Order"}</a></nav>`;
+  // Its own category page: belts have one, and so do Ready to Ship and Made to Order.
+  const [catHref, catName] = p.type === "belt" ? ["/shop/belts", "Belts"] : ready ? ["/shop/ready-to-ship", "Ready to Ship"] : ["/shop/made-to-order", "Made to Order"];
+  const crumbs = `<nav class="crumbs" aria-label="Breadcrumb"><a href="/shop">\u2190 Shop</a> <span aria-hidden="true">/</span> <a href="${catHref}">${catName}</a></nav>`;
   const fields = [
     ...Object.keys(p.options)
       .filter((k) => p.options[k].length)
