@@ -157,6 +157,12 @@ body {
   margin-bottom: 1.1rem;
 }
 .swatch-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.swatch-sub + .swatch-sub { margin-top: 1rem; }
+.line-label { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
+.opt-note { font-size: 0.85rem; line-height: 1.6; color: var(--tan-light); border-left: 2px solid var(--accent); padding-left: 0.75rem; margin: -0.25rem 0 0.9rem; }
+.swatch[disabled] { opacity: 0.4; cursor: not-allowed; }
+[data-buy][hidden] { display: none !important; }
+.leather-about .opt-help strong { color: var(--tan); font-weight: 600; }
 .swatch {
   display: flex;
   align-items: center;
@@ -722,6 +728,29 @@ const LEATHERS = [
     tex: 'leather-ink.jpg' },
   { id: 'plum',    name: 'Plum',            line: 'Horween Cavalier', hex: '#2a2833', shade: '#18171e',
     tex: 'leather-plum.jpg' },
+  /* Newbury Balmoral. Hexes are the median of a flat patch of the leather in
+     the shop's own photos where there is one (Antique Copper, Cognac, Navy
+     Blue, Forest Green, Sunflower), and the vendor swatch chart toned down 15%
+     where there is not yet (the rest). Swap a chart value for a photo's, or add
+     a `tex` swatch photo, as each colour is shot. Shade is 58% of the hex. */
+  { id: 'nb-black',     name: 'Black',          line: 'Newbury Balmoral', hex: '#2a2a2a', shade: '#181818' },
+  { id: 'nb-chocolate', name: 'Chocolate',      line: 'Newbury Balmoral', hex: '#41291f', shade: '#261812' },
+  { id: 'nb-copper',    name: 'Antique Copper', line: 'Newbury Balmoral', hex: '#32171f', shade: '#1d0d12' },
+  { id: 'nb-cognac',    name: 'Cognac',         line: 'Newbury Balmoral', hex: '#693420', shade: '#3d1e13' },
+  { id: 'nb-navy',      name: 'Navy Blue',      line: 'Newbury Balmoral', hex: '#072749', shade: '#04172a' },
+  { id: 'nb-forest',    name: 'Forest Green',   line: 'Newbury Balmoral', hex: '#191a0f', shade: '#0e0f09' },
+  { id: 'nb-kelly',     name: 'Kelly Green',    line: 'Newbury Balmoral', hex: '#3d371d', shade: '#232011' },
+  { id: 'nb-stone',     name: 'Stone Brown',    line: 'Newbury Balmoral', hex: '#473627', shade: '#291f17' },
+  { id: 'nb-red',       name: 'Red',            line: 'Newbury Balmoral', hex: '#7e2422', shade: '#491514' },
+  { id: 'nb-sunflower', name: 'Sunflower',      line: 'Newbury Balmoral', hex: '#7b590e', shade: '#473408' },
+];
+
+/* The leather picker is two sections, one per line, each with the owner's blurb. */
+const LEATHER_LINES = [
+  { line: 'Horween Cavalier', short: 'Horween',
+    blurb: 'Horween is a world-renowned tannery. Cavalier is limited: Horween has stopped producing it, and remaining stock is finite.' },
+  { line: 'Newbury Balmoral', short: 'Newbury',
+    blurb: 'American-made leather from the East Coast. Dual tannage comparable to Horween Cavalier, but the color is struck through, giving a more consistent burnished edge. Slightly thinner, so pockets stack without too much bulk. Plentiful, consistent, and not going out of production.' },
 ];
 
 /* Sampled off the two spool photos. Both were shot in open shade, so the light
@@ -1318,6 +1347,8 @@ const MODELS = {
     name: 'Classic Bifold',
     detail: '4 card slots, 2 pockets',
     code: 'TPL-CB',
+    price: 145,
+    buyUrl: 'https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00',
     geo: CLASSIC_GEO,
     offersStash: true,
     closed: walletClosed,
@@ -1327,6 +1358,10 @@ const MODELS = {
     name: 'Vertical Bifold',
     detail: '4 card slots, 2 pockets',
     code: 'TPL-BF',
+    price: 115,
+    // The $115 Stripe Payment Link for this style goes here. Until it does, the Buy
+    // buttons are hidden for the vertical and "Discuss Your Build" is the way to order.
+    buyUrl: '',
     geo: VERTICAL_GEO,
     closed: walletClosed,
     open: walletOpen,
@@ -1336,6 +1371,10 @@ const DEFAULT_MODEL = 'classic';
 const MODEL_LIST = Object.entries(MODELS).map(([id, m]) => ({ id, ...m }));
 const currentModel = () => MODELS[state.model] || MODELS[DEFAULT_MODEL];
 const hasStash = () => !!currentModel().offersStash && state.stash === 'stash';
+/* Newbury is thinner, so it is always built with the two stash pockets (12-16
+   cards); the stash choice is locked on while the outside is Newbury. In Horween
+   Cavalier, a thick leather, the pockets are optional and add bulk. */
+const stashLocked = () => !!currentModel().offersStash && byId(LEATHERS, state.exterior).line === 'Newbury Balmoral';
 
 /* ── State ──────────────────────────────────────────────────────────── */
 const state = {};
@@ -1429,11 +1468,26 @@ function render() {
   });
 
   document.querySelector('[data-opt="stash"]').hidden = !currentModel().offersStash;
+  const locked = stashLocked();
+  document.querySelectorAll('[data-group="stash"][data-value="none"]').forEach((b) => { b.disabled = locked; });
+  const stashNote = document.getElementById('stash-note');
+  stashNote.textContent = locked
+    ? 'Newbury is always built with its two stash pockets, which hold 12\u201316 cards.'
+    : hasStash() && byId(LEATHERS, state.exterior).line === 'Horween Cavalier'
+      ? 'Heads up: stash pockets add bulk in Horween Cavalier, a thick leather.'
+      : '';
+  stashNote.hidden = !stashNote.textContent;
 
   const href = buildMailtoHref();
   sendBtns.forEach((a) => { a.href = href; });
-  const buy = buildBuyHref();
-  buyBtns.forEach((a) => { a.href = buy; });
+  // Each style has its own price and Payment Link; a style without a link yet cannot be bought here.
+  const canBuy = !!m.buyUrl;
+  const buy = canBuy ? buildBuyHref() : '#';
+  buyBtns.forEach((a) => { a.hidden = !canBuy; a.href = buy; a.textContent = `Buy \u2014 $${m.price}`; });
+  document.querySelectorAll('[id^="send-note"]').forEach((n) => {
+    n.textContent = canBuy ? `$${m.price}, every option included. Secure checkout by Stripe.`
+                           : `$${m.price}, every option included. Use Discuss Your Build to order this style.`;
+  });
 }
 
 /* ── Options UI ─────────────────────────────────────────────────────── */
@@ -1487,6 +1541,7 @@ function buildOptions() {
   TARGETS.forEach((t) => groups.push({
     key: t.key, label: t.label, help: t.help, items: LEATHERS, kind: 'leather',
   }));
+  groups.splice(1, 0, { key: 'leathers-about', kind: 'info', label: 'Leathers' });
   groups.push({
     key: 'stash', label: 'Stash Pocket', kind: 'option', items: STASH,
     help: 'Each inside panel sewn across its top, closing the space behind the card '
@@ -1497,12 +1552,20 @@ function buildOptions() {
     items: THREADS, kind: 'thread',
   });
 
-  document.getElementById('options').innerHTML = groups.map((grp) => `
+  const swatchRow = (grp, items) => `<div class="swatch-row">${items.map((it) => swatchMarkup(grp.key, it, grp.kind)).join('')}</div>`;
+  document.getElementById('options').innerHTML = groups.map((grp) => grp.kind === 'info' ? `
+    <div class="opt-group leather-about" data-opt="${grp.key}">
+      <h2>${grp.label}</h2>
+      ${LEATHER_LINES.map((l) => `<p class="opt-help"><strong>${l.short}.</strong> ${l.blurb}</p>`).join('')}
+    </div>` : `
     <div class="opt-group" data-opt="${grp.key}">
       <h2 id="lbl-${grp.key}">${grp.label}</h2>
       <p class="opt-help">${grp.help}</p>
-      <div class="swatch-row" role="radiogroup" aria-labelledby="lbl-${grp.key}" data-group="${grp.key}">
-        ${grp.items.map((it) => swatchMarkup(grp.key, it, grp.kind)).join('')}
+      ${grp.key === 'stash' ? '<p class="opt-note" id="stash-note" role="status" hidden></p>' : ''}
+      <div role="radiogroup" aria-labelledby="lbl-${grp.key}" data-group="${grp.key}">
+        ${grp.kind === 'leather'
+          ? LEATHER_LINES.map((l) => `<div class="swatch-sub"><p class="line-label">${l.line}</p>${swatchRow(grp, grp.items.filter((it) => it.line === l.line))}</div>`).join('')
+          : swatchRow(grp, grp.items)}
       </div>
     </div>`).join('');
 
@@ -1520,7 +1583,7 @@ function buildOptions() {
     if (!(e.key in keys)) return;
     e.preventDefault();
     const row = btn.closest('[role="radiogroup"]');
-    const all = [...row.querySelectorAll('[role="radio"]')];
+    const all = [...row.querySelectorAll('[role="radio"]:not([disabled])')];
     const next = all[(all.indexOf(btn) + keys[e.key] + all.length) % all.length];
     choose(next.dataset.group, next.dataset.value);
     next.focus();
@@ -1535,15 +1598,19 @@ function buildOptions() {
    live on the <svg> itself rather than on the paths, so the new markup comes
    up already wearing the leathers that were chosen. */
 function choose(group, value) {
+  if (group === 'stash' && stashLocked()) return;
   const changed = state[group] !== value;
+  const stashBefore = state.stash;
   state[group] = value;
   // The inside matches the outside, as a one-leather wallet does, until it is
   // chosen on its own.
   if (group === 'exterior' && state.interiorLinked) state.interior = value;
   // Choosing the outside's own leather here joins them back up.
   if (group === 'interior') state.interiorLinked = value === state.exterior;
-  if (changed && (group === 'model' || group === 'stash')) buildWallet();
-  if (changed && (group === 'stash' || group === 'interior')) setView(true);
+  if (stashLocked()) state.stash = 'stash';
+  const stashChanged = state.stash !== stashBefore;
+  if ((changed && group === 'model') || stashChanged) buildWallet();
+  if (stashChanged || (changed && group === 'interior')) setView(true);
   render();
 }
 
@@ -1639,17 +1706,15 @@ function buildMailtoHref() {
        + `&body=${encodeURIComponent(body)}`;
 }
 
-/* One flat price, so one Stripe Payment Link for every build. The build code
+/* One flat price per style, so one Stripe Payment Link per style. The build code
    rides along as the checkout's client_reference_id, which shows on the
    payment in the Stripe dashboard. Stripe takes only letters, digits, - and _
    there, up to 200 characters, so the code's separators are swapped:
      TPL-CB / EXT:whiskey / MON:abc   ->   TPL-CB__EXT-whiskey__MON-abc */
-const BUY_URL = 'https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00';
-
 function buildBuyHref() {
   const ref = buildCode().replace(/ \/ /g, '__').replace(/:/g, '-')
     .replace(/[^A-Za-z0-9_-]/g, '').slice(0, 200);
-  return `${BUY_URL}?client_reference_id=${ref}`;
+  return `${currentModel().buyUrl}?client_reference_id=${ref}`;
 }
 
 /* ── View toggle ────────────────────────────────────────────────────── */
