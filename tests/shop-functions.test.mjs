@@ -57,6 +57,20 @@ test("a Ready to Ship piece checks out with its ship time", async () => {
   assert.match(session()["shipping_options[0][shipping_rate_data][display_name]"], /1-3 business days/);
 });
 
+test("Managed Payments is left alone unless STRIPE_MANAGED_PAYMENTS=false", async () => {
+  stubStripe();
+  await order([{ slug: "plum", qty: 1, options: {} }]);
+  assert.equal(session()["managed_payments[enabled]"], undefined);
+  process.env.STRIPE_MANAGED_PAYMENTS = "false";
+  try {
+    stubStripe();
+    await order([{ slug: "plum", qty: 1, options: {} }]);
+    assert.equal(session()["managed_payments[enabled]"], "false");
+  } finally {
+    delete process.env.STRIPE_MANAGED_PAYMENTS;
+  }
+});
+
 test("a sold-out piece is refused", async () => {
   stubStripe();
   const res = await order([{ slug: "gone", qty: 1, options: {} }]);
@@ -220,4 +234,52 @@ test("the sitemap lists the shop and every published product, sold ones included
   assert.match(xml, /\/shop\/gone</); // sold out, page stays up
   assert.doesNotMatch(xml, /\/shop\/draft</);
   assert.doesNotMatch(xml, /\/shop\/monogram</);
+});
+
+// --- thank-you page and owner email ---
+
+const { handler: orderHandler } = await import("../netlify/functions/order.js");
+const paidSession = {
+  id: "cs_test_abc123",
+  payment_status: "paid",
+  currency: "usd",
+  amount_total: 20000,
+  customer_details: { email: "buyer@example.com", name: "Test Buyer" },
+  // Stripe's current API: the address lives under collected_information.
+  collected_information: { shipping_details: { name: "Test Buyer", address: { line1: "123 Test Street", city: "Indianapolis", state: "IN", postal_code: "46201" } } },
+  metadata: { item_1: "gv1 x1 | Snap: Double Snap" },
+  line_items: { data: [{ description: "GV1", quantity: 1, amount_total: 6500, price: { product: { description: "Snap: Double Snap · Initials: EY" } } }] },
+};
+
+test("the order summary reads the shipping address and shows names with choices", async () => {
+  stubStripe({ "GET /checkout/sessions/cs_test_abc123": paidSession });
+  const res = await orderHandler({ queryStringParameters: { session_id: "cs_test_abc123" } });
+  const o = JSON.parse(res.body);
+  assert.equal(o.paid, true);
+  assert.deepEqual(o.shipTo, { name: "Test Buyer", lines: ["123 Test Street", "Indianapolis IN 46201"] });
+  assert.deepEqual(o.details, ["GV1 — Snap: Double Snap · Initials: EY"]);
+});
+
+test("the owner email carries the shipping address and the oversold line", async () => {
+  process.env.RESEND_API_KEY = "re_stub";
+  process.env.ORDER_EMAIL_FROM = "shop@example.com";
+  const sent = [];
+  try {
+    const evt = { ...paidSession, metadata: { item_1: "plum x1 | " } };
+    stubStripe({ "GET /checkout/sessions/cs_1": { ...evt, id: "cs_1", metadata: { ...evt.metadata, oversold: "plum x1 (only 0 was in stock)", inventory_applied: "true" } } });
+    const base = globalThis.fetch;
+    globalThis.fetch = async (u, init) => {
+      if (String(u).includes("api.resend.com")) { sent.push(JSON.parse(init.body)); return { ok: true, status: 200, json: async () => ({}) }; }
+      return base(u, init);
+    };
+    await webhook(signed({ type: "checkout.session.completed", data: { object: { id: "cs_1" } } }));
+  } finally {
+    delete process.env.RESEND_API_KEY;
+    delete process.env.ORDER_EMAIL_FROM;
+  }
+  assert.equal(sent.length, 1);
+  assert.match(sent[0].subject, /^OVERSOLD /);
+  assert.match(sent[0].text, /OVERSOLD, refund or remake: plum x1/);
+  assert.match(sent[0].text, /123 Test Street/);
+  assert.match(sent[0].text, /Indianapolis IN 46201/);
 });

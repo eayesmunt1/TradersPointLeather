@@ -340,13 +340,13 @@
           writeCart([]);
           var ul = el('ul', {});
           (o.details.length ? o.details : o.items.map(function (i) { return i.name + ' x' + i.quantity; })).forEach(function (t) { ul.append(el('li', { text: t })); });
-          box.append(
+          box.append.apply(box, [
             el('p', { class: 'lede', text: 'A receipt is on its way to ' + (o.email || 'your email') + '. Orders ship within 1\u20132 weeks; ready-to-ship pieces sooner.' }),
             ul,
             el('p', { class: 'cart-summary subtotal', text: 'Total: ' + money(o.total) }),
             o.shipTo ? el('p', { class: 'muted', text: 'Shipping to ' + o.shipTo.name + ', ' + o.shipTo.lines.join(', ') }) : null,
             el('p', {}, [el('a', { href: '/shop', text: 'Back to the shop' })])
-          );
+          ].filter(Boolean));
         })
         .catch(function () { box.textContent = 'We could not load that order. Your payment receipt is in your email.'; });
     },

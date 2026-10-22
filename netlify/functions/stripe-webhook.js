@@ -1,5 +1,5 @@
 import { loadCatalog } from "../lib/catalog.js";
-import { json, stripe, verifySignature } from "../lib/stripe.js";
+import { json, shippingOf, stripe, verifySignature } from "../lib/stripe.js";
 
 // Parses the "slug xQTY | details" lines that checkout.js wrote into the Session metadata.
 function orderedItems(metadata) {
@@ -42,7 +42,8 @@ async function emailOwner(session, items, oversold = "") {
     console.warn("RESEND_API_KEY or ORDER_EMAIL_FROM not set: order email skipped for", session.id);
     return false;
   }
-  const a = session.shipping_details?.address || {};
+  const ship = shippingOf(session);
+  const a = ship?.address || {};
   const text = [
     ...(oversold ? [`OVERSOLD, refund or remake: ${oversold}`, ""] : []),
     `New order ${session.id}`,
@@ -53,7 +54,7 @@ async function emailOwner(session, items, oversold = "") {
     ...items.map((i) => `- ${i.line}`),
     "",
     "Ship to:",
-    session.shipping_details?.name || "",
+    ship?.name || "",
     [a.line1, a.line2].filter(Boolean).join(", "),
     [a.city, a.state, a.postal_code].filter(Boolean).join(" "),
   ].join("\n");

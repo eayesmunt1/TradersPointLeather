@@ -42,6 +42,7 @@ Without JavaScript a product page's button posts straight to checkout for that o
 | `STRIPE_SECRET_KEY` | yes | `sk_test_...` until launch |
 | `STRIPE_WEBHOOK_SECRET` | yes | `whsec_...` for the endpoint `https://<site>/api/stripe-webhook`, event `checkout.session.completed` |
 | `SITE_URL` | no | Defaults to Netlify's `URL`; used for the success and cancel URLs |
+| `STRIPE_MANAGED_PAYMENTS` | no | `false` opts each Checkout Session out of Managed Payments. Needed when the account has it on by default, since our line items carry no product tax code and Stripe rejects them otherwise |
 | `STRIPE_TAX` | no | `true` turns on Stripe automatic tax. Decide with a tax professional |
 | `RESEND_API_KEY`, `ORDER_EMAIL_FROM` | for owner emails | Without them the webhook logs and skips the email. `ORDER_EMAIL_TO` defaults to the support address |
 

@@ -1,13 +1,14 @@
-import { json, stripe } from "../lib/stripe.js";
+import { json, shippingOf, stripe } from "../lib/stripe.js";
 
 // Order summary for the thanks page, looked up server-side by Checkout Session id.
 export async function handler(event) {
   const id = event.queryStringParameters?.session_id || "";
   if (!/^cs_(test|live)_[A-Za-z0-9]+$/.test(id)) return json(400, { error: "Invalid session." });
   try {
-    const s = await stripe("GET", `/checkout/sessions/${id}`, { expand: ["line_items"] });
+    const s = await stripe("GET", `/checkout/sessions/${id}`, { expand: ["line_items.data.price.product"] });
     if (s.payment_status !== "paid") return json(200, { paid: false });
-    const addr = s.shipping_details?.address || {};
+    const ship = shippingOf(s);
+    const addr = ship?.address || {};
     return json(
       200,
       {
@@ -18,14 +19,16 @@ export async function handler(event) {
           quantity: l.quantity,
           total: l.amount_total,
         })),
-        details: Object.entries(s.metadata || {})
-          .filter(([k]) => k.startsWith("item_"))
-          .map(([, v]) => v),
+        // One readable line per item: the name, then its choices and initials from the product description.
+        details: s.line_items.data.map((l) => {
+          const choices = l.price?.product?.description;
+          return `${l.description}${l.quantity > 1 ? ` x${l.quantity}` : ""}${choices ? ` \u2014 ${choices}` : ""}`;
+        }),
         total: s.amount_total,
         currency: s.currency,
-        shipTo: s.shipping_details
+        shipTo: ship
           ? {
-              name: s.shipping_details.name,
+              name: ship.name,
               lines: [addr.line1, addr.line2, [addr.city, addr.state, addr.postal_code].filter(Boolean).join(" ")].filter(Boolean),
             }
           : null,

@@ -56,6 +56,9 @@ export function verifySignature(rawBody, header, secret, toleranceSec = 300) {
   if (!ok) throw new Error("Signature mismatch");
 }
 
+// Stripe moved the shipping address to collected_information; older Sessions keep it at the top.
+export const shippingOf = (session) => session.collected_information?.shipping_details || session.shipping_details || null;
+
 export const json = (statusCode, body, headers = {}) => ({
   statusCode,
   headers: { "content-type": "application/json", ...headers },

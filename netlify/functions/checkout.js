@@ -170,6 +170,9 @@ export async function handler(event) {
       success_url: `${origin}/order/thanks?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/cart`,
       ...(process.env.STRIPE_TAX === "true" ? { automatic_tax: { enabled: true } } : {}),
+      // Accounts with Managed Payments on by default reject line items that carry no product tax
+      // code. Set STRIPE_MANAGED_PAYMENTS=false to opt a session out of it.
+      ...(process.env.STRIPE_MANAGED_PAYMENTS === "false" ? { managed_payments: { enabled: false } } : {}),
     });
     return reply(200, { url: session.url });
   } catch (e) {
