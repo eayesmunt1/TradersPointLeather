@@ -1,6 +1,10 @@
 {
  "cygnet-horween-cavalier-mto": [
   {
+   "src": "/img/cygnet-horween-cavalier-mto/whiskey-a/06.jpg",
+   "color": "Whiskey"
+  },
+  {
    "src": "/img/cygnet-horween-cavalier-mto/whiskey-a/01.jpg",
    "color": "Whiskey"
   },
@@ -18,10 +22,6 @@
   },
   {
    "src": "/img/cygnet-horween-cavalier-mto/whiskey-a/05.jpg",
-   "color": "Whiskey"
-  },
-  {
-   "src": "/img/cygnet-horween-cavalier-mto/whiskey-a/06.jpg",
    "color": "Whiskey"
   },
   {
@@ -59,10 +59,10 @@
  ],
  "cygnet-horween-cavalier-sunflower": [
   {
-   "src": "/img/cygnet-horween-cavalier-sunflower/01.jpg"
+   "src": "/img/cygnet-horween-cavalier-sunflower/02.jpg"
   },
   {
-   "src": "/img/cygnet-horween-cavalier-sunflower/02.jpg"
+   "src": "/img/cygnet-horween-cavalier-sunflower/01.jpg"
   },
   {
    "src": "/img/cygnet-horween-cavalier-sunflower/03.jpg"
@@ -103,11 +103,11 @@
  ],
  "cygnet-newbury-balmoral-mto": [
   {
-   "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/01.jpg",
+   "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/02.jpg",
    "color": "Antique Copper"
   },
   {
-   "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/02.jpg",
+   "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/01.jpg",
    "color": "Antique Copper"
   },
   {
@@ -133,6 +133,10 @@
   {
    "src": "/img/cygnet-newbury-balmoral-mto/antique-copper/08.jpg",
    "color": "Antique Copper"
+  },
+  {
+   "src": "/img/cygnet-newbury-balmoral-mto/cognac/08.jpg",
+   "color": "Cognac"
   },
   {
    "src": "/img/cygnet-newbury-balmoral-mto/cognac/01.jpg",
@@ -163,8 +167,8 @@
    "color": "Cognac"
   },
   {
-   "src": "/img/cygnet-newbury-balmoral-mto/cognac/08.jpg",
-   "color": "Cognac"
+   "src": "/img/cygnet-newbury-balmoral-mto/sunflower/07.jpg",
+   "color": "Sunflower"
   },
   {
    "src": "/img/cygnet-newbury-balmoral-mto/sunflower/01.jpg",
@@ -189,13 +193,12 @@
   {
    "src": "/img/cygnet-newbury-balmoral-mto/sunflower/06.jpg",
    "color": "Sunflower"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-mto/sunflower/07.jpg",
-   "color": "Sunflower"
   }
  ],
  "cygnet-newbury-balmoral-navy": [
+  {
+   "src": "/img/cygnet-newbury-balmoral-navy/06.jpg"
+  },
   {
    "src": "/img/cygnet-newbury-balmoral-navy/01.jpg"
   },
@@ -210,9 +213,6 @@
   },
   {
    "src": "/img/cygnet-newbury-balmoral-navy/05.jpg"
-  },
-  {
-   "src": "/img/cygnet-newbury-balmoral-navy/06.jpg"
   },
   {
    "src": "/img/cygnet-newbury-balmoral-navy/07.jpg"
@@ -249,6 +249,9 @@
  ],
  "sparrow-horween-cavalier-two-tone": [
   {
+   "src": "/img/sparrow-horween-cavalier-two-tone/04.jpg"
+  },
+  {
    "src": "/img/sparrow-horween-cavalier-two-tone/01.jpg"
   },
   {
@@ -256,9 +259,6 @@
   },
   {
    "src": "/img/sparrow-horween-cavalier-two-tone/03.jpg"
-  },
-  {
-   "src": "/img/sparrow-horween-cavalier-two-tone/04.jpg"
   },
   {
    "src": "/img/sparrow-horween-cavalier-two-tone/05.jpg"
@@ -367,6 +367,9 @@
  ],
  "sparrow-horween-cavalier-mto": [
   {
+   "src": "/img/sparrow-horween-cavalier-two-tone/04.jpg"
+  },
+  {
    "src": "/img/sparrow-horween-cavalier-two-tone/01.jpg"
   },
   {
@@ -374,9 +377,6 @@
   },
   {
    "src": "/img/sparrow-horween-cavalier-two-tone/03.jpg"
-  },
-  {
-   "src": "/img/sparrow-horween-cavalier-two-tone/04.jpg"
   },
   {
    "src": "/img/sparrow-horween-cavalier-two-tone/05.jpg"
@@ -390,10 +390,10 @@
  ],
  "collar-horween-cxl": [
   {
-   "src": "/img/collar-horween-cxl/01.jpg"
+   "src": "/img/collar-horween-cxl/02.jpg"
   },
   {
-   "src": "/img/collar-horween-cxl/02.jpg"
+   "src": "/img/collar-horween-cxl/01.jpg"
   },
   {
    "src": "/img/collar-horween-cxl/03.jpg"
@@ -403,6 +403,9 @@
   }
  ],
  "gv1-horween-cypress": [
+  {
+   "src": "/img/gv1-horween-cypress/06.jpg"
+  },
   {
    "src": "/img/gv1-horween-cypress/01.jpg"
   },
@@ -417,9 +420,6 @@
   },
   {
    "src": "/img/gv1-horween-cypress/05.jpg"
-  },
-  {
-   "src": "/img/gv1-horween-cypress/06.jpg"
   }
  ],
  "belt-newbury-latigo-burgundy": [

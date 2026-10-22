@@ -72,7 +72,12 @@
   ]).then(function (res) { catalog = res[0]; manifest = res[1]; prune(); return catalog; });
 
   // Our own photos first, then whatever Stripe holds for the product.
-  function photos(p) { return manifest[p.slug] || p.images.map(function (src) { return { src: src }; }); }
+  function photos(p) {
+    var all = manifest[p.slug] || p.images.map(function (src) { return { src: src }; });
+    // A page with a fixed colour shows that colour's photos when there are any.
+    var mine = p.build && p.build.color ? all.filter(function (ph) { return ph.color === p.build.color; }) : [];
+    return mine.length ? mine : all;
+  }
 
   // Drop anything sold out or removed since it was added, and say so.
   function prune() {
