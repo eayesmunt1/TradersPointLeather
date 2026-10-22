@@ -728,21 +728,26 @@ const LEATHERS = [
     tex: 'leather-ink.jpg' },
   { id: 'plum',    name: 'Plum',            line: 'Horween Cavalier', hex: '#2a2833', shade: '#18171e',
     tex: 'leather-plum.jpg' },
-  /* Newbury Balmoral. Hexes are the median of a flat patch of the leather in
-     the shop's own photos where there is one (Antique Copper, Cognac, Navy
-     Blue, Forest Green, Sunflower), and the vendor swatch chart toned down 15%
-     where there is not yet (the rest). Swap a chart value for a photo's, or add
-     a `tex` swatch photo, as each colour is shot. Shade is 58% of the hex. */
+  /* Newbury Balmoral. Cognac, Navy Blue, Forest Green and Sunflower have a
+     swatch photo (leather-nb-*.jpg), each a flat patch cropped from the shop's own
+     photos. Antique Copper stays a flat colour, a deep ruddy brown, because every
+     photo of it reads pinker than the leather is. The rest are the vendor swatch
+     chart toned down 15% until there is a photo. Add a `tex` as each is shot.
+     Shade is 58% of the hex. */
   { id: 'nb-black',     name: 'Black',          line: 'Newbury Balmoral', hex: '#2a2a2a', shade: '#181818' },
   { id: 'nb-chocolate', name: 'Chocolate',      line: 'Newbury Balmoral', hex: '#41291f', shade: '#261812' },
   { id: 'nb-copper',    name: 'Antique Copper', line: 'Newbury Balmoral', hex: '#3d1b10', shade: '#230f09' },
-  { id: 'nb-cognac',    name: 'Cognac',         line: 'Newbury Balmoral', hex: '#693420', shade: '#3d1e13' },
-  { id: 'nb-navy',      name: 'Navy Blue',      line: 'Newbury Balmoral', hex: '#072749', shade: '#04172a' },
-  { id: 'nb-forest',    name: 'Forest Green',   line: 'Newbury Balmoral', hex: '#191a0f', shade: '#0e0f09' },
+  { id: 'nb-cognac',    name: 'Cognac',         line: 'Newbury Balmoral', hex: '#693420', shade: '#3d1e13',
+    tex: 'leather-nb-cognac.jpg' },
+  { id: 'nb-navy',      name: 'Navy Blue',      line: 'Newbury Balmoral', hex: '#072749', shade: '#04172a',
+    tex: 'leather-nb-navy.jpg' },
+  { id: 'nb-forest',    name: 'Forest Green',   line: 'Newbury Balmoral', hex: '#191a0f', shade: '#0e0f09',
+    tex: 'leather-nb-forest.jpg' },
   { id: 'nb-kelly',     name: 'Kelly Green',    line: 'Newbury Balmoral', hex: '#3d371d', shade: '#232011' },
   { id: 'nb-stone',     name: 'Stone Brown',    line: 'Newbury Balmoral', hex: '#473627', shade: '#291f17' },
   { id: 'nb-red',       name: 'Red',            line: 'Newbury Balmoral', hex: '#7e2422', shade: '#491514' },
-  { id: 'nb-sunflower', name: 'Sunflower',      line: 'Newbury Balmoral', hex: '#7b590e', shade: '#473408' },
+  { id: 'nb-sunflower', name: 'Sunflower',      line: 'Newbury Balmoral', hex: '#7b590e', shade: '#473408',
+    tex: 'leather-nb-sunflower.jpg' },
 ];
 
 /* The leather picker is two sections, one per line, each with the owner's blurb. */
