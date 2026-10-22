@@ -60,7 +60,8 @@ export function shape(price) {
     options: optionLists(m),
     // The one pre-built version a Made to Order page sells, set by the owner.
     build: { color: m.build_color || "", thread: m.build_thread || "" },
-    sizeInput: m.size_input === "text" ? { label: m.size_label || "Size" } : null,
+    // Free-text size (belt length, collar size): the collar takes a breed size or neck inches.
+    sizeInput: m.size_input === "text" ? { label: m.size_label || "Size", max: m.type === "collar" ? 30 : 20 } : null,
     needsReview: Boolean(m.needs_review),
   };
 }

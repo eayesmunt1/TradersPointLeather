@@ -48,7 +48,7 @@ export function productHtml(p, { photos = [], monogram = null } = {}) {
       .filter((k) => p.options[k].length)
       .map((k) => select(`opt-${k}`, k[0].toUpperCase() + k.slice(1), p.options[k])),
     p.sizeInput
-      ? `<div class="field"><label for="opt-sizeText">${esc(p.sizeInput.label)}</label><input id="opt-sizeText" name="sizeText" type="text" required maxlength="20" autocomplete="off"></div>`
+      ? `<div class="field"><label for="opt-sizeText">${esc(p.sizeInput.label)}</label><input id="opt-sizeText" name="sizeText" type="text" required maxlength="${p.sizeInput.max || 20}" autocomplete="off"></div>`
       : "",
     p.monogram && monogram
       ? `<div class="field"><label for="initials">Monogram initials (optional, +${money(monogram.amount)})</label><input id="initials" name="initials" type="text" maxlength="4" pattern="[A-Za-z]{1,4}" autocomplete="off"><p class="hint">Up to 4 letters.</p></div>`

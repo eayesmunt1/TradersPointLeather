@@ -27,7 +27,7 @@ export async function handler(event) {
   try {
     if (isForm) {
       const f = Object.fromEntries(new URLSearchParams(event.isBase64Encoded ? Buffer.from(event.body, "base64").toString() : event.body));
-      items = [{ slug: f.slug, qty: Number(f.qty || 1), initials: f.initials, options: { color: f.color, thread: f.thread, size: f.size, sizeText: f.sizeText } }];
+      items = [{ slug: f.slug, qty: Number(f.qty || 1), initials: f.initials, options: f }];
     } else {
       items = JSON.parse(event.body || "{}").items;
     }
@@ -57,21 +57,25 @@ export async function handler(event) {
       problems.push(`An item in your cart is no longer available.`);
       return;
     }
+    if (product.soldOut) {
+      problems.push(`${product.name} has sold. Ask for a Made to Order build instead.`);
+      return;
+    }
     const qty = Number(raw.qty);
     const total = (wanted.get(slug) || 0) + qty;
     wanted.set(slug, total);
     if (!Number.isInteger(qty) || qty < 1 || total > maxQty(product)) {
       problems.push(
-        product.oneOfAKind
-          ? `${product.name} is one of a kind, so only one can be ordered.`
-          : `${product.name}: that quantity is not available.`
+        product.section === "made"
+          ? `${product.name} is built to order, so only one can be ordered at a time.`
+          : `${product.name}: only ${maxQty(product)} available.`
       );
       return;
     }
 
+    // Every choice the product offers is required and must be one of its listed values.
     const chosen = {};
-    for (const key of ["color", "thread", "size"]) {
-      const list = product.options[key];
+    for (const [key, list] of Object.entries(product.options)) {
       if (!list.length) continue;
       const v = clean(raw.options?.[key], 60);
       if (!list.includes(v)) {
@@ -81,7 +85,7 @@ export async function handler(event) {
       chosen[key] = v;
     }
     if (product.sizeInput) {
-      const v = clean(raw.options?.sizeText, 20);
+      const v = clean(raw.options?.sizeText, product.sizeInput.max);
       if (!v) {
         problems.push(`${product.name}: please enter ${product.sizeInput.label.toLowerCase()}.`);
         return;
@@ -95,7 +99,13 @@ export async function handler(event) {
       return;
     }
 
+    // The owner's pre-built color and thread, so the order says exactly what to make.
+    const built = [
+      product.build.color && `Color: ${product.build.color}`,
+      product.build.thread && `Thread: ${product.build.thread}`,
+    ];
     const description = [
+      ...built,
       ...Object.entries(chosen).map(([k, v]) => `${k[0].toUpperCase()}${k.slice(1)}: ${v}`),
       initials ? `Initials: ${initials}` : "",
     ].filter(Boolean).join(" · ");
