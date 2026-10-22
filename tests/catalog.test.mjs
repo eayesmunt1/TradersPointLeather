@@ -31,6 +31,18 @@ test("only snap is a buyer choice; other options_* keys are ignored", () => {
   assert.deepEqual(shape(price({})).options.snap, []);
 });
 
+test("a product opts into more choices with `choices`, and only those", () => {
+  const gv1 = shape(price({ choices: "snap|thread", options_snap: "Single Snap|Double Snap", options_thread: "Cream|Havana Brown" }));
+  assert.deepEqual(gv1.options.snap, ["Single Snap", "Double Snap"]);
+  assert.deepEqual(gv1.options.thread, ["Cream", "Havana Brown"]);
+  // A leftover options_thread on a product that does not list it stays ignored.
+  const siah = shape(price({ options_thread: "Cream|Chestnut|Havana Brown" }));
+  assert.deepEqual(siah.options.thread, []);
+  assert.deepEqual(siah.options.snap, []);
+  // Names are plain lowercase words, so a stray key cannot be asked for.
+  assert.deepEqual(shape(price({ choices: "../x|snap", options_snap: "A|B" })).options.snap, ["A", "B"]);
+});
+
 test("stock, sold out and quantity caps", () => {
   const ready2 = shape(price({ section: "ready", stock: "2" }));
   assert.equal(ready2.stock, 2);

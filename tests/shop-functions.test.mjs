@@ -22,7 +22,9 @@ const product = (id, name, metadata, amount = 14500) => ({
 const PRICES = [
   product("plum", "CygnetV2 Plum", { section: "ready", stock: "2", monogram: "true", type: "wallet" }),
   product("gone", "CygnetV2 Gone", { section: "ready", stock: "0", monogram: "true", type: "wallet" }),
-  product("gv1", "GV1", { section: "made", monogram: "true", type: "wallet", options_snap: "Single Snap|Double Snap" }, 6500),
+  product("gv1", "GV1", { section: "made", monogram: "true", type: "wallet", choices: "snap|thread", options_snap: "Single Snap|Double Snap", options_thread: "Cream|Havana Brown" }, 6500),
+  // A product with a leftover thread list but no `choices`: the thread must not become a choice.
+  product("siah", "SiahV2", { section: "made", monogram: "true", type: "wallet", options_thread: "Cream|Chestnut|Havana Brown" }, 6500),
   product("belt", "Belt", { section: "made", type: "belt", size_input: "text", size_label: "Belt length" }, 9500),
   product("collar", "Collar", { section: "made", type: "collar", size_input: "text", size_label: "Size" }, 5000),
   product("cygnet", "CygnetV2 Cavalier", { section: "made", monogram: "true", type: "wallet", build_color: "Whiskey", build_thread: "Cream" }),
@@ -92,14 +94,28 @@ test("a split line cannot over-order stock", async () => {
   assert.equal(res.statusCode, 400);
 });
 
-test("GV1 needs a listed snap and records it", async () => {
+test("GV1 needs a listed snap and a listed thread, and records both", async () => {
   stubStripe();
   assert.equal((await order([{ slug: "gv1", qty: 1, options: {} }])).statusCode, 400);
-  assert.equal((await order([{ slug: "gv1", qty: 1, options: { snap: "Triple Snap" } }])).statusCode, 400);
+  // Each is required on its own.
+  assert.equal((await order([{ slug: "gv1", qty: 1, options: { snap: "Double Snap" } }])).statusCode, 400);
+  assert.equal((await order([{ slug: "gv1", qty: 1, options: { thread: "Cream" } }])).statusCode, 400);
+  // Values must be on the product's own lists.
+  assert.equal((await order([{ slug: "gv1", qty: 1, options: { snap: "Triple Snap", thread: "Cream" } }])).statusCode, 400);
+  assert.equal((await order([{ slug: "gv1", qty: 1, options: { snap: "Double Snap", thread: "Chestnut" } }])).statusCode, 400);
   stubStripe();
-  const res = await order([{ slug: "gv1", qty: 1, options: { snap: "Double Snap" } }]);
+  const res = await order([{ slug: "gv1", qty: 1, options: { snap: "Double Snap", thread: "Havana Brown" } }]);
   assert.equal(res.statusCode, 200);
-  assert.match(session()["line_items[0][price_data][product_data][description]"], /Snap: Double Snap/);
+  const d = session()["line_items[0][price_data][product_data][description]"];
+  assert.match(d, /Thread: Havana Brown/);
+  assert.match(d, /Snap: Double Snap/);
+});
+
+test("a leftover thread list on a product that does not opt in is not required", async () => {
+  stubStripe();
+  const res = await order([{ slug: "siah", qty: 1, options: {} }]);
+  assert.equal(res.statusCode, 200);
+  assert.doesNotMatch(session()["line_items[0][price_data][product_data][description]"] || "", /Thread/);
 });
 
 test("a price or choice the product does not offer is ignored", async () => {
