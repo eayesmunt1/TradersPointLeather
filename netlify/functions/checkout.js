@@ -133,7 +133,7 @@ export async function handler(event) {
 
   if (problems.length) return reply(400, { error: [...new Set(problems)].join(" ") });
 
-  // 1-2 weeks to ship unless every piece is marked ready_to_ship; 5-7 days in transit either way.
+  // 1-2 weeks to ship unless every piece is Ready to Ship (section=ready); 5-7 days in transit either way.
   const ready = items.every((raw) => catalog.get(clean(raw?.slug, 80))?.readyToShip);
   const origin = process.env.SITE_URL || process.env.URL || event.headers.origin;
   const now = Math.floor(Date.now() / 1000);

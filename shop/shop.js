@@ -5,7 +5,7 @@
   'use strict';
 
   var KEY = 'tpl-cart-v1';
-  // Matches shipLine() in product-html.js: 1-2 weeks unless every piece is ready to ship.
+  // Matches shipLine() in product-html.js: 1-2 weeks unless every piece is Ready to Ship (section=ready).
   function shipText(ready) {
     return 'Free shipping (US) \u00b7 ' + (ready ? 'Ready to ship: ships in 1\u20133 business days' : 'Ships in 1\u20132 weeks') +
       ', arrives 5\u20137 days after shipping in the lower 48 \u00b7 30-day returns if undamaged (buyer pays return shipping)';
@@ -50,7 +50,7 @@
   }
   // During launch review, products whose Stripe description is still a draft stay out of public view.
   function visible(p) { return !(window.SHOP_PUBLIC && p.needsReview); }
-  function maxQty(p) { return p.oneOfAKind ? 1 : p.stock ? Math.min(p.stock, 10) : 10; }
+  function maxQty(p) { return p.section === 'made' ? 1 : p.soldOut ? 0 : p.stock !== null ? Math.min(p.stock, 10) : p.oneOfAKind ? 1 : 10; }
   function optionText(i) {
     var o = i.options || {}, parts = [];
     ['color', 'thread', 'size'].forEach(function (k) { if (o[k]) parts.push(k[0].toUpperCase() + k.slice(1) + ': ' + o[k]); });

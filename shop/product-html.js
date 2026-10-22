@@ -3,7 +3,7 @@
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 export const money = (cents) => "$" + (cents / 100).toFixed(2).replace(/\.00$/, "");
 export const TYPES = { wallet: "Wallets", belt: "Belts", collar: "Collars" };
-// Everything ships in 1-2 weeks unless the product carries ready_to_ship=true in Stripe.
+// Ready to Ship pieces (section=ready in Stripe) ship in 1-3 business days; Made to Order in 1-2 weeks.
 export const shipLine = (ready) =>
   "Free shipping (US) \u00b7 " +
   (ready ? "Ready to ship: ships in 1\u20133 business days" : "Ships in 1\u20132 weeks") +
@@ -18,7 +18,7 @@ function select(id, label, list) {
 
 // photos: [{src, color?}]. monogram: {amount} or null.
 export function productHtml(p, { photos = [], monogram = null } = {}) {
-  const cap = p.oneOfAKind ? 1 : p.stock ? Math.min(p.stock, 10) : 10;
+  const cap = p.section === "made" ? 1 : p.soldOut ? 0 : p.stock !== null ? Math.min(p.stock, 10) : p.oneOfAKind ? 1 : 10;
   // Photos are shown whole (mostly 2:3 portrait) in a swipeable strip; thumbnails jump to one.
   const slides = photos.length
     ? photos
