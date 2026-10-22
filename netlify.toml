@@ -17,6 +17,13 @@
   to = "/.netlify/functions/shop-page"
   status = 200
 
+# The sitemap is built from the Stripe catalog, so it is a function, not a file.
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/.netlify/functions/sitemap"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/cart"
   to = "/cart.html"

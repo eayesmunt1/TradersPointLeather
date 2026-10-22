@@ -85,7 +85,7 @@
           "material": "Full-grain leather",
           "offers": {
             "@type": "AggregateOffer",
-            "url": "https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4401934583&section_id=58176763",
+            "url": "https://traderspointleather.com/shop#made-to-order",
             "lowPrice": "65.00",
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
@@ -108,7 +108,7 @@
           "material": "Full-grain leather",
           "offers": {
             "@type": "Offer",
-            "url": "https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4419228681&section_id=58173348",
+            "url": "https://traderspointleather.com/shop#made-to-order",
             "price": "95.00",
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
@@ -470,6 +470,8 @@ body {
 .gallery-item.wide     { grid-column: span 2; }
 .gallery-item.featured { grid-column: span 2; grid-row: span 2; }
 .gallery-item.full     { grid-column: span 4; }
+/* Shop-only links stay out of sight until SHOP_PUBLIC is true; site CSS would otherwise override [hidden]. */
+[data-shop-only][hidden] { display: none !important; }
 .gallery-item img {
   width: 100%;
   height: 100%;
@@ -972,8 +974,9 @@ body::after {
   <nav class="site-nav" id="site-nav" aria-label="Main">
     <a href="#craft">Process</a>
     <a href="#details">Details</a>
-    <a data-shop="/shop?type=wallet" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" target="_blank" rel="noopener">Wallets</a>
-    <a data-shop="/shop?type=belt" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58173348" target="_blank" rel="noopener">Belts</a>
+    <a href="/shop" data-shop-only hidden>Shop</a>
+    <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763">Wallets</a>
+    <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58173348">Belts</a>
     <a href="/design.html">Design Your Wallet</a>
     <a href="#contact">Contact</a>
   </nav>
@@ -1048,7 +1051,7 @@ body::after {
      page. The wallet designer is the secondary text link beside it. -->
 <div class="mid-cta reveal">
   <div class="banner-actions">
-    <a data-shop="/shop" href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener" class="btn-shop" data-shop-text="Shop">Shop on Etsy</a>
+    <a href="/shop" data-etsy="https://www.etsy.com/shop/TradersPointLeather" class="btn-shop" data-etsy-text="Shop on Etsy">Shop</a>
     <a href="/design.html" class="link-secondary">Design Your Wallet &rarr;</a>
   </div>
 </div>
@@ -1058,18 +1061,17 @@ body::after {
   <p class="section-label">The Details</p>
   <h2>Crafted with Care, Made to Last</h2>
   <!-- The .featured and .wide spans below tile the four columns with no holes,
-       which only works in this order: 1 | 2(2x2) | 3 / 4 | [2] | 5 / 6(wide) | 7 | 8.
+       which only works in this order: 1 | 2(2x2) | 3 / 4 | [2] | 5 / 6(wide) | 7(wide).
        Reorder the items and the grid grows a gap. Both classes are cancelled
        under 768px, where the grid is a plain two-up. -->
   <div class="gallery-grid">
-    <a data-shop="/shop?type=wallet" class="gallery-item" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" target="_blank" rel="noopener"><img src="IMG_7465.jpeg" alt="Open Ink Blue vertical bifold wallet with a blue suede spine" loading="lazy" width="800" height="533"></a>
-    <a data-shop="/shop?type=wallet" class="gallery-item featured" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" target="_blank" rel="noopener"><img src="IMG_2301.jpeg" class="crop-upper" alt="Hand-dyed green marbled vertical bifold wallet" loading="lazy" width="800" height="1200"></a>
-    <a data-shop="/shop?type=wallet" class="gallery-item" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" target="_blank" rel="noopener"><img src="IMG_7076.jpeg" alt="Close-up of a saddle-stitched tan leather wallet held in hand, showing burnished edges and cream thread" loading="lazy" width="800" height="533"></a>
-    <a data-shop="/shop?type=belt" class="gallery-item" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58173348" target="_blank" rel="noopener"><img src="IMG_6991.jpg" alt="Close-up of a navy blue leather belt with a matte black buckle and punched holes" loading="lazy" width="533" height="800"></a>
-    <a data-shop="/shop" class="gallery-item" href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener"><img src="IMG_7374.jpg"  alt="Navy blue leather key fob with a snap closure and white saddle stitching" loading="lazy" width="800" height="533"></a>
-    <a data-shop="/shop" class="gallery-item wide" href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener"><img src="IMG_0168.jpeg" alt="Dark brown leather bifold wallet open flat, showing cream hand stitching" loading="lazy" width="800" height="600"></a>
-    <a data-shop="/shop?type=wallet" class="gallery-item" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" target="_blank" rel="noopener"><img src="IMG_2302.jpeg" class="crop-upper" alt="Navy bifold wallet open, showing marbled interior and stamped logo" loading="lazy" width="800" height="1200"></a>
-    <a data-shop="/shop?type=wallet" class="gallery-item" href="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" target="_blank" rel="noopener"><img src="IMG_7383.jpg"  alt="Open tan vertical bifold wallet with four card slots, a cash pocket and the Traders Point Leather stamp" loading="lazy" width="800" height="533"></a>
+    <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item"><img src="IMG_7465.jpeg" alt="Open Ink Blue vertical bifold wallet with a blue suede spine" loading="lazy" width="800" height="533"></a>
+    <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item featured"><img src="IMG_2301.jpeg" class="crop-upper" alt="Hand-dyed green marbled vertical bifold wallet" loading="lazy" width="800" height="1200"></a>
+    <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item"><img src="IMG_7076.jpeg" alt="Close-up of a saddle-stitched tan leather wallet held in hand, showing burnished edges and cream thread" loading="lazy" width="800" height="533"></a>
+    <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58173348" class="gallery-item"><img src="IMG_6991.jpg" alt="Close-up of a navy blue leather belt with a matte black buckle and punched holes" loading="lazy" width="533" height="800"></a>
+    <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather" class="gallery-item"><img src="IMG_0168.jpeg" alt="Dark brown leather bifold wallet open flat, showing cream hand stitching" loading="lazy" width="800" height="600"></a>
+    <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item wide"><img src="IMG_2302.jpeg" class="crop-upper" alt="Navy bifold wallet open, showing marbled interior and stamped logo" loading="lazy" width="800" height="1200"></a>
+    <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item wide"><img src="IMG_7383.jpg"  alt="Open tan vertical bifold wallet with four card slots, a cash pocket and the Traders Point Leather stamp" loading="lazy" width="800" height="533"></a>
   </div>
 </section>
 
@@ -1078,7 +1080,7 @@ body::after {
   <p class="section-label">What We Make</p>
   <h2>Everyday Carry, Elevated</h2>
   <div class="product-cards">
-    <a data-shop="/shop?type=wallet" class="product-card" href="https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4401934583&section_id=58176763" target="_blank" rel="noopener">
+    <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4401934583&section_id=58176763" class="product-card">
       <div class="product-card-img">
         <img src="IMG_2045.jpeg" alt="Tan-brown bifold wallet held in hand, showing the hand-stitched edge" loading="lazy" width="800" height="1200">
       </div>
@@ -1089,7 +1091,7 @@ body::after {
         <span class="card-cta">Shop Wallets &rarr;</span>
       </div>
     </a>
-    <a data-shop="/shop?type=belt" class="product-card" href="https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4419228681&section_id=58173348" target="_blank" rel="noopener">
+    <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4419228681&section_id=58173348" class="product-card">
       <div class="product-card-img">
         <img src="IMG_5640.jpg" alt="Navy blue leather belt with a matte black buckle lying on a worn, riveted metal surface" loading="lazy" width="600" height="900">
       </div>
@@ -1100,7 +1102,7 @@ body::after {
         <span class="card-cta">Shop Belts &rarr;</span>
       </div>
     </a>
-    <a data-shop="/shop" class="product-card" href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">
+    <a href="/shop" data-etsy="https://www.etsy.com/shop/TradersPointLeather" class="product-card">
       <div class="product-card-img">
         <img src="IMG_6451.jpeg" alt="Open kraft shipping box printed with the Traders Point Leather logo, holding a wallet wrapped in navy tissue and tied with natural twine" loading="lazy" width="600" height="900">
       </div>
@@ -1138,14 +1140,15 @@ body::after {
 <!-- TWO PATHS -->
 <section class="paths reveal" aria-label="Two ways to buy">
   <div class="path">
-    <h3>From the shop</h3>
-    <p data-shop-text="Browse wallets, belts and more in the shop.">Browse wallets, belts and more in the shop on Etsy.</p>
-    <a data-shop="/shop" href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener" class="link-secondary" data-shop-text="Browse the shop →">Browse the shop &rarr;</a>
+    <h3>Ready to ship</h3>
+    <p data-etsy-text="Browse wallets, belts and more in the shop on Etsy.">Finished pieces that leave in 1&ndash;3 business days.</p>
+    <a href="/shop#ready-to-ship" data-etsy="https://www.etsy.com/shop/TradersPointLeather" class="link-secondary" data-etsy-text="Browse the shop →">Browse Ready to Ship &rarr;</a>
   </div>
   <div class="path">
     <h3>Made your way</h3>
-    <p>Choose leather, color and stitching in the wallet designer.</p>
-    <a href="/design.html" class="link-secondary">Open the designer &rarr;</a>
+    <p>Pre-built pieces made for you, or fully custom in the wallet designer.</p>
+    <a href="/shop#made-to-order" class="link-secondary" data-shop-only hidden>Made to Order &rarr;</a>
+    <a href="/design.html" class="link-secondary">Fully custom? Open the designer &rarr;</a>
   </div>
 </section>
 
@@ -1154,7 +1157,7 @@ body::after {
   <h2>Find Your Piece</h2>
   <p>Handmade. One at a time. Shipped from Indiana to your door.</p>
   <div class="banner-actions">
-    <a data-shop="/shop" href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener" class="btn-shop" data-shop-text="Shop">Shop on Etsy</a>
+    <a href="/shop" data-etsy="https://www.etsy.com/shop/TradersPointLeather" class="btn-shop" data-etsy-text="Shop on Etsy">Shop</a>
   </div>
 </section>
 
@@ -1165,7 +1168,7 @@ body::after {
   <div class="footer-loc">Handcrafted in Indiana</div>
   <div class="footer-links">
     <a href="/design.html">Design Your Wallet</a>
-    <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener" data-shop-text="Also on Etsy">Etsy Shop</a>
+    <a href="https://www.etsy.com/shop/TradersPointLeather" target="_blank" rel="noopener">Also on Etsy</a>
     <a href="https://traderspointleather.com" target="_blank" rel="noopener">TradersPointLeather.com</a>
     <a href="mailto:customer-support@traderspointleather.com">customer-support@traderspointleather.com</a>
   </div>
@@ -1251,15 +1254,17 @@ body::after {
 
 <script src="/shop-config.js"></script>
 <script>
-  // On-site shop: invisible until SHOP_PUBLIC is true in shop-config.js. Then every
-  // buy link goes to the shop; Etsy stays as review proof and a footer link.
+  // Every buy link already points at the shop. While SHOP_PUBLIC is false in shop-config.js
+  // the links fall back to Etsy and the shop-only links stay hidden: a one-line rollback.
   if (window.SHOP_PUBLIC) {
-    document.querySelectorAll('[data-shop]').forEach(function (a) {
-      a.href = a.dataset.shop;
-      a.removeAttribute('target');
-      a.removeAttribute('rel');
+    document.querySelectorAll('[data-shop-only]').forEach(function (a) { a.hidden = false; });
+  } else {
+    document.querySelectorAll('[data-etsy]').forEach(function (a) {
+      a.href = a.dataset.etsy;
+      a.target = '_blank';
+      a.rel = 'noopener';
     });
-    document.querySelectorAll('[data-shop-text]').forEach(function (n) { n.textContent = n.dataset.shopText; });
+    document.querySelectorAll('[data-etsy-text]').forEach(function (n) { n.textContent = n.dataset.etsyText; });
   }
 </script>
 <script async data-uid="aeb2c16a21" src="https://traders-point-leather.kit.com/aeb2c16a21/index.js"></script>

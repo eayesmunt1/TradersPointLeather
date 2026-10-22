@@ -193,3 +193,31 @@ test("a repeat delivery does not count stock twice", async () => {
   console.warn = warn;
   assert.equal(productWrites().length, 0);
 });
+
+// --- sitemap ---
+
+const { handler: sitemap } = await import("../netlify/functions/sitemap.js");
+const sitemapFor = async (publicFlag) => {
+  stubStripe();
+  const real = globalThis.fetch;
+  globalThis.fetch = async (u, init) =>
+    String(u).endsWith("/shop-config.js")
+      ? { ok: true, text: async () => `window.SHOP_PUBLIC = ${publicFlag};` }
+      : real(u, init);
+  return (await sitemap({ rawUrl: "https://shop.test/sitemap.xml" })).body;
+};
+
+test("the sitemap lists only the static pages while the shop is hidden", async () => {
+  const xml = await sitemapFor(false);
+  assert.match(xml, /<loc>https:\/\/traderspointleather\.com\/<\/loc>/);
+  assert.doesNotMatch(xml, /\/shop/);
+});
+
+test("the sitemap lists the shop and every published product, sold ones included", async () => {
+  const xml = await sitemapFor(true);
+  assert.match(xml, /traderspointleather\.com\/shop<\/loc>/);
+  assert.match(xml, /\/shop\/plum</);
+  assert.match(xml, /\/shop\/gone</); // sold out, page stays up
+  assert.doesNotMatch(xml, /\/shop\/draft</);
+  assert.doesNotMatch(xml, /\/shop\/monogram</);
+});
