@@ -157,12 +157,18 @@ body {
   margin-bottom: 1.1rem;
 }
 .swatch-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-.swatch-sub + .swatch-sub { margin-top: 1rem; }
-.line-label { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
+.swatch[hidden] { display: none !important; }
+.family-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+.family-card { text-align: left; font: inherit; color: var(--cream); background: var(--bg-warm, #1a1613); border: 1px solid rgba(196,168,130,0.2); padding: 1.1rem 1.15rem 1.2rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.35rem; min-height: 44px; }
+.family-card:hover { border-color: rgba(196,168,130,0.5); }
+.family-card[aria-checked="true"] { border-color: var(--tan); box-shadow: inset 0 0 0 1px var(--tan); }
+.family-name { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--white, #f5f0ea); }
+.family-tag { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tan); }
+.family-blurb { font-family: 'Cormorant Garamond', serif; font-size: 1.02rem; line-height: 1.55; color: var(--cream); margin-top: 0.35rem; }
+@media (max-width: 720px) { .family-row { grid-template-columns: 1fr; } }
 .opt-note { font-size: 0.85rem; line-height: 1.6; color: var(--tan-light); border-left: 2px solid var(--accent); padding-left: 0.75rem; margin: -0.25rem 0 0.9rem; }
 .swatch[disabled] { opacity: 0.4; cursor: not-allowed; }
 [data-buy][hidden] { display: none !important; }
-.leather-about .opt-help strong { color: var(--tan); font-weight: 600; }
 .swatch {
   display: flex;
   align-items: center;
@@ -750,13 +756,27 @@ const LEATHERS = [
     tex: 'leather-nb-sunflower.jpg' },
 ];
 
-/* The leather picker is two sections, one per line, each with the owner's blurb. */
+/* The leather is chosen once, at the top: an all-Horween wallet or an all-Newbury
+   one, never a mix, because the two are built differently (Newbury is thinner and
+   always carries the stash pockets). Each family then offers its own colours.
+   `def` is the colour a wallet starts in when its family is picked. The copy uses
+   only what the owner has said about each leather. */
 const LEATHER_LINES = [
-  { line: 'Horween Cavalier', short: 'Horween',
-    blurb: 'Horween is a world-renowned tannery. Cavalier is limited: Horween has stopped producing it, and remaining stock is finite.' },
-  { line: 'Newbury Balmoral', short: 'Newbury',
-    blurb: 'American-made leather from the East Coast. Dual tannage comparable to Horween Cavalier, but the color is struck through, giving a more consistent burnished edge. Slightly thinner, so pockets stack without too much bulk. Plentiful, consistent, and not going out of production.' },
+  { id: 'horween', line: 'Horween Cavalier', short: 'Horween', def: 'whiskey',
+    tag: 'Chicago-tanned, and limited',
+    blurb: 'Horween of Chicago has been tanning leather since 1905, and it is one of the most celebrated tanneries in the world. '
+         + 'Cavalier, a sub-class of its signature CXL, is hot-stuffed over twenty-eight days into a leather with a soft hand '
+         + 'and deep, dimensional pull-up. It takes on a patina that is different for every owner, the way heirloom boots and '
+         + 'the finest American-made wallets do. And it will not come around again: Horween has stopped producing Cavalier, '
+         + 'and what remains is finite.' },
+  { id: 'newbury', line: 'Newbury Balmoral', short: 'Newbury', def: 'nb-cognac',
+    tag: 'East Coast, American-made',
+    blurb: 'Tanned on the American East Coast, Newbury Balmoral is dual-tanned to stand beside Horween Cavalier. Its color is '
+         + 'struck all the way through the hide, so a burnished edge comes up even and clean from one end of the wallet to the '
+         + 'other. A touch thinner, it lets pockets stack flat without bulk. It is plentiful and consistent, and it is not '
+         + 'going out of production, so the leather you choose today is the leather we can cut tomorrow.' },
 ];
+const lineOf = (leather) => LEATHER_LINES.find((l) => l.line === leather.line);
 
 /* Sampled off the two spool photos. Both were shot in open shade, so the light
    is skylight and everything reads cool — the white thread measured #b8c8dc
@@ -1377,7 +1397,7 @@ const hasStash = () => !!currentModel().offersStash && state.stash === 'stash';
 /* Newbury is thinner, so it is always built with the two stash pockets (12-16
    cards); the stash choice is locked on while the outside is Newbury. In Horween
    Cavalier, a thick leather, the pockets are optional and add bulk. */
-const stashLocked = () => !!currentModel().offersStash && byId(LEATHERS, state.exterior).line === 'Newbury Balmoral';
+const stashLocked = () => !!currentModel().offersStash && state.family === 'newbury';
 
 /* ── State ──────────────────────────────────────────────────────────── */
 const state = {};
@@ -1387,6 +1407,7 @@ state.model = DEFAULT_MODEL;
 state.monogram = '';
 state.stash = STASH[0].id;
 state.interiorLinked = true;
+state.family = LEATHER_LINES[0].id;
 
 const byId = (list, id) => list.find((x) => x.id === id) || list[0];
 
@@ -1471,12 +1492,13 @@ function render() {
   });
 
   document.querySelector('[data-opt="stash"]').hidden = !currentModel().offersStash;
+  document.querySelectorAll('.swatch[data-family]').forEach((b) => { b.hidden = b.dataset.family !== state.family; });
   const locked = stashLocked();
   document.querySelectorAll('[data-group="stash"][data-value="none"]').forEach((b) => { b.disabled = locked; });
   const stashNote = document.getElementById('stash-note');
   stashNote.textContent = locked
     ? 'Newbury is always built with its two stash pockets, which hold 12\u201316 cards.'
-    : hasStash() && byId(LEATHERS, state.exterior).line === 'Horween Cavalier'
+    : hasStash() && state.family === 'horween'
       ? 'Heads up: stash pockets add bulk in Horween Cavalier, a thick leather.'
       : '';
   stashNote.hidden = !stashNote.textContent;
@@ -1529,7 +1551,8 @@ function swatchMarkup(group, item, kind) {
               : kind === 'model'   ? `${item.name} — ${item.detail}`
               : item.name;
   return `<button type="button" class="swatch" role="radio" aria-checked="false" tabindex="-1"
-                  aria-label="${label}" data-group="${group}" data-value="${item.id}">
+                  aria-label="${label}" data-group="${group}" data-value="${item.id}"${
+                    kind === 'leather' ? ` data-family="${lineOf(item).id}"` : ''}>
             ${chip}
             <span>${item.name}</span>
           </button>`;
@@ -1544,7 +1567,7 @@ function buildOptions() {
   TARGETS.forEach((t) => groups.push({
     key: t.key, label: t.label, help: t.help, items: LEATHERS, kind: 'leather',
   }));
-  groups.splice(1, 0, { key: 'leathers-about', kind: 'info', label: 'Leathers' });
+  groups.unshift({ key: 'family', kind: 'family', label: 'Leather' });
   groups.push({
     key: 'stash', label: 'Stash Pocket', kind: 'option', items: STASH,
     help: 'Each inside panel sewn across its top, closing the space behind the card '
@@ -1556,19 +1579,25 @@ function buildOptions() {
   });
 
   const swatchRow = (grp, items) => `<div class="swatch-row">${items.map((it) => swatchMarkup(grp.key, it, grp.kind)).join('')}</div>`;
-  document.getElementById('options').innerHTML = groups.map((grp) => grp.kind === 'info' ? `
-    <div class="opt-group leather-about" data-opt="${grp.key}">
-      <h2>${grp.label}</h2>
-      ${LEATHER_LINES.map((l) => `<p class="opt-help"><strong>${l.short}.</strong> ${l.blurb}</p>`).join('')}
+  document.getElementById('options').innerHTML = groups.map((grp) => grp.kind === 'family' ? `
+    <div class="opt-group family-pick" data-opt="${grp.key}">
+      <h2 id="lbl-${grp.key}">${grp.label}</h2>
+      <p class="opt-help">Choose one leather for the whole wallet. The two are built a little differently, so they are not mixed.</p>
+      <div class="family-row" role="radiogroup" aria-labelledby="lbl-${grp.key}" data-group="${grp.key}">
+        ${LEATHER_LINES.map((l) => `
+        <button type="button" class="family-card" role="radio" aria-checked="false" tabindex="-1" data-group="${grp.key}" data-value="${l.id}">
+          <span class="family-name">${l.short}</span>
+          <span class="family-tag">${l.tag}</span>
+          <span class="family-blurb">${l.blurb}</span>
+        </button>`).join('')}
+      </div>
     </div>` : `
     <div class="opt-group" data-opt="${grp.key}">
       <h2 id="lbl-${grp.key}">${grp.label}</h2>
       <p class="opt-help">${grp.help}</p>
       ${grp.key === 'stash' ? '<p class="opt-note" id="stash-note" role="status" hidden></p>' : ''}
       <div role="radiogroup" aria-labelledby="lbl-${grp.key}" data-group="${grp.key}">
-        ${grp.kind === 'leather'
-          ? LEATHER_LINES.map((l) => `<div class="swatch-sub"><p class="line-label">${l.line}</p>${swatchRow(grp, grp.items.filter((it) => it.line === l.line))}</div>`).join('')
-          : swatchRow(grp, grp.items)}
+        ${swatchRow(grp, grp.items)}
       </div>
     </div>`).join('');
 
@@ -1586,7 +1615,7 @@ function buildOptions() {
     if (!(e.key in keys)) return;
     e.preventDefault();
     const row = btn.closest('[role="radiogroup"]');
-    const all = [...row.querySelectorAll('[role="radio"]:not([disabled])')];
+    const all = [...row.querySelectorAll('[role="radio"]:not([disabled]):not([hidden])')];
     const next = all[(all.indexOf(btn) + keys[e.key] + all.length) % all.length];
     choose(next.dataset.group, next.dataset.value);
     next.focus();
@@ -1605,6 +1634,12 @@ function choose(group, value) {
   const changed = state[group] !== value;
   const stashBefore = state.stash;
   state[group] = value;
+  // A new leather family restarts every part in that family's own colour.
+  if (group === 'family' && changed) {
+    const def = LEATHER_LINES.find((l) => l.id === value).def;
+    TARGETS.forEach((t) => { state[t.key] = def; });
+    state.interiorLinked = true;
+  }
   // The inside matches the outside, as a one-leather wallet does, until it is
   // chosen on its own.
   if (group === 'exterior' && state.interiorLinked) state.interior = value;
@@ -1657,6 +1692,7 @@ function buildCode() {
   const m = currentModel();
   return [m.code]
     .concat(TARGETS.map((t) => `${t.code}:${state[t.key]}`))
+    .concat(`LEA:${state.family}`)
     .concat(`THR:${state.thread}`)
     .concat(m.offersStash ? [`STASH:${hasStash() ? 'yes' : 'no'}`] : [])
     .concat(`MON:${state.monogram || 'none'}`)
@@ -1670,6 +1706,7 @@ function buildSpec() {
     const l = byId(LEATHERS, state[t.key]);
     return `${t.label}: ${l.line} ${l.name}`;
   });
+  rows.unshift(`Leather: ${LEATHER_LINES.find((l) => l.id === state.family).line}`);
   rows.push(`Stitching: ${byId(THREADS, state.thread).name}`);
   if (currentModel().offersStash) rows.push(`Stash Pocket: ${hasStash() ? 'Yes' : 'No'}`);
   /* Written out even when there isn't one: a row saying None tells whoever cuts
