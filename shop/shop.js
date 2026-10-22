@@ -8,7 +8,7 @@
   // Matches shipLine() in product-html.js: 1-2 weeks unless every piece is Ready to Ship (section=ready).
   function shipText(ready) {
     return 'Free shipping (US) \u00b7 ' + (ready ? 'Ready to ship: ships in 1\u20133 business days' : 'Ships in 1\u20132 weeks') +
-      ', arrives 5\u20137 days after shipping in the lower 48 \u00b7 30-day returns if undamaged (buyer pays return shipping)';
+      ', arrives 5\u20137 days after shipping in the lower 48 \u00b7 14-day returns if undamaged. Buyer pays return shipping.';
   }
   var memory = null; // used when localStorage is unavailable
   var catalog = null;

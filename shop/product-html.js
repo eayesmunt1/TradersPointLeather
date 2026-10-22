@@ -10,7 +10,7 @@ export const mtoMessage = (p) => `I'd like a ${p.name} built to order. It shows 
 export const shipLine = (ready) =>
   "Free shipping (US) \u00b7 " +
   (ready ? "Ready to ship: ships in 1\u20133 business days" : "Ships in 1\u20132 weeks") +
-  ", arrives 5\u20137 days after shipping in the lower 48 \u00b7 30-day returns if undamaged (buyer pays return shipping)";
+  ", arrives 5\u20137 days after shipping in the lower 48 \u00b7 14-day returns if undamaged. Buyer pays return shipping.";
 
 function select(id, label, list) {
   return `<div class="field"><label for="${id}">${esc(label)}</label>
