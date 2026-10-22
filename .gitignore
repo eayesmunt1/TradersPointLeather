@@ -3,3 +3,5 @@ claude-code-tasks.pdf
 
 # Local Netlify folder
 .netlify
+
+node_modules
