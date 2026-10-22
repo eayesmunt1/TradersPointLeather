@@ -285,7 +285,6 @@
           el('div', { class: 'card-body' }, [
             el('h2', { text: p.name }),
             el('div', { class: 'price', text: money(p.amount) }),
-            ready ? null : el('p', { class: 'leather', text: 'Built for you, ships in 1\u20132 weeks' }),
           ]),
         ])]);
       }

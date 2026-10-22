@@ -64,7 +64,6 @@ export function productHtml(p, { photos: allPhotos = [], monogram = null } = {})
   ${gallery}
   <div class="product-info">
     <h1>${esc(p.name)}</h1>
-    ${p.leather ? `<p class="leather">${esc(p.leather)}</p>` : ""}
     ${[p.build.color && `Color: ${p.build.color}`, p.build.thread && `Thread: ${p.build.thread}`].filter(Boolean).length ? `<p class="leather">${esc([p.build.color && `Color: ${p.build.color}`, p.build.thread && `Thread: ${p.build.thread}`].filter(Boolean).join(" \u00b7 "))}</p>` : ""}
     <div class="price">${money(p.amount)}</div>
     ${p.description ? `<p class="desc">${esc(p.description)}</p>` : ""}
