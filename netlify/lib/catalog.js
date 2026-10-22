@@ -6,12 +6,14 @@ const split = (v) => (v ? v.split("|").map((s) => s.trim()).filter(Boolean) : []
 // "ready" is a finished piece (1-3 business days), "made" is built after the order (1-2 weeks).
 const SECTIONS = ["ready", "made"];
 
-// Every options_<name> key is a list of choices the buyer must make, pipe-separated.
+// Made to Order pages are pre-built, so only these options_<name> keys are choices the
+// buyer makes (pipe-separated). Any other options_* key left in Stripe is ignored;
+// customising leather, color, thread and stash pockets happens in the wallet designer.
+const CHOICES = ["snap"];
+
 function optionLists(m) {
   const lists = { color: [], thread: [], size: [] };
-  for (const [k, v] of Object.entries(m)) {
-    if (k.startsWith("options_")) lists[k.slice("options_".length)] = split(v);
-  }
+  for (const name of CHOICES) lists[name] = split(m[`options_${name}`]);
   return lists;
 }
 

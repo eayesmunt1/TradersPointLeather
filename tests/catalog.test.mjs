@@ -20,12 +20,15 @@ test("section defaults to made and drives readyToShip", () => {
   assert.equal(shape(price({ section: "made", ready_to_ship: "true" })).readyToShip, false);
 });
 
-test("every options_<name> key becomes a choice list", () => {
-  const p = shape(price({ options_stash: "Without|With", options_snaps: "One snap|Two snaps", options_color: "Red|Whiskey" }));
-  assert.deepEqual(p.options.stash, ["Without", "With"]);
-  assert.deepEqual(p.options.snaps, ["One snap", "Two snaps"]);
-  assert.deepEqual(p.options.color, ["Red", "Whiskey"]);
+test("only snap is a buyer choice; other options_* keys are ignored", () => {
+  const p = shape(
+    price({ options_snap: "Single Snap|Double Snap", options_stash: "Without|With", options_color: "Red|Whiskey", options_thread: "Cream", options_stamp: "TP Monogram" })
+  );
+  assert.deepEqual(p.options.snap, ["Single Snap", "Double Snap"]);
+  assert.deepEqual(p.options.color, []);
   assert.deepEqual(p.options.thread, []);
+  assert.equal(p.options.stash, undefined);
+  assert.deepEqual(shape(price({})).options.snap, []);
 });
 
 test("stock, sold out and quantity caps", () => {
