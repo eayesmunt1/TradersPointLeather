@@ -158,14 +158,22 @@ body {
 }
 .swatch-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .swatch[hidden] { display: none !important; }
-.family-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
-.family-card { text-align: left; font: inherit; color: var(--cream); background: var(--bg-warm, #1a1613); border: 1px solid rgba(196,168,130,0.2); padding: 1.1rem 1.15rem 1.2rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.35rem; min-height: 44px; }
-.family-card:hover { border-color: rgba(196,168,130,0.5); }
-.family-card[aria-checked="true"] { border-color: var(--tan); box-shadow: inset 0 0 0 1px var(--tan); }
-.family-name { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--white, #f5f0ea); }
-.family-tag { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tan); }
-.family-blurb { font-family: 'Cormorant Garamond', serif; font-size: 1.02rem; line-height: 1.55; color: var(--cream); margin-top: 0.35rem; }
-@media (max-width: 720px) { .family-row { grid-template-columns: 1fr; } }
+.family-row { display: grid; grid-template-columns: minmax(170px, 0.4fr) 1fr; gap: 1.25rem; align-items: stretch; }
+.family-toggle { display: flex; flex-direction: column; border: 1px solid rgba(196,168,130,0.3); }
+.family-opt { flex: 1; text-align: left; font: inherit; color: var(--text-muted); background: transparent; border: 0; padding: 0.95rem 1.1rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.2rem; min-height: 44px; }
+.family-opt + .family-opt { border-top: 1px solid rgba(196,168,130,0.3); }
+.family-opt:hover { color: var(--cream); }
+.family-opt[aria-checked="true"] { background: var(--tan); color: var(--bg); }
+.family-name { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+.family-tag { font-size: 0.72rem; letter-spacing: 0.06em; opacity: 0.8; }
+.family-about { background: var(--bg-warm); border-left: 2px solid var(--accent); padding: 1rem 1.25rem 1.15rem; }
+.family-about h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 400; color: var(--white); margin-bottom: 0.5rem; }
+.family-about p { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; line-height: 1.6; color: var(--cream); }
+@media (max-width: 720px) {
+  .family-row { grid-template-columns: 1fr; }
+  .family-toggle { flex-direction: row; }
+  .family-opt + .family-opt { border-top: 0; border-left: 1px solid rgba(196,168,130,0.3); }
+}
 .opt-note { font-size: 0.85rem; line-height: 1.6; color: var(--tan-light); border-left: 2px solid var(--accent); padding-left: 0.75rem; margin: -0.25rem 0 0.9rem; }
 .swatch[disabled] { opacity: 0.4; cursor: not-allowed; }
 [data-buy][hidden] { display: none !important; }
@@ -773,7 +781,7 @@ const LEATHER_LINES = [
     tag: 'East Coast, American-made',
     blurb: 'Tanned on the American East Coast, Newbury Balmoral is dual-tanned to stand beside Horween Cavalier. Its color is '
          + 'struck all the way through the hide, so a burnished edge comes up even and clean from one end of the wallet to the '
-         + 'other. A touch thinner, it lets pockets stack flat without bulk, and it is consistent, wallet after wallet.' },
+         + 'other. A touch thinner, it lets pockets stack flat without bulk.' },
 ];
 const lineOf = (leather) => LEATHER_LINES.find((l) => l.line === leather.line);
 
@@ -1491,6 +1499,9 @@ function render() {
   });
 
   document.querySelector('[data-opt="stash"]').hidden = !currentModel().offersStash;
+  const fam = LEATHER_LINES.find((l) => l.id === state.family);
+  document.getElementById('family-about-name').textContent = fam.line;
+  document.getElementById('family-about-blurb').textContent = fam.blurb;
   document.querySelectorAll('.swatch[data-family]').forEach((b) => { b.hidden = b.dataset.family !== state.family; });
   const locked = stashLocked();
   document.querySelectorAll('[data-group="stash"][data-value="none"]').forEach((b) => { b.disabled = locked; });
@@ -1582,13 +1593,18 @@ function buildOptions() {
     <div class="opt-group family-pick" data-opt="${grp.key}">
       <h2 id="lbl-${grp.key}">${grp.label}</h2>
       <p class="opt-help">Choose one leather for the whole wallet. The two are built a little differently, so they are not mixed.</p>
-      <div class="family-row" role="radiogroup" aria-labelledby="lbl-${grp.key}" data-group="${grp.key}">
-        ${LEATHER_LINES.map((l) => `
-        <button type="button" class="family-card" role="radio" aria-checked="false" tabindex="-1" data-group="${grp.key}" data-value="${l.id}">
-          <span class="family-name">${l.short}</span>
-          <span class="family-tag">${l.tag}</span>
-          <span class="family-blurb">${l.blurb}</span>
-        </button>`).join('')}
+      <div class="family-row">
+        <div class="family-toggle" role="radiogroup" aria-labelledby="lbl-${grp.key}" data-group="${grp.key}">
+          ${LEATHER_LINES.map((l) => `
+          <button type="button" class="family-opt" role="radio" aria-checked="false" tabindex="-1" data-group="${grp.key}" data-value="${l.id}">
+            <span class="family-name">${l.short}</span>
+            <span class="family-tag">${l.tag}</span>
+          </button>`).join('')}
+        </div>
+        <div class="family-about" id="family-about" aria-live="polite">
+          <h3 id="family-about-name"></h3>
+          <p id="family-about-blurb"></p>
+        </div>
       </div>
     </div>` : `
     <div class="opt-group" data-opt="${grp.key}">
