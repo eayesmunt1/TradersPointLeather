@@ -1,15 +1,4 @@
 {
- "belt-hermann-oak": [
-  {
-   "src": "/img/belt-hermann-oak/01.jpg"
-  },
-  {
-   "src": "/img/belt-hermann-oak/02.jpg"
-  },
-  {
-   "src": "/img/belt-hermann-oak/03.jpg"
-  }
- ],
  "cygnet-horween-cavalier-mto": [
   {
    "src": "/img/cygnet-horween-cavalier-mto/whiskey-a/01.jpg",
@@ -363,6 +352,108 @@
   },
   {
    "src": "/img/cygnet-horween-cavalier-plum/08.jpg"
+  }
+ ],
+ "belt-horween-cxl-raven": [
+  {
+   "src": "/img/belt-horween-cxl-raven/01.jpg"
+  },
+  {
+   "src": "/img/belt-horween-cxl-raven/02.jpg"
+  },
+  {
+   "src": "/img/belt-horween-cxl-raven/03.jpg"
+  }
+ ],
+ "sparrow-horween-cavalier-mto": [
+  {
+   "src": "/img/sparrow-horween-cavalier-two-tone/01.jpg"
+  },
+  {
+   "src": "/img/sparrow-horween-cavalier-two-tone/02.jpg"
+  },
+  {
+   "src": "/img/sparrow-horween-cavalier-two-tone/03.jpg"
+  },
+  {
+   "src": "/img/sparrow-horween-cavalier-two-tone/04.jpg"
+  },
+  {
+   "src": "/img/sparrow-horween-cavalier-two-tone/05.jpg"
+  },
+  {
+   "src": "/img/sparrow-horween-cavalier-two-tone/06.jpg"
+  },
+  {
+   "src": "/img/sparrow-horween-cavalier-two-tone/07.jpg"
+  }
+ ],
+ "collar-horween-cxl": [
+  {
+   "src": "/img/collar-horween-cxl/01.jpg"
+  },
+  {
+   "src": "/img/collar-horween-cxl/02.jpg"
+  },
+  {
+   "src": "/img/collar-horween-cxl/03.jpg"
+  },
+  {
+   "src": "/img/collar-horween-cxl/04.jpg"
+  }
+ ],
+ "gv1-horween-cypress": [
+  {
+   "src": "/img/gv1-horween-cypress/01.jpg"
+  },
+  {
+   "src": "/img/gv1-horween-cypress/02.jpg"
+  },
+  {
+   "src": "/img/gv1-horween-cypress/03.jpg"
+  },
+  {
+   "src": "/img/gv1-horween-cypress/04.jpg"
+  },
+  {
+   "src": "/img/gv1-horween-cypress/05.jpg"
+  },
+  {
+   "src": "/img/gv1-horween-cypress/06.jpg"
+  }
+ ],
+ "belt-newbury-latigo-burgundy": [
+  {
+   "src": "/img/belt-newbury-latigo-burgundy/01.jpg"
+  },
+  {
+   "src": "/img/belt-newbury-latigo-burgundy/02.jpg"
+  },
+  {
+   "src": "/img/belt-newbury-latigo-burgundy/03.jpg"
+  },
+  {
+   "src": "/img/belt-newbury-latigo-burgundy/04.jpg"
+  }
+ ],
+ "siah-horween-cavalier": [
+  {
+   "src": "/img/siah-horween-cavalier/01.jpg"
+  },
+  {
+   "src": "/img/siah-horween-cavalier/02.jpg"
+  },
+  {
+   "src": "/img/siah-horween-cavalier/03.jpg"
+  },
+  {
+   "src": "/img/siah-horween-cavalier/04.jpg"
+  },
+  {
+   "src": "/img/siah-horween-cavalier/05.jpg"
+  },
+  {
+   "src": "/img/siah-horween-cavalier/06.jpg"
   }
  ]
 }
