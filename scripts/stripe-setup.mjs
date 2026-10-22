@@ -66,7 +66,8 @@ const PLAN = {
   "jonas-horween-cavalier": { section: "made" },
   "gv1-horween-cypress": { section: "made", meta: { options_snap: "Single Snap|Double Snap" } },
   "siah-horween-cavalier": { section: "made" },
-  "belt-hermann-oak": { section: "made" },
+  // Not sold any more: archived, never deleted, so past orders keep their history.
+  "belt-hermann-oak": { archive: "no longer sold" },
   "belt-horween-cxl-raven": { section: "made" },
   "belt-newbury-latigo-burgundy": { section: "made" },
   "collar-horween-cxl": { section: "made", meta: { size_input: "text", size_label: "Size", options_size: "" } },
