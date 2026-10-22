@@ -351,7 +351,24 @@
     },
   };
 
+  // Header menu (phones), the same as the home page's.
+  function wireMenu() {
+    var btn = document.querySelector('.nav-toggle'), nav = document.getElementById('site-nav');
+    if (!btn || !nav) return;
+    function setOpen(open) {
+      nav.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', open);
+      btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    }
+    btn.addEventListener('click', function () { setOpen(!nav.classList.contains('open')); });
+    nav.addEventListener('click', function (e) { if (e.target.closest('a')) setOpen(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && nav.classList.contains('open')) { setOpen(false); btn.focus(); }
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    wireMenu();
     buildDrawer();
     var btn = document.querySelector('.cart-btn');
     if (btn) btn.addEventListener('click', function () {

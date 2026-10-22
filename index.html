@@ -162,6 +162,14 @@ body {
   border-bottom: 1px solid rgba(196,168,130,0.12);
 }
 .site-header-logo { display: flex; align-items: center; min-height: 44px; }
+.site-header-end { display: flex; align-items: center; gap: 0.25rem; }
+.cart-btn {
+  display: inline-flex; align-items: center; min-width: 44px; min-height: 44px; padding: 0 1rem; text-decoration: none;
+  background: transparent; color: var(--tan); border: 1px solid rgba(196,168,130,0.4);
+  font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+}
+.cart-btn:hover { border-color: var(--tan); }
+.cart-count { margin-left: 0.5rem; color: var(--white); }
 .site-header-logo img { height: 44px; width: auto; display: block; }
 .site-nav { display: flex; align-items: center; gap: 0.25rem; }
 .site-nav a {
@@ -201,7 +209,7 @@ body {
 }
 .nav-toggle span::before { position: absolute; top: -7px; left: 0; }
 .nav-toggle span::after { position: absolute; top: 7px; left: 0; }
-@media (max-width: 719px) {
+@media (max-width: 899px) {
   .nav-toggle { display: block; }
   .site-nav {
     display: none;
@@ -366,7 +374,7 @@ body {
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
   background: rgba(196,168,130,0.1);
-  margin: 4rem 0;
+  margin: 2rem 0 4rem;
   /* The 1px gaps show this background through as the hairlines between cells,
      so the gutter cannot be padding — that would paint a tan band down each
      side. Taken off the width instead, which leaves the trick intact. */
@@ -377,7 +385,7 @@ body {
 .pillar {
   background: var(--bg);
   padding: 4rem 2.5rem;
-  text-align: center;
+  text-align: left;
   transition: background 0.4s;
 }
 .pillar:hover { background: var(--bg-warm); }
@@ -497,7 +505,7 @@ body {
 
 /* ── CRAFT: process video ── */
 .craft {
-  padding: 6rem 2rem;
+  padding: 6rem 2rem 3rem;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -732,6 +740,7 @@ body {
   padding: 0 2rem 6rem;
   text-align: center;
 }
+.path-img { display: block; width: 100%; height: 220px; object-fit: cover; border-radius: 4px; margin-bottom: 1.25rem; }
 .path h3 {
   font-family: 'Playfair Display', serif;
   font-size: 1.3rem;
@@ -971,16 +980,19 @@ body::after {
 <!-- HEADER -->
 <header class="site-header">
   <a class="site-header-logo" href="/" aria-label="Traders Point Leather home"><img src="logo.png" alt="" width="44" height="44"></a>
-  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu"><span></span></button>
+  <div class="site-header-end">
   <nav class="site-nav" id="site-nav" aria-label="Main">
-    <a href="#craft">Process</a>
-    <a href="#details">Details</a>
+    <a href="/#craft">Process</a>
+    <a href="/#details">Details</a>
     <a href="/shop" data-shop-only hidden>Shop</a>
     <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763">Wallets</a>
     <a href="/shop#made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58173348">Belts</a>
     <a href="/design.html">Design Your Wallet</a>
-    <a href="#contact">Contact</a>
+    <a href="/#contact">Contact</a>
   </nav>
+  <a class="cart-btn" href="/cart" aria-label="Open cart" data-shop-only hidden>Cart <span class="cart-count">0</span></a>
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu"><span></span></button>
+  </div>
 </header>
 
 <!-- HERO -->
@@ -1140,11 +1152,13 @@ body::after {
 <!-- TWO PATHS -->
 <section class="paths reveal" aria-label="Two ways to buy">
   <div class="path">
+    <img class="path-img" src="img/cygnus-shell-cordovan-marbled/01.jpg" alt="A blue marbled shell cordovan wallet on a worn wooden workbench" loading="lazy" width="800" height="1200">
     <h3>Ready to ship</h3>
     <p data-etsy-text="Browse wallets, belts and more in the shop on Etsy.">Finished pieces that leave in 1&ndash;3 business days.</p>
     <a href="/shop#ready-to-ship" data-etsy="https://www.etsy.com/shop/TradersPointLeather" class="link-secondary" data-etsy-text="Browse the shop →">Browse Ready to Ship &rarr;</a>
   </div>
   <div class="path">
+    <img class="path-img" src="designer-preview.jpg" alt="The wallet designer showing a cognac bifold with sunflower and navy pockets" loading="lazy" width="1318" height="634">
     <h3>Made your way</h3>
     <p>Our standard designs, built after you order. Or design your own.</p>
     <a href="/shop#made-to-order" class="link-secondary" data-shop-only hidden>Made to Order &rarr;</a>
@@ -1175,6 +1189,14 @@ body::after {
 </footer>
 
 <script>
+  // Cart count in the header (the cart link shows only once the shop is live).
+  (function () {
+    var n = 0;
+    try { (JSON.parse(localStorage.getItem('tpl-cart-v1')) || []).forEach(function (i) { n += i.qty || 0; }); } catch (e) {}
+    var el = document.querySelector('.cart-count');
+    if (el) el.textContent = n;
+  })();
+
   // Header menu (phones)
   (function () {
     var btn = document.querySelector('.nav-toggle');

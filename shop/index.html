@@ -26,9 +26,21 @@
 <script src="/shop/shop.js" defer></script>
 </head>
 <body data-page="list">
-<header class="shop-header">
-  <a class="logo" href="/shop"><img src="/logo.png" alt="" width="40" height="40"><span>Traders Point Leather</span></a>
-  <button class="cart-btn" type="button" aria-label="Open cart">Cart <span class="cart-count" aria-live="polite">0</span></button>
+<header class="site-header">
+  <a class="site-header-logo" href="/" aria-label="Traders Point Leather home"><img src="/logo.png" alt="" width="44" height="44"></a>
+  <div class="site-header-end">
+    <nav class="site-nav" id="site-nav" aria-label="Main">
+    <a href="/#craft">Process</a>
+    <a href="/#details">Details</a>
+    <a href="/shop" aria-current="page">Shop</a>
+    <a href="/shop#made-to-order">Wallets</a>
+    <a href="/shop#made-to-order">Belts</a>
+    <a href="/design.html">Design Your Wallet</a>
+    <a href="/#contact">Contact</a>
+    </nav>
+    <button class="cart-btn" type="button" aria-label="Open cart">Cart <span class="cart-count" aria-live="polite">0</span></button>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu"><span></span></button>
+  </div>
 </header>
 <main>
   <h1>Shop</h1>
