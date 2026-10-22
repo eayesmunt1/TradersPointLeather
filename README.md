@@ -45,22 +45,26 @@ Without JavaScript a product page's button posts straight to checkout for that o
 | `STRIPE_TAX` | no | `true` turns on Stripe automatic tax. Decide with a tax professional |
 | `RESEND_API_KEY`, `ORDER_EMAIL_FROM` | for owner emails | Without them the webhook logs and skips the email. `ORDER_EMAIL_TO` defaults to the support address |
 
-### Soft launch and `SHOP_PUBLIC`
+### `SHOP_PUBLIC`
 
-`shop-config.js` holds `window.SHOP_PUBLIC = false`. While false nothing public links to the shop,
-the cart button exists only on shop pages, and every shop page has `noindex, nofollow`.
+`shop-config.js` holds `window.SHOP_PUBLIC`, and it is `true`. That means:
 
-To launch, set `SHOP_PUBLIC = true`, then also (these are static files, not driven by the flag):
+- The home page's Shop link shows, and every buy link points at the shop. Each link keeps its old Etsy
+  URL in `data-etsy`, so setting the flag to `false` swaps them back to Etsy and hides the Shop link: a
+  one-line rollback.
+- `/sitemap.xml` (a function, built from the Stripe catalog) lists `/shop` and every published product
+  page, sold Ready to Ship pieces included. With the flag `false` it lists only the home page and the designer.
+- The shop pages have no `noindex` tag. `cart.html` and `order-thanks.html` keep theirs, and a `?drafts=1`
+  preview of unapproved products is added `noindex` by the page itself.
+- `robots.txt` does not mention the shop.
+- Products with `needs_review` in Stripe are never listed or sold. Approve a description, then delete that metadata key.
 
-1. Remove the `<meta name="robots">` tag from `shop/index.html`, `shop/product.html`, `cart.html` and `order-thanks.html`.
-2. `robots.txt` deliberately does not mention the shop: a blocked crawler never sees `noindex`. Nothing to change.
-3. Add `/shop` and each product page to `sitemap.xml`.
-4. Point `offers.url` in the `index.html` Product JSON-LD at the on-site pages.
-5. Products with `needs_review` in Stripe stay hidden once the flag is true. Approve each description, then delete that metadata key.
+Locally, `npx netlify-cli dev --offline` serves the site with the functions. `python3 -m http.server`
+serves the home page and the designer but not `/shop` or `/api/*`.
 
 ### Known limits
 
-- Two buyers can check out the same one-of-a-kind piece within the same few minutes. If the webhook finds it already sold, refund one.
+- Two buyers can check out the last piece of a Ready to Ship item within the same few minutes. The webhook sets `oversold` on the Checkout Session and adds an OVERSOLD line to the owner email: refund one.
 - Items sold on Etsy must be marked inactive in Stripe by hand.
 - Checkout Sessions last 31 minutes (Stripe's minimum is 30).
 - Limited-stock counts (`stock`) are decremented by the webhook, not atomically.
