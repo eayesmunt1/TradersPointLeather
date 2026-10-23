@@ -74,6 +74,7 @@ test("the phone menu opens and closes on every page", async () => {
 
 test("the cart count follows the cart, on the shop and on the home page", async () => {
   const { page, ctx } = await open("/shop/gv1-horween-cypress");
+  await page.selectOption("[name=thread]", "Cream");
   await page.selectOption("[name=snap]", "Single Snap");
   await page.click('#add-form button[type=submit]');
   await page.waitForSelector("dialog[open]");
