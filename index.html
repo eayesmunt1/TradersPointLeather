@@ -485,6 +485,7 @@ body {
 .gallery-item.wide     { grid-column: span 2; }
 .gallery-item.featured { grid-column: span 2; grid-row: span 2; }
 .gallery-item.full     { grid-column: span 4; }
+.gallery-item.tall     { grid-row: span 2; }
 /* Shop-only links stay out of sight until SHOP_PUBLIC is true; site CSS would otherwise override [hidden]. */
 [data-shop-only][hidden] { display: none !important; }
 .gallery-item img {
@@ -843,6 +844,7 @@ body::after {
   .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 180px; gap: 6px; }
   .gallery-item.wide,
   .gallery-item.featured,
+  .gallery-item.tall,
   .gallery-item.full { grid-column: span 1 !important; grid-row: span 1 !important; }
   .hero h1 { font-size: 1.9rem; letter-spacing: 0.1em; }
   .product-cards { grid-template-columns: 1fr; }
@@ -1078,17 +1080,16 @@ body::after {
   <p class="section-label">The Details</p>
   <h2>From the Bench</h2>
   <!-- The .featured and .wide spans below tile the four columns with no holes,
-       which only works in this order: 1 | 2(2x2) | 3 / 4 | [2] | 5 / 6(wide) | 7(wide).
-       Reorder the items and the grid grows a gap. Both classes are cancelled
+       which only works in this order: 1 | 2(2x2) | 3(tall) / 4 | [2] | [3] / 5(wide) | 6(wide).
+       Reorder the items and the grid grows a gap. All three classes are cancelled
        under 768px, where the grid is a plain two-up. -->
   <div class="gallery-grid">
     <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item"><img src="img/cygnet-newbury-balmoral-navy/06.jpg" alt="Closed navy blue Newbury Balmoral bifold wallet with blue stitching on a worn workbench" loading="lazy" width="800" height="1200"></a>
-    <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item featured"><img src="IMG_2301.jpeg" class="crop-upper" alt="Hand-dyed green marbled vertical bifold wallet" loading="lazy" width="800" height="1200"></a>
-    <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item"><img src="IMG_7076.jpeg" alt="Close-up of a saddle-stitched tan leather wallet held in hand, showing burnished edges and cream thread" loading="lazy" width="800" height="533"></a>
-    <a href="/shop/belts" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58173348" class="gallery-item"><img src="IMG_6991.jpg" alt="Close-up of a navy blue leather belt with a matte black buckle and punched holes" loading="lazy" width="533" height="800"></a>
+    <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item featured"><img src="img/cygnet-newbury-balmoral-navy/05.jpg" alt="Open navy blue Newbury Balmoral bifold wallet showing its card pockets and blue stitching" loading="lazy" width="800" height="1200"></a>
+    <a href="/shop/belts" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58173348" class="gallery-item tall"><img src="IMG_6991.jpg" alt="Close-up of a navy blue leather belt with a matte black buckle and punched holes" loading="lazy" width="533" height="800"></a>
     <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather" class="gallery-item"><img src="img/cygnet-newbury-balmoral-antique-copper/02.jpg" alt="Closed antique copper Newbury Balmoral bifold wallet, a deep ruddy brown, with hand stitching" loading="lazy" width="800" height="1200"></a>
     <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item wide"><img src="img/cygnet-horween-cavalier-mto/whiskey-b/03.jpg" alt="Close-up of the hand-stitched edge on a Horween Cavalier whiskey bifold wallet" loading="lazy" width="800" height="1200"></a>
-    <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item wide"><img src="img/cygnet-newbury-balmoral-sunflower/07.jpg" alt="Closed sunflower Newbury Balmoral bifold wallet in olive gold with cream stitching" loading="lazy" width="800" height="1200"></a>
+    <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item wide"><img src="img/cygnet-newbury-balmoral-sunflower/02.jpg" alt="Open sunflower Newbury Balmoral bifold wallet in olive gold, showing its card pockets and cream stitching" loading="lazy" width="800" height="1200"></a>
   </div>
 </section>
 
