@@ -101,8 +101,8 @@
           "name": "Leather Belt",
           "description": "Solid brass hardware on a single piece of thick full-grain leather. No layers, no filler. Built to last.",
           "image": [
-            "https://traderspointleather.com/IMG_6991.jpg",
-            "https://traderspointleather.com/IMG_5640.jpg"
+            "https://traderspointleather.com/img/home/belt-gallery.jpg",
+            "https://traderspointleather.com/img/home/belt-card.jpg"
           ],
           "brand": { "@type": "Brand", "name": "Traders Point Leather" },
           "material": "Full-grain leather",
@@ -428,7 +428,10 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: 50% 50%;
 }
+/* Card 01's wallet sits high in its photo, so its crop sits a little lower than the posters'. */
+.pillar:first-child .pillar-img img { object-position: 50% 60%; }
 /* 16:9 video cover-filling the 4:3 slot: match the slot's height, overflow the sides. */
 .pillar-img iframe {
   position: absolute;
@@ -469,10 +472,9 @@ body {
 }
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: 280px;
-  gap: 4px;
-  max-width: 1400px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 2rem;
 }
@@ -481,14 +483,15 @@ body {
   overflow: hidden;
   position: relative;
   cursor: pointer;
+  aspect-ratio: 4 / 5;
 }
-.gallery-item.wide     { grid-column: span 2; }
-.gallery-item.featured { grid-column: span 2; grid-row: span 2; }
-.gallery-item.full     { grid-column: span 4; }
-.gallery-item.tall     { grid-row: span 2; }
+.gallery-item.featured { grid-column: span 2; grid-row: span 2; aspect-ratio: auto; }
 /* Shop-only links stay out of sight until SHOP_PUBLIC is true; site CSS would otherwise override [hidden]. */
 [data-shop-only][hidden] { display: none !important; }
 .gallery-item img {
+  /* Fills the tile without adding to its height, so the 4:5 shape and the grid rows stay exact. */
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -841,11 +844,8 @@ body::after {
   .hero-logo { width: 90px; height: 90px; margin-bottom: 1.5rem; }
   .pillars { grid-template-columns: 1fr; }
   .pillar { padding: 3rem 2rem; }
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 180px; gap: 6px; }
-  .gallery-item.wide,
-  .gallery-item.featured,
-  .gallery-item.tall,
-  .gallery-item.full { grid-column: span 1 !important; grid-row: span 1 !important; }
+  .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 0 1.25rem; }
+  .gallery-item.featured, .gallery-item:last-child { grid-column: span 2; grid-row: span 1; aspect-ratio: 4 / 5; }
   .hero h1 { font-size: 1.9rem; letter-spacing: 0.1em; }
   .product-cards { grid-template-columns: 1fr; }
   .paths { grid-template-columns: 1fr; padding-bottom: 4rem; }
@@ -887,6 +887,11 @@ body::after {
   /* Wider, not taller: height is the one dimension the peek cannot spare, so this only raises the
      height budget a little for large screens. The base 22vh stays as written for the small phone. */
   .hero-feature { --hero-h: clamp(210px, 36vh, 540px); margin-top: clamp(1.25rem, 3vh, 2.5rem); max-width: 1300px; }
+  /* On wide screens the Shop button comes before the photo, so it is on screen without scrolling.
+     (On phones the photo is small and the button follows it.) */
+  .hero-shop { order: 1; margin-top: clamp(1.25rem, 3vh, 2rem); }
+  .hero-feature { order: 2; }
+  .scroll-hint { order: 3; }
   .scroll-hint span { height: clamp(28px, 4.4vh, 40px); }
 
   /* A sliver of empty padding tells nobody anything, so the top padding comes
@@ -919,7 +924,6 @@ body::after {
   .products h2,
   .craft-copy h2 { font-size: 3.2rem; }
   .banner-cta h2 { font-size: 4rem; }
-  .gallery-grid { max-width: 1600px; grid-auto-rows: 330px; }
   .pillars { max-width: min(1360px, calc(100% - 6rem)); }
   .craft { max-width: 1360px; }
   .craft-media { grid-template-columns: minmax(0, 360px) minmax(0, 520px); gap: 5rem; }
@@ -1079,17 +1083,16 @@ body::after {
 <section class="gallery-section reveal" id="details">
   <p class="section-label">The Details</p>
   <h2>From the Bench</h2>
-  <!-- The .featured and .wide spans below tile the four columns with no holes,
-       which only works in this order: 1 | 2(2x2) | 3(tall) / 4 | [2] | [3] / 5(wide) | 6(wide).
-       Reorder the items and the grid grows a gap. All three classes are cancelled
-       under 768px, where the grid is a plain two-up. -->
+  <!-- Three columns of 4:5 tiles; the first spans two columns and two rows. Six tiles fill it
+       exactly (1 1 2 / 1 1 3 / 4 5 6). On phones it is two columns, with the first and last tile
+       spanning both. -->
   <div class="gallery-grid">
-    <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item"><img src="img/cygnet-newbury-balmoral-navy/06.jpg" alt="Closed navy blue Newbury Balmoral bifold wallet with blue stitching on a worn workbench" loading="lazy" width="800" height="1200"></a>
     <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item featured"><img src="img/cygnet-newbury-balmoral-navy/05.jpg" alt="Open navy blue Newbury Balmoral bifold wallet showing its card pockets and blue stitching" loading="lazy" width="800" height="1200"></a>
-    <a href="/shop/belts" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58173348" class="gallery-item tall"><img src="IMG_6991.jpg" alt="Close-up of a navy blue leather belt with a matte black buckle and punched holes" loading="lazy" width="533" height="800"></a>
+    <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item"><img src="img/cygnet-newbury-balmoral-navy/06.jpg" alt="Closed navy blue Newbury Balmoral bifold wallet with blue stitching on a worn workbench" loading="lazy" width="800" height="1200"></a>
     <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather" class="gallery-item"><img src="img/cygnet-newbury-balmoral-antique-copper/02.jpg" alt="Closed antique copper Newbury Balmoral bifold wallet, a deep ruddy brown, with hand stitching" loading="lazy" width="800" height="1200"></a>
-    <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item wide"><img src="img/cygnet-horween-cavalier-mto/whiskey-b/03.jpg" alt="Close-up of the hand-stitched edge on a Horween Cavalier whiskey bifold wallet" loading="lazy" width="800" height="1200"></a>
-    <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item wide"><img src="img/cygnet-newbury-balmoral-sunflower/02.jpg" alt="Open sunflower Newbury Balmoral bifold wallet in olive gold, showing its card pockets and cream stitching" loading="lazy" width="800" height="1200"></a>
+    <a href="/shop/belts" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58173348" class="gallery-item"><img src="img/home/belt-gallery.jpg" alt="Close-up of a navy blue leather belt with a matte black buckle and punched holes" loading="lazy" width="800" height="1200"></a>
+    <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item"><img src="img/cygnet-horween-cavalier-mto/whiskey-b/03.jpg" alt="Close-up of the hand-stitched edge on a Horween Cavalier whiskey bifold wallet" loading="lazy" width="800" height="1200"></a>
+    <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?section_id=58176763" class="gallery-item"><img src="img/cygnet-newbury-balmoral-sunflower/02.jpg" alt="Open sunflower Newbury Balmoral bifold wallet in olive gold, showing its card pockets and cream stitching" loading="lazy" width="800" height="1200"></a>
   </div>
 </section>
 
@@ -1111,7 +1114,7 @@ body::after {
     </a>
     <a href="/shop/belts" data-etsy="https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4419228681&section_id=58173348" class="product-card">
       <div class="product-card-img">
-        <img src="IMG_5640.jpg" alt="Navy blue leather belt with a matte black buckle lying on a worn, riveted metal surface" loading="lazy" width="600" height="900">
+        <img src="img/home/belt-card.jpg" alt="Navy blue leather belt with a matte black buckle lying on a worn, riveted metal surface" loading="lazy" width="600" height="900">
       </div>
       <div class="product-card-body">
         <h3>Leather Belts</h3>

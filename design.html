@@ -83,11 +83,9 @@ body {
   margin: 2rem auto;
 }
 .page-head p {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.25rem;
-  font-style: italic;
+  font-size: 1.05rem;
   color: var(--tan-light);
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 /* ── CONFIGURATOR LAYOUT ── */
@@ -102,7 +100,7 @@ body {
 }
 
 /* ── PREVIEW ── */
-.preview-col { position: sticky; top: 2rem; }
+.preview-col { position: sticky; top: 5rem; }
 .preview-stage {
   background: var(--bg-warm);
   border: 1px solid rgba(196,168,130,0.08);
@@ -163,7 +161,7 @@ body {
 .family-tag { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tan); margin-bottom: 0.3rem; }
 .family-about { background: var(--bg-warm); border-left: 2px solid var(--accent); padding: 1rem 1.25rem 1.15rem; }
 .family-about h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 400; color: var(--white); margin-bottom: 0.5rem; }
-#family-about-blurb { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; line-height: 1.6; color: var(--cream); }
+#family-about-blurb { font-size: 0.95rem; line-height: 1.7; color: var(--cream); }
 @media (max-width: 720px) {
   .family-row { grid-template-columns: 1fr; }
   .family-toggle { flex-direction: row; flex-wrap: wrap; }
@@ -358,9 +356,7 @@ body {
   color: var(--tan-light);
 }
 .pieces-intro {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   color: var(--tan-light);
   margin: -2rem auto 2.5rem;
   max-width: 560px;
@@ -523,6 +519,42 @@ body::after {
   .pieces-grid { grid-template-columns: 1fr; gap: 1.5rem; }
   .footer-links { flex-direction: column; gap: 1rem; }
 }
+
+/* ── Shared site header (copied from index.html, per the repo's copy-don't-import habit) ── */
+body { padding-top: 64px; }
+.site-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 max(1.25rem, env(safe-area-inset-right)) 0 max(1.25rem, env(safe-area-inset-left));
+  background: var(--bg); border-bottom: 1px solid rgba(196,168,130,0.12);
+}
+.site-header-logo { display: flex; align-items: center; min-height: 44px; }
+.site-header-logo img { height: 44px; width: auto; display: block; }
+.site-header-end { display: flex; align-items: center; gap: 0.25rem; }
+.site-nav { display: flex; align-items: center; gap: 0.25rem; }
+.site-nav a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.85rem;
+  color: var(--cream); text-decoration: none; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; transition: color 0.3s;
+}
+.site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--tan); }
+.site-header a:focus-visible, .nav-toggle:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 2px; }
+.cart-btn {
+  display: inline-flex; align-items: center; min-width: 44px; min-height: 44px; padding: 0 1rem; text-decoration: none;
+  background: transparent; color: var(--tan); border: 1px solid rgba(196,168,130,0.4);
+  font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+}
+.cart-btn:hover { border-color: var(--tan); }
+.cart-count { margin-left: 0.5rem; color: var(--white); }
+.nav-toggle { display: none; min-width: 44px; min-height: 44px; background: transparent; border: 0; color: var(--tan); cursor: pointer; }
+.nav-toggle span, .nav-toggle span::before, .nav-toggle span::after { display: block; width: 22px; height: 2px; background: currentColor; position: relative; margin: 0 auto; content: ''; }
+.nav-toggle span::before { position: absolute; top: -7px; left: 0; }
+.nav-toggle span::after { position: absolute; top: 7px; left: 0; }
+@media (max-width: 899px) {
+  .nav-toggle { display: block; }
+  .site-nav { display: none; position: absolute; top: 64px; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0; padding: 0.5rem 1.25rem 1rem; background: var(--bg); border-bottom: 1px solid rgba(196,168,130,0.12); }
+  .site-nav.open { display: flex; }
+  .site-nav a { padding: 0 0.25rem; font-size: 0.85rem; }
+}
 </style>
 <!-- Crisp live chat. Visitors' messages land in the Crisp app on the shop's
      phone. Deferred to page load, like Clarity, so it never slows the first
@@ -542,6 +574,22 @@ body::after {
 </script>
 </head>
 <body>
+<header class="site-header">
+  <a class="site-header-logo" href="/" aria-label="Traders Point Leather home"><img src="/logo.png" alt="" width="44" height="44"></a>
+  <div class="site-header-end">
+    <nav class="site-nav" id="site-nav" aria-label="Main">
+    <a href="/#craft">Process</a>
+    <a href="/#details">Details</a>
+    <a href="/shop">Shop</a>
+    <a href="/shop/made-to-order">Wallets</a>
+    <a href="/shop/belts">Belts</a>
+    <a href="/design.html" aria-current="page">Design Your Wallet</a>
+    <a href="/#contact">Contact</a>
+    </nav>
+    <a class="cart-btn" href="/cart" aria-label="Open cart">Cart <span class="cart-count">0</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu"><span></span></button>
+  </div>
+</header>
 
 <!-- HEADER -->
 <header class="page-head">
@@ -651,22 +699,6 @@ body::after {
   </div>
   <span class="spec-note" id="send-note-bar">$145, every option included. Secure checkout by Stripe.</span>
 </div>
-
-<!-- SPEC -->
-<section class="spec-section reveal">
-  <div class="spec-inner">
-    <p class="section-label">Your Build</p>
-    <h2>The Spec</h2>
-    <p>Everything we need to cut your wallet — sent straight to the bench.</p>
-    <div class="spec-actions">
-      <div class="send-actions">
-        <a class="btn-shop" data-buy href="https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00" aria-describedby="send-note">Buy — $145</a>
-        <a class="btn-shop btn-ghost" id="send-btn" data-send href="#" aria-describedby="send-note">Discuss Your Build</a>
-      </div>
-      <span class="spec-note" id="send-note">$145, every option included. Secure checkout by Stripe.</span>
-    </div>
-  </div>
-</section>
 
 <!-- REAL PIECES -->
 <section class="real-pieces reveal">
@@ -1806,12 +1838,12 @@ monoInput.addEventListener('input', () => {
   }
 });
 
-// The bottom bar steps aside once the spec section is in view, and stays aside
-// below it, so it never sits over that section's own button or the footer.
+// The bottom bar steps aside once the pieces section below the configurator is in view, and
+// stays aside below it, so it never sits over that section or the footer.
 const sendBar = document.getElementById('send-bar');
 new IntersectionObserver(([e]) => {
   sendBar.classList.toggle('is-away', e.isIntersecting || e.boundingClientRect.top < 0);
-}).observe(document.querySelector('.spec-section'));
+}).observe(document.querySelector('.real-pieces'));
 
 /* ── Send, by chat ──────────────────────────────────────────────────
    Discuss Your Build opens Crisp and sends the spec as the visitor's first
@@ -1850,5 +1882,18 @@ const observer = new IntersectionObserver((entries) => {
 reveals.forEach(el => observer.observe(el));
 </script>
 
+<script>
+  // Header menu (phones) and the cart count, as on the other pages.
+  (function () {
+    var n = 0;
+    try { (JSON.parse(localStorage.getItem('tpl-cart-v1')) || []).forEach(function (i) { n += i.qty || 0; }); } catch (e) {}
+    var c = document.querySelector('.cart-count'); if (c) c.textContent = n;
+    var btn = document.querySelector('.nav-toggle'), nav = document.getElementById('site-nav');
+    function setOpen(open) { nav.classList.toggle('open', open); btn.setAttribute('aria-expanded', open); btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); }
+    btn.addEventListener('click', function () { setOpen(!nav.classList.contains('open')); });
+    nav.addEventListener('click', function (e) { if (e.target.closest('a')) setOpen(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && nav.classList.contains('open')) { setOpen(false); btn.focus(); } });
+  })();
+</script>
 </body>
 </html>

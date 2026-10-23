@@ -40,9 +40,10 @@ export function productHtml(p, { photos: allPhotos = [], monogram = null } = {})
     <div class="thumbs">${photos
       .map(
         (ph, i) =>
-          `<button type="button" aria-label="Show photo ${i + 1}" aria-current="${i === 0}" data-color="${esc(ph.color || "")}"><img src="${esc(ph.src)}" alt="" loading="lazy" width="64" height="96"></button>`
+          `<button type="button" aria-label="Show photo ${i + 1}" aria-current="${i === 0}" data-color="${esc(ph.color || "")}"><img src="${esc(ph.src)}" alt="" loading="lazy" width="72" height="72"></button>`
       )
-      .join("")}</div>` : ""}
+      .join("")}</div>
+    <div class="dots">${photos.map((ph, i) => `<button type="button" aria-label="Show photo ${i + 1}" aria-current="${i === 0}" data-color="${esc(ph.color || "")}"></button>`).join("")}</div>` : ""}
   </div>`;
   const ready = p.section === "ready";
   // Its own category page: belts have one, and so do Ready to Ship and Made to Order.
