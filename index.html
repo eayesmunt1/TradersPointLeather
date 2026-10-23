@@ -483,7 +483,7 @@ body {
   overflow: hidden;
   position: relative;
   cursor: pointer;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1 / 1;
 }
 .gallery-item.featured { grid-column: span 2; grid-row: span 2; aspect-ratio: auto; }
 /* Shop-only links stay out of sight until SHOP_PUBLIC is true; site CSS would otherwise override [hidden]. */
@@ -845,7 +845,7 @@ body::after {
   .pillars { grid-template-columns: 1fr; }
   .pillar { padding: 3rem 2rem; }
   .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 0 1.25rem; }
-  .gallery-item.featured, .gallery-item:last-child { grid-column: span 2; grid-row: span 1; aspect-ratio: 4 / 5; }
+  .gallery-item.featured, .gallery-item:last-child { grid-column: span 2; grid-row: span 1; aspect-ratio: 1 / 1; }
   .hero h1 { font-size: 1.9rem; letter-spacing: 0.1em; }
   .product-cards { grid-template-columns: 1fr; }
   .paths { grid-template-columns: 1fr; padding-bottom: 4rem; }

@@ -220,6 +220,9 @@
     });
     var form = box.querySelector('#add-form'); // a sold-out piece has no form
     var strip = box.querySelector('.slides');
+    var lead = box.querySelector('.slide img'), frame = box.querySelector('.gallery');
+    function orient() { if (frame && lead && lead.naturalWidth > lead.naturalHeight) frame.classList.add('landscape'); }
+    if (lead) { if (lead.complete) orient(); else lead.addEventListener('load', orient); }
     var slides = [].slice.call(box.querySelectorAll('.slide'));
     var thumbs = [].slice.call(box.querySelectorAll('.thumbs button'));
     var dots = [].slice.call(box.querySelectorAll('.dots button'));
@@ -293,16 +296,21 @@
       ];
       var cat = CATS.filter(function (c) { return path === '/shop/' + c.slug; })[0] || null;
 
+      // Square card images cropped from the owner's originals, where the first gallery photo crops badly.
+      var TILES = ['gv1-horween-cypress', 'cygnus-shell-cordovan-marbled', 'belt-newbury-latigo-burgundy', 'belt-horween-cxl-raven'];
       function card(p) {
         var ready = p.section === 'ready', badges = [];
         if (p.needsReview) badges.push('Draft');
         if (ready && p.stock > 1) badges.push('Only ' + p.stock + ' left');
-        var ph = photos(p)[0];
+        var ph = photos(p)[0], tileSrc = TILES.indexOf(p.slug) > -1 ? '/img/' + p.slug + '/tile.jpg' : ph && ph.src;
+        // "Model in Leather - Color" reads as Model \u00b7 Color over the leather, so the color is never cut off.
+        var m = /^(.+?) in (.+?) - (.+)$/.exec(p.name || ''), title = m ? m[1] + ' \u00b7 ' + m[3] : p.name;
         return el('li', {}, [el('a', { class: 'card', href: '/shop/' + encodeURIComponent(p.slug) + drafts }, [
-          el('div', { class: 'card-img' }, [ph ? el('img', { src: ph.src, alt: '', loading: 'lazy' }) : el('span', { text: 'Photos coming soon' })]),
+          el('div', { class: 'card-img' }, [tileSrc ? el('img', { src: tileSrc, alt: '', loading: 'lazy' }) : el('span', { text: 'Photos coming soon' })]),
           badges.length ? el('div', { class: 'badges' }, badges.map(function (b) { return el('span', { class: 'badge', text: b }); })) : null,
           el('div', { class: 'card-body' }, [
-            el('h2', { text: p.name }),
+            el('h2', { text: title }),
+            m ? el('div', { class: 'leather', text: m[2] }) : null,
             el('div', { class: 'price', text: money(p.amount) }),
           ]),
         ])]);

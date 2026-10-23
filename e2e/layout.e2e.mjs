@@ -20,7 +20,7 @@ async function open(path, viewport) {
 }
 const box = (page, sel) => page.$$eval(sel, (els) => els.map((e) => { const r = e.getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height) }; }));
 
-test("the home gallery is six portrait tiles that fill a three-column grid", async () => {
+test("the home gallery is six square tiles that fill a three-column grid", async () => {
   const { page, ctx } = await open("/", { width: 1280, height: 900 });
   const tiles = await box(page, ".gallery-item");
   assert.equal(tiles.length, 6);
@@ -59,10 +59,10 @@ test("the cue under the hero is 64px above the next section at every size", asyn
   }
 });
 
-test("every product album gets the same 4:5 gallery frame", async () => {
+test("portrait albums get a 4:5 gallery frame and landscape albums 3:2", async () => {
   for (const vp of [{ width: 1280, height: 800 }, { width: 390, height: 844 }]) {
     const sizes = new Set();
-    for (const slug of ["cygnus-shell-cordovan-marbled", "cygnet-horween-cavalier-sunflower", "collar-horween-cxl", "gv1-horween-cypress"]) {
+    for (const slug of ["cygnus-shell-cordovan-marbled", "gv1-horween-cypress"]) {
       const { page, ctx } = await open(`/shop/${slug}`, vp);
       const [frame] = await box(page, ".slides");
       sizes.add(`${frame.w}x${frame.h}`);
@@ -70,6 +70,13 @@ test("every product album gets the same 4:5 gallery frame", async () => {
       await ctx.close();
     }
     assert.equal(sizes.size, 1, `frames differ at ${vp.width}px: ${[...sizes]}`);
+    for (const slug of ["cygnet-horween-cavalier-sunflower", "collar-horween-cxl"]) {
+      const { page, ctx } = await open(`/shop/${slug}`, vp);
+      await page.waitForSelector(".gallery.landscape");
+      const [frame] = await box(page, ".slides");
+      assert.ok(Math.abs(frame.w / frame.h - 1.5) < 0.02, `${slug}: ${frame.w}x${frame.h}`);
+      await ctx.close();
+    }
   }
 });
 
@@ -96,11 +103,13 @@ test("the category tabs stay on one row on a phone", async () => {
   await ctx.close();
 });
 
-test("shop card titles take at most two lines, so prices line up", async () => {
+test("shop cards split the color from the leather, and prices line up", async () => {
   const { page, ctx } = await open("/shop/made-to-order", { width: 390, height: 800 });
   await page.waitForSelector("#listing .grid");
-  const offsets = await page.$$eval(".card", (cs) => [...new Set(cs.map((c) => Math.round(c.querySelector(".price").getBoundingClientRect().top - c.getBoundingClientRect().top)))]);
-  assert.equal(offsets.length, 1, `price offsets differ: ${offsets}`);
+  const off = await page.$$eval(".card", (cs) => [...new Set(cs.map((c) => Math.round(c.getBoundingClientRect().bottom - c.querySelector(".price").getBoundingClientRect().bottom)))]);
+  assert.equal(off.length, 1, `prices sit at different heights in their cards: ${off}`);
+  const cygnet = await page.$$eval(".card h2", (hs) => hs.map((h) => h.textContent).filter((t) => /^CygnetV2 \u00b7 /.test(t)));
+  assert.ok(cygnet.length >= 2, "Cygnet cards lead with the color");
   await ctx.close();
 });
 
