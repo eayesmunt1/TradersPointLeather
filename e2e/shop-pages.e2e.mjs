@@ -93,3 +93,30 @@ test("the shop pages fit a phone", async () => {
     await ctx.close();
   }
 });
+
+test("GV1 asks for a thread and a snap, and will not add until both are chosen", async () => {
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/shop/gv1-horween-cypress`, { waitUntil: "networkidle" });
+  const valid = () => page.evaluate(() => document.querySelector("#add-form").checkValidity());
+  assert.equal(await page.$$eval('#add-form select[required]', (s) => s.map((e) => e.name).join(",")), "thread,snap");
+  assert.equal(await valid(), false);
+  await page.selectOption("[name=thread]", "Havana Brown");
+  assert.equal(await valid(), false, "a thread alone is not enough");
+  await page.selectOption("[name=snap]", "Double Snap");
+  assert.equal(await valid(), true);
+  await page.click('#add-form button[type=submit]');
+  await page.waitForSelector("dialog[open]");
+  assert.match(await page.innerText("dialog .drawer-body"), /Thread: Havana Brown · Snap: Double Snap/);
+  await ctx.close();
+});
+
+test("pages that fix their thread do not ask for one", async () => {
+  for (const slug of ["siah-horween-cavalier", "cygnet-horween-cavalier-mto"]) {
+    const ctx = await browser.newContext();
+    const page = await ctx.newPage();
+    await page.goto(`${BASE}/shop/${slug}`, { waitUntil: "networkidle" });
+    assert.equal(await page.locator('#add-form select[name="thread"]').count(), 0, slug);
+    await ctx.close();
+  }
+});

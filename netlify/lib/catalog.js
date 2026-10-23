@@ -9,14 +9,16 @@ const SECTIONS = ["ready", "made"];
 // Made to Order pages are pre-built, so only the options a product lists in `choices` are
 // choices the buyer makes. Any other options_* key left in Stripe is ignored;
 // customising leather, color, thread and stash pockets happens in the wallet designer.
-// A product opts in with `choices`, a pipe-separated list of option names (GV1: `snap|thread`);
-// without it the only choice is `snap`. Each named option reads its values from `options_<name>`.
-const DEFAULT_CHOICES = ["snap"];
+// The buyer choices are `snap` and `thread`, each read from `options_<name>` (pipe-separated). A page
+// that fixes its thread with `build_thread` does not also ask for one, so a leftover options_thread
+// there stays ignored. A product can set `choices` to list exactly the options it asks for instead.
+const DEFAULT_CHOICES = ["snap", "thread"];
 
 function optionLists(m) {
   const lists = { color: [], thread: [], size: [], snap: [] };
   const named = split(m.choices).filter((n) => /^[a-z]+$/.test(n));
-  for (const name of named.length ? named : DEFAULT_CHOICES) lists[name] = split(m[`options_${name}`]);
+  const names = named.length ? named : DEFAULT_CHOICES.filter((n) => !(n === "thread" && m.build_thread));
+  for (const name of names) lists[name] = split(m[`options_${name}`]);
   return lists;
 }
 

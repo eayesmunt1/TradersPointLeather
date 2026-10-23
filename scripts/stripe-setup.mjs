@@ -76,7 +76,7 @@ const PLAN = {
   "sparrow-horween-cavalier-mto": { section: "made", desc: "sparrow" },
   "sparrow-newbury-balmoral-mto": { section: "made", desc: "sparrow" },
   "jonas-horween-cavalier": { section: "made" },
-  "gv1-horween-cypress": { section: "made", meta: { options_snap: "Single Snap|Double Snap", options_thread: "Cream|Havana Brown", choices: "snap|thread" } },
+  "gv1-horween-cypress": { section: "made", meta: { options_snap: "Single Snap|Double Snap", options_thread: "Cream|Havana Brown" } },
   "siah-horween-cavalier": { section: "made" },
   // Not sold any more: archived, never deleted, so past orders keep their history.
   "belt-hermann-oak": { archive: "no longer sold" },

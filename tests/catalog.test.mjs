@@ -20,25 +20,28 @@ test("section defaults to made and drives readyToShip", () => {
   assert.equal(shape(price({ section: "made", ready_to_ship: "true" })).readyToShip, false);
 });
 
-test("only snap is a buyer choice; other options_* keys are ignored", () => {
+test("snap and thread are buyer choices; other options_* keys are ignored", () => {
   const p = shape(
-    price({ options_snap: "Single Snap|Double Snap", options_stash: "Without|With", options_color: "Red|Whiskey", options_thread: "Cream", options_stamp: "TP Monogram" })
+    price({ options_snap: "Single Snap|Double Snap", options_thread: "Cream|Havana Brown", options_stash: "Without|With", options_color: "Red|Whiskey", options_stamp: "TP Monogram" })
   );
   assert.deepEqual(p.options.snap, ["Single Snap", "Double Snap"]);
+  assert.deepEqual(p.options.thread, ["Cream", "Havana Brown"]);
   assert.deepEqual(p.options.color, []);
-  assert.deepEqual(p.options.thread, []);
   assert.equal(p.options.stash, undefined);
   assert.deepEqual(shape(price({})).options.snap, []);
+  assert.deepEqual(shape(price({})).options.thread, []);
 });
 
-test("a product opts into more choices with `choices`, and only those", () => {
-  const gv1 = shape(price({ choices: "snap|thread", options_snap: "Single Snap|Double Snap", options_thread: "Cream|Havana Brown" }));
-  assert.deepEqual(gv1.options.snap, ["Single Snap", "Double Snap"]);
-  assert.deepEqual(gv1.options.thread, ["Cream", "Havana Brown"]);
-  // A leftover options_thread on a product that does not list it stays ignored.
-  const siah = shape(price({ options_thread: "Cream|Chestnut|Havana Brown" }));
+test("a page that fixes its thread does not ask for one", () => {
+  const siah = shape(price({ options_thread: "Cream|Chestnut|Havana Brown", build_thread: "Chestnut" }));
   assert.deepEqual(siah.options.thread, []);
-  assert.deepEqual(siah.options.snap, []);
+  assert.equal(siah.build.thread, "Chestnut");
+});
+
+test("`choices` lists exactly the options a product asks for", () => {
+  const only = shape(price({ choices: "snap", options_snap: "A|B", options_thread: "Cream|Havana Brown" }));
+  assert.deepEqual(only.options.snap, ["A", "B"]);
+  assert.deepEqual(only.options.thread, []);
   // Names are plain lowercase words, so a stray key cannot be asked for.
   assert.deepEqual(shape(price({ choices: "../x|snap", options_snap: "A|B" })).options.snap, ["A", "B"]);
 });

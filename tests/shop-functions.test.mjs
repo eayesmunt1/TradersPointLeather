@@ -22,9 +22,9 @@ const product = (id, name, metadata, amount = 14500) => ({
 const PRICES = [
   product("plum", "CygnetV2 Plum", { section: "ready", stock: "2", monogram: "true", type: "wallet" }),
   product("gone", "CygnetV2 Gone", { section: "ready", stock: "0", monogram: "true", type: "wallet" }),
-  product("gv1", "GV1", { section: "made", monogram: "true", type: "wallet", choices: "snap|thread", options_snap: "Single Snap|Double Snap", options_thread: "Cream|Havana Brown" }, 6500),
-  // A product with a leftover thread list but no `choices`: the thread must not become a choice.
-  product("siah", "SiahV2", { section: "made", monogram: "true", type: "wallet", options_thread: "Cream|Chestnut|Havana Brown" }, 6500),
+  product("gv1", "GV1", { section: "made", monogram: "true", type: "wallet", options_snap: "Single Snap|Double Snap", options_thread: "Cream|Havana Brown" }, 6500),
+  // A page that fixes its thread keeps a leftover list, which must not become a choice.
+  product("siah", "SiahV2", { section: "made", monogram: "true", type: "wallet", options_thread: "Cream|Chestnut|Havana Brown", build_thread: "Chestnut" }, 6500),
   product("belt", "Belt", { section: "made", type: "belt", size_input: "text", size_label: "Belt length" }, 9500),
   product("collar", "Collar", { section: "made", type: "collar", size_input: "text", size_label: "Size" }, 5000),
   product("cygnet", "CygnetV2 Cavalier", { section: "made", monogram: "true", type: "wallet", build_color: "Whiskey", build_thread: "Cream" }),
@@ -111,11 +111,11 @@ test("GV1 needs a listed snap and a listed thread, and records both", async () =
   assert.match(d, /Snap: Double Snap/);
 });
 
-test("a leftover thread list on a product that does not opt in is not required", async () => {
+test("a leftover thread list on a page that fixes its thread is not required", async () => {
   stubStripe();
   const res = await order([{ slug: "siah", qty: 1, options: {} }]);
   assert.equal(res.statusCode, 200);
-  assert.doesNotMatch(session()["line_items[0][price_data][product_data][description]"] || "", /Thread/);
+  assert.match(session()["line_items[0][price_data][product_data][description]"], /^Thread: Chestnut$/); // the fixed one, not a choice
 });
 
 test("a price or choice the product does not offer is ignored", async () => {
