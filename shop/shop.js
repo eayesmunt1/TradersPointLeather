@@ -7,8 +7,8 @@
   var KEY = 'tpl-cart-v1';
   // Matches shipLine() in product-html.js: 1-2 weeks unless every piece is Ready to Ship (section=ready).
   function shipText(ready) {
-    return 'Free shipping (US) \u00b7 ' + (ready ? 'Ready to ship: ships in 1\u20133 business days' : 'Ships in 1\u20132 weeks') +
-      ', arrives 5\u20137 days after shipping in the lower 48 \u00b7 14-day returns if undamaged. Buyer pays return shipping.';
+    return 'Free shipping (US). ' + (ready ? 'Ships in 1\u20133 business days.' : 'Ships in 1\u20132 weeks.') +
+      ' Delivery takes 5\u20137 days in the lower 48. 14-day returns if undamaged. Buyer pays return shipping.';
   }
   var memory = null; // used when localStorage is unavailable
   var catalog = null;
@@ -322,16 +322,17 @@
 
       // The same tabs on every shop page, so a visitor can move between the three.
       var tabs = document.getElementById('shop-tabs');
-      [{ slug: '', title: 'All' }].concat(CATS).forEach(function (c) {
+      // The tabs and the intro line belong to the three pages; the /shop landing is just its tiles.
+      if (cat) [{ slug: '', title: 'All' }].concat(CATS).forEach(function (c) {
         var href = '/shop' + (c.slug ? '/' + c.slug : '');
         var a = el('a', { href: href + drafts, text: c.title });
         if (path === href) a.setAttribute('aria-current', 'page');
         tabs.append(a);
       });
-      tabs.hidden = false;
+      tabs.hidden = !cat;
 
-      // The header link for this page: Wallets for Made to Order, Belts for Belts, Shop otherwise.
-      var navHref = cat && cat.slug === 'made-to-order' ? '/shop/made-to-order' : cat && cat.slug === 'belts' ? '/shop/belts' : '/shop';
+      // The header link for this page: Belts for Belts, Shop for everything else.
+      var navHref = cat && cat.slug === 'belts' ? '/shop/belts' : '/shop';
       document.querySelectorAll('.site-nav a').forEach(function (a) { a.removeAttribute('aria-current'); });
       var cur = [].filter.call(document.querySelectorAll('.site-nav a'), function (a) { return a.getAttribute('href') === navHref; })[0];
       if (cur) cur.setAttribute('aria-current', 'page');
@@ -340,6 +341,7 @@
         document.title = cat.title + ' \u2014 Traders Point Leather';
         document.getElementById('shop-title').textContent = cat.title;
         document.getElementById('shop-lede').textContent = cat.lede;
+        document.getElementById('shop-lede').hidden = false;
       }
 
       catalogPromise.then(function (c) {

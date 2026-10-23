@@ -73,7 +73,7 @@
         "item": {
           "@type": "Product",
           "name": "Bifold Wallet",
-          "description": "4 card slots and 2 pockets for extra cards and folded cash. Full-grain leather, saddle-stitched by hand with bonded nylon or polyester thread. Available in multiple colors.",
+          "description": "4 card slots and 2 pockets for extra cards and folded cash. Full-grain leather, saddle-stitched by hand with bonded nylon or polyester thread. Choose your leather and color.",
           "image": [
             "https://traderspointleather.com/IMG_2045.jpeg",
             "https://traderspointleather.com/IMG_2302.jpeg",
@@ -86,7 +86,7 @@
           "offers": {
             "@type": "AggregateOffer",
             "url": "https://traderspointleather.com/shop/made-to-order",
-            "lowPrice": "115.00",
+            "lowPrice": "125.00",
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock",
             "seller": { "@type": "Organization", "name": "Traders Point Leather" }
@@ -231,14 +231,14 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* Pinned to the bottom so the cue is always exactly 64px above the Process section; any spare
+     height falls above the logo. */
+  justify-content: flex-end;
   align-items: center;
   text-align: center;
   position: relative;
-  /* Extra bottom padding reserves the band occupied by .scroll-hint, which is
-     absolutely positioned and so takes no part in this flex layout. Without it,
-     centred content grows downward into the hint instead of growing the hero. */
-  padding: 5rem 2rem 8rem;
+  /* The bottom padding is the 64px between "Explore the craft" and the Process section. */
+  padding: 5rem 2rem 4rem;
   overflow: hidden;
 }
 .hero::before {
@@ -310,6 +310,11 @@ body {
   opacity: 0;
   animation: fadeUp 1s 1.1s forwards;
 }
+.hero-shop {
+  margin-top: 1.75rem;
+  opacity: 0;
+  animation: fadeUp 1s 1.2s forwards;
+}
 .hero-feature img {
   /* A fixed 7:3 window, as wide as the height cap allows, so every screen shows the same part of
      the photo. In the 840x756 source the "Traders Point Leather" stamp starts near y=330 and the
@@ -333,10 +338,8 @@ body {
    the stagger — the pause before someone decides the page has ended is the one
    moment the cue has to exist. Resting appearance is unchanged. */
 .scroll-hint {
-  position: absolute;
-  bottom: 2rem;
-  left: 0;
-  right: 0;
+  /* In the flow, 40px under the Shop button; the hero's bottom padding gives the 64px below. */
+  margin-top: 40px;
   display: block;
   text-align: center;
   text-decoration: none;
@@ -744,6 +747,8 @@ body {
   padding: 0 2rem 6rem;
   text-align: center;
 }
+.inline-link { color: var(--tan); text-decoration: underline; text-underline-offset: 3px; }
+.inline-link:hover { color: var(--tan-light); }
 .path-img { display: block; width: 100%; height: 220px; object-fit: cover; border-radius: 4px; margin-bottom: 1.25rem; }
 .path h3 {
   font-family: 'Playfair Display', serif;
@@ -830,10 +835,8 @@ body::after {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
-  /* Centred rather than top-aligned: without the shop button the hero content
-     is short enough to centre without overflowing, and top-aligning it would
-     leave a dead band above the pinned scroll hint. */
-  .hero { padding-top: 5rem; justify-content: center; padding-bottom: 8rem; }
+  /* Bottom padding is the 64px under the cue; the base rule pins the content to the bottom. */
+  .hero { padding-top: 5rem; padding-bottom: 4rem; }
   .hero-logo { width: 90px; height: 90px; margin-bottom: 1.5rem; }
   .pillars { grid-template-columns: 1fr; }
   .pillar { padding: 3rem 2rem; }
@@ -869,7 +872,7 @@ body::after {
      give up what a 1440px monitor can spend. Written as clamps rather than a
      ladder of height breakpoints so it scales continuously — measured, the peek
      holds from 740px of viewport height upwards. */
-  .hero { min-height: 88vh; padding-bottom: clamp(5.5rem, 12vh, 7.5rem); }
+  .hero { min-height: 88vh; }
   .hero-logo {
     width: clamp(88px, 13vh, 140px);
     height: clamp(88px, 13vh, 140px);
@@ -882,7 +885,6 @@ body::after {
   /* Wider, not taller: height is the one dimension the peek cannot spare, so this only raises the
      height budget a little for large screens. The base 22vh stays as written for the small phone. */
   .hero-feature { --hero-h: clamp(210px, 36vh, 540px); margin-top: clamp(1.25rem, 3vh, 2.5rem); max-width: 1300px; }
-  .scroll-hint { bottom: clamp(1.25rem, 2.4vh, 2rem); }
   .scroll-hint span { height: clamp(28px, 4.4vh, 40px); }
 
   /* A sliver of empty padding tells nobody anything, so the top padding comes
@@ -939,6 +941,7 @@ body::after {
   .hero-divider,
   .hero-sub,
   .hero-feature,
+  .hero-shop,
   .scroll-hint {
     animation: none;
     opacity: 1;
@@ -1010,6 +1013,7 @@ body::after {
   <div class="hero-feature">
     <img src="hero-horween.jpg" alt="Open bifold wallet in Horween leather beside a brass Famous Horween Leathers tag" width="840" height="756">
   </div>
+  <a class="btn-shop hero-shop" href="/shop" data-shop-only hidden>Shop</a>
   <a class="scroll-hint" href="#craft">
     <p class="scroll-hint-text">Explore the craft</p>
     <span></span>
@@ -1091,7 +1095,7 @@ body::after {
 <!-- PRODUCTS -->
 <section class="products reveal" id="products">
   <p class="section-label">What We Make</p>
-  <h2>Everyday Carry, Elevated</h2>
+  <h2>Wallets and Belts</h2>
   <div class="product-cards">
     <a href="/shop/made-to-order" data-etsy="https://www.etsy.com/shop/TradersPointLeather?ref=shop_profile&listing_id=4401934583&section_id=58176763" class="product-card">
       <div class="product-card-img">
@@ -1099,8 +1103,8 @@ body::after {
       </div>
       <div class="product-card-body">
         <h3>Bifold Wallets</h3>
-        <p>4 card slots and 2 pockets for extra cards and folded cash. Full-grain leather, saddle-stitched by hand with bonded nylon or polyester thread. Available in multiple colors.</p>
-        <p class="card-price">From $115</p>
+        <p>4 card slots and 2 pockets for extra cards and folded cash. Full-grain leather, saddle-stitched by hand with bonded nylon or polyester thread. Choose your leather and color.</p>
+        <p class="card-price">From $125</p>
         <span class="card-cta">Shop Wallets &rarr;</span>
       </div>
     </a>
@@ -1161,7 +1165,7 @@ body::after {
   <div class="path">
     <img class="path-img" src="designer-preview.jpg" alt="The wallet designer showing a cognac bifold with sunflower and navy pockets" loading="lazy" width="1318" height="634">
     <h3>Made your way</h3>
-    <p>Our standard designs, built after you order. Or design your own.</p>
+    <p>Our standard designs, built after you order. Or <a href="/design.html" class="inline-link">design your own</a>.</p>
     <a href="/shop/made-to-order" class="link-secondary" data-shop-only hidden>Made to Order &rarr;</a>
   </div>
 </section>

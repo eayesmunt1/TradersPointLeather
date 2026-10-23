@@ -52,7 +52,9 @@ export function shape(price) {
       ["Thread", m.thread],
       ["Hardware", m.hardware],
       ["Features", m.features],
-    ].filter(([, v]) => v),
+    ]
+      .map(([k, v]) => [k, String(v ?? "").trim()])
+      .filter(([, v]) => v), // a blank spec value never makes a row
     leather: m.leather || "",
     etsyListing: m.etsy_listing || "",
     oneOfAKind: m.one_of_a_kind === "true",

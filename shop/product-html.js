@@ -8,9 +8,9 @@ export const CONTACT = "customer-support@traderspointleather.com";
 export const mtoMessage = (p) => `I'd like a ${p.name} built to order. It shows as sold.`;
 // Ready to Ship pieces (section=ready in Stripe) ship in 1-3 business days; Made to Order in 1-2 weeks.
 export const shipLine = (ready) =>
-  "Free shipping (US) \u00b7 " +
-  (ready ? "Ready to ship: ships in 1\u20133 business days" : "Ships in 1\u20132 weeks") +
-  ", arrives 5\u20137 days after shipping in the lower 48 \u00b7 14-day returns if undamaged. Buyer pays return shipping.";
+  "Free shipping (US). " +
+  (ready ? "Ships in 1\u20133 business days." : "Ships in 1\u20132 weeks.") +
+  " Delivery takes 5\u20137 days in the lower 48. 14-day returns if undamaged. Buyer pays return shipping.";
 
 function select(id, label, list) {
   return `<div class="field"><label for="${id}">${esc(label)}</label>
@@ -56,7 +56,7 @@ export function productHtml(p, { photos: allPhotos = [], monogram = null } = {})
       ? `<div class="field"><label for="opt-sizeText">${esc(p.sizeInput.label)}</label><input id="opt-sizeText" name="sizeText" type="text" required maxlength="${p.sizeInput.max || 20}" autocomplete="off"></div>`
       : "",
     p.monogram && monogram
-      ? `<div class="field"><label for="initials">Monogram initials (optional, +${money(monogram.amount)})</label><input id="initials" name="initials" type="text" maxlength="4" pattern="[A-Za-z]{1,4}" autocomplete="off"><p class="hint">Up to 4 letters.</p></div>`
+      ? `<div class="field"><label for="initials">Initials (optional, +${money(monogram.amount)})</label><input id="initials" name="initials" type="text" maxlength="4" pattern="[A-Za-z]{1,4}" autocomplete="off"><p class="hint">Up to 4 letters.</p></div>`
       : "",
     cap > 1
       ? `<div class="field"><label for="qty">Quantity</label><select id="qty" name="qty">${Array.from({ length: cap }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join("")}</select></div>`
@@ -84,7 +84,7 @@ export function productHtml(p, { photos: allPhotos = [], monogram = null } = {})
     </form>
     <noscript><p class="hint">Without JavaScript this button goes straight to checkout for this item.</p></noscript>`
     }
-    ${ready ? "" : `<p class="hint">Want something different? <a href="/design">Open the designer</a>.</p>`}
+    ${ready || p.type !== "wallet" ? "" : `<p class="hint">Want something different? <a href="/design">Open the designer</a>.</p>`}
     <p class="terms">${esc(shipLine(ready))}</p>
   </div>
 </div>`;

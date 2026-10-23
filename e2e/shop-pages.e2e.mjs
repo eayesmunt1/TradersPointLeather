@@ -26,6 +26,9 @@ test("/shop is a landing page with one tile for each of the three pages", async 
   assert.deepEqual(tiles.map((t) => t.href), ["/shop/ready-to-ship", "/shop/made-to-order", "/shop/belts"]);
   assert.deepEqual(tiles.map((t) => t.name), ["Ready to Ship", "Made to Order", "Belts"]);
   assert.equal(await page.textContent("#shop-title"), "Shop");
+  // Just the tiles: no intro line and no tabs on the landing page.
+  assert.equal(await page.locator("#shop-lede").isVisible(), false);
+  assert.equal(await page.locator("#shop-tabs").isVisible(), false);
   assert.deepEqual(errors, []);
   await ctx.close();
 });
@@ -70,7 +73,9 @@ test("the tabs and the header move between the pages and mark where you are", as
   await page.click('#shop-tabs a:has-text("Made to Order")');
   await page.waitForURL(/\/shop\/made-to-order$/);
   await page.waitForSelector("#listing .grid");
-  assert.equal(await page.getAttribute('.site-nav a[href="/shop/made-to-order"]', "aria-current"), "page");
+  // Made to Order highlights Shop, not Wallets.
+  assert.equal(await page.getAttribute('.site-nav a[href="/shop"]', "aria-current"), "page");
+  assert.equal(await page.getAttribute('.site-nav a[href="/shop/made-to-order"]', "aria-current"), null);
   await ctx.close();
 });
 
