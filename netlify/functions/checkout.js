@@ -199,7 +199,7 @@ export async function handler(event) {
       // Stripe's minimum lifetime is 30 minutes; a minute of slack keeps the request valid.
       expires_at: now + 31 * 60,
       success_url: `${origin}/order/thanks?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/cart`,
+      cancel_url: build ? `${origin}/design.html` : `${origin}/cart`,
       ...(process.env.STRIPE_TAX === "true" ? { automatic_tax: { enabled: true } } : {}),
       // Managed Payments is off for this shop: accounts with it on by default reject our shipping
       // address collection and line items with no product tax code. Set STRIPE_MANAGED_PAYMENTS=true

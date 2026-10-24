@@ -301,6 +301,14 @@ test("the order summary reads the shipping address and shows names with choices"
   assert.deepEqual(o.details, ["GV1 — Snap: Double Snap · Initials: EY"]);
 });
 
+test("the order summary says whether everything was Ready to Ship", async () => {
+  const rate = (display_name) => ({ ...paidSession, shipping_cost: { shipping_rate: { display_name } } });
+  stubStripe({ "GET /checkout/sessions/cs_test_abc123": rate("Free shipping · ships in 1-3 business days") });
+  assert.equal(JSON.parse((await orderHandler({ queryStringParameters: { session_id: "cs_test_abc123" } })).body).readyToShip, true);
+  stubStripe({ "GET /checkout/sessions/cs_test_abc123": rate("Free shipping · ships in 1-2 weeks") });
+  assert.equal(JSON.parse((await orderHandler({ queryStringParameters: { session_id: "cs_test_abc123" } })).body).readyToShip, false);
+});
+
 test("the owner email carries the shipping address and the oversold line", async () => {
   process.env.RESEND_API_KEY = "re_stub";
   process.env.ORDER_EMAIL_FROM = "shop@example.com";

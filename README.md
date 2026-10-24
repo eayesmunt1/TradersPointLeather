@@ -28,6 +28,8 @@ product names on display, since every piece is made to order by default. The `mo
 product is the $10 add-on. Stripe sandbox and live are separate catalogs: use the sandbox key
 until launch, then recreate the catalog in live mode.
 
+**Launch checklist:** in the live Stripe dashboard register the webhook (endpoint `https://<site>/api/stripe-webhook`, event `checkout.session.completed`) and put its `whsec_...` in Netlify as `STRIPE_WEBHOOK_SECRET`. Without it, stock never drops in production.
+
 ### Photos
 
 `img/<slug>/` holds web-sized photos from the owner's TPL-photos folder; `img/manifest.json` maps each

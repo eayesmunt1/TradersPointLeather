@@ -1756,7 +1756,7 @@ function buildSpec() {
   // proportional font would tear any column alignment apart.
   const rows = TARGETS.map((t) => {
     const l = byId(LEATHERS, state[t.key]);
-    return `${t.label}: ${l.line} ${l.name}`;
+    return `${t.label}: ${l.name}`; // the Leather row below names the line once
   });
   rows.unshift(`Leather: ${LEATHER_LINES.find((l) => l.id === state.family).line}`);
   rows.push(`Stitching: ${byId(THREADS, state.thread).name}`);

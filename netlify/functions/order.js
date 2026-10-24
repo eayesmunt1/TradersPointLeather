@@ -5,7 +5,7 @@ export async function handler(event) {
   const id = event.queryStringParameters?.session_id || "";
   if (!/^cs_(test|live)_[A-Za-z0-9]+$/.test(id)) return json(400, { error: "Invalid session." });
   try {
-    const s = await stripe("GET", `/checkout/sessions/${id}`, { expand: ["line_items.data.price.product"] });
+    const s = await stripe("GET", `/checkout/sessions/${id}`, { expand: ["line_items.data.price.product", "shipping_cost.shipping_rate"] });
     if (s.payment_status !== "paid") return json(200, { paid: false });
     const ship = shippingOf(s);
     const addr = ship?.address || {};
@@ -24,6 +24,8 @@ export async function handler(event) {
           const choices = l.price?.product?.description;
           return `${l.description}${l.quantity > 1 ? ` x${l.quantity}` : ""}${choices ? ` \u2014 ${choices}` : ""}`;
         }),
+        // The shipping rate carries the promise made at checkout: 1-3 business days when everything was Ready to Ship.
+        readyToShip: /1-3 business days/.test(s.shipping_cost?.shipping_rate?.display_name || ""),
         total: s.amount_total,
         currency: s.currency,
         shipTo: ship

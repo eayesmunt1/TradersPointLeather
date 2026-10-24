@@ -140,9 +140,9 @@ test("the build spec and code say what was chosen", async () => {
   await pick(page, "exterior", "plum");
   await pick(page, "interior", "ink");
   const spec = await page.evaluate(() => buildSpec());
-  assert.match(spec, /Outside: Horween Cavalier Plum/);
-  assert.match(spec, /Inside: Horween Cavalier Ink Blue/);
-  assert.match(spec, /Upper Card Pockets: Horween Cavalier Plum/);
+  assert.match(spec, /Leather: Horween Cavalier\nOutside: Plum/);
+  assert.match(spec, /Inside: Ink Blue/);
+  assert.match(spec, /Upper Card Pockets: Plum/);
   const code = await page.evaluate(() => buildCode());
   assert.match(code, /EXT:plum \/ INT:ink \/ PU:plum \/ PL:plum/);
   await ctx.close();
