@@ -667,7 +667,7 @@ body { padding-top: 64px; }
         <a class="btn-shop" data-buy href="https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00" aria-describedby="send-note-side">Buy — $145</a>
         <a class="btn-shop btn-ghost" data-send href="#" aria-describedby="send-note-side">Discuss Your Build</a>
       </div>
-      <span class="spec-note" id="send-note-side">$145, every option included. Secure checkout by Stripe.</span>
+      <span class="spec-note" id="send-note-side">$145. Initials +$10. Secure checkout by Stripe.</span>
     </div>
   </div>
 
@@ -697,7 +697,7 @@ body { padding-top: 64px; }
     <a class="btn-shop" data-buy href="https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00" aria-describedby="send-note-bar">Buy — $145</a>
     <a class="btn-shop btn-ghost" data-send href="#" aria-describedby="send-note-bar">Discuss Your Build</a>
   </div>
-  <span class="spec-note" id="send-note-bar">$145, every option included. Secure checkout by Stripe.</span>
+  <span class="spec-note" id="send-note-bar">$145. Initials +$10. Secure checkout by Stripe.</span>
 </div>
 
 <!-- REAL PIECES -->
@@ -856,6 +856,7 @@ const STASH = [
    may appear. Both are stamping limits rather than screen ones: four letters is
    what fits in the corner at a size worth pressing, and a third repeat of the
    same letter almost always means a typo rather than a name. */
+const INITIALS_PRICE = 10;
 const MONOGRAM_MAX = 4;
 const MONOGRAM_MAX_REPEAT = 2;
 
@@ -1408,6 +1409,7 @@ const MODELS = {
     code: 'TPL-CB',
     price: 145,
     buyUrl: 'https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00',
+    buyUrlInitials: '', // Payment Link for this style at price + initials; until it is set, a build with initials goes through Discuss Your Build.
     geo: CLASSIC_GEO,
     offersStash: true,
     closed: walletClosed,
@@ -1419,6 +1421,7 @@ const MODELS = {
     code: 'TPL-BF',
     price: 145,
     buyUrl: 'https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00',
+    buyUrlInitials: '', // Payment Link for this style at price + initials; until it is set, a build with initials goes through Discuss Your Build.
     geo: VERTICAL_GEO,
     closed: walletClosed,
     open: walletOpen,
@@ -1546,12 +1549,16 @@ function render() {
   const href = buildMailtoHref();
   sendBtns.forEach((a) => { a.href = href; });
   // Each style has its own price and Payment Link; a style without a link yet cannot be bought here.
-  const canBuy = !!m.buyUrl;
+  // Initials are +$10, so a build with them needs its own Payment Link at the higher price.
+  const withInitials = !!state.monogram, price = m.price + (withInitials ? INITIALS_PRICE : 0);
+  const buyUrl = withInitials ? m.buyUrlInitials : m.buyUrl;
+  const canBuy = !!buyUrl;
   const buy = canBuy ? buildBuyHref() : '#';
-  buyBtns.forEach((a) => { a.hidden = !canBuy; a.href = buy; a.textContent = `Buy \u2014 $${m.price}`; });
+  buyBtns.forEach((a) => { a.hidden = !canBuy; a.href = buy; a.textContent = `Buy \u2014 $${price}`; });
   document.querySelectorAll('[id^="send-note"]').forEach((n) => {
-    n.textContent = canBuy ? `$${m.price}, every option included. Secure checkout by Stripe.`
-                           : `$${m.price}, every option included. Use Discuss Your Build to order this style.`;
+    n.textContent = canBuy
+      ? (withInitials ? `$${m.price} + Initials (+$${INITIALS_PRICE}) = $${price}. Secure checkout by Stripe.` : `$${m.price}. Initials +$${INITIALS_PRICE}. Secure checkout by Stripe.`)
+      : `$${price}${withInitials ? ` with initials (+$${INITIALS_PRICE})` : ''}. Use Discuss Your Build to order this style.`;
   });
 }
 
@@ -1799,7 +1806,8 @@ function buildMailtoHref() {
 function buildBuyHref() {
   const ref = buildCode().replace(/ \/ /g, '__').replace(/:/g, '-')
     .replace(/[^A-Za-z0-9_-]/g, '').slice(0, 200);
-  return `${currentModel().buyUrl}?client_reference_id=${ref}`;
+  const m = currentModel();
+  return `${state.monogram ? m.buyUrlInitials : m.buyUrl}?client_reference_id=${ref}`;
 }
 
 /* ── View toggle ────────────────────────────────────────────────────── */

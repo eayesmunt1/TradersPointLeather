@@ -147,3 +147,20 @@ test("the build spec and code say what was chosen", async () => {
   assert.match(code, /EXT:plum \/ INT:ink \/ PU:plum \/ PL:plum/);
   await ctx.close();
 });
+
+test("initials add $10 to the price, and are never sold at the $145 link", async () => {
+  const { page, ctx, errors } = await open();
+  const buy = page.locator("a[data-buy]:visible").first();
+  assert.equal((await buy.textContent()).trim(), "Buy — $145");
+  assert.match(await page.textContent("#send-note-side"), /\$145\. Initials \+\$10/);
+  await page.fill("#monogram", "ABC");
+  const note = await page.textContent("#send-note-side");
+  assert.match(note, /\$145 \+ Initials \(\+\$10\) = \$155|\$155 with initials/);
+  // With no initials-price link configured yet, the $145 Buy button must not be offered.
+  const shown = await page.$$eval("a[data-buy]", (as) => as.filter((a) => a.getClientRects().length).map((a) => a.textContent.trim()));
+  assert.ok(shown.length === 0 || shown.every((t) => t === "Buy — $155"), `buy buttons: ${shown}`);
+  await page.fill("#monogram", "");
+  assert.equal((await page.locator("a[data-buy]:visible").first().textContent()).trim(), "Buy — $145");
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
