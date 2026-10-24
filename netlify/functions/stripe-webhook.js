@@ -20,6 +20,7 @@ async function applyInventory(items) {
   const left = new Map(); // slug -> stock after the lines handled so far
   const oversold = [];
   for (const it of items) {
+    if (it.slug.startsWith("designer-")) continue; // a custom build: nothing in stock to count
     const product = catalog.get(it.slug);
     if (!product) {
       oversold.push(`${it.slug} x${it.qty} (no longer listed)`);

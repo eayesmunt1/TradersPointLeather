@@ -148,19 +148,26 @@ test("the build spec and code say what was chosen", async () => {
   await ctx.close();
 });
 
-test("initials add $10 to the price, and are never sold at the $145 link", async () => {
+test("Buy posts the build to /api/checkout, and initials add a $10 line without changing the style", async () => {
   const { page, ctx, errors } = await open();
+  const posts = [];
+  await page.route("**/api/checkout", (route) => { posts.push(JSON.parse(route.request().postData())); route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ error: "stub" }) }); });
+  page.on("dialog", (d) => d.dismiss());
   const buy = page.locator("a[data-buy]:visible").first();
-  assert.equal((await buy.textContent()).trim(), "Buy — $145");
+  assert.equal((await buy.textContent()).trim(), "Buy \u2014 $145");
   assert.match(await page.textContent("#send-note-side"), /\$145\. Initials \+\$10/);
   await page.fill("#monogram", "ABC");
-  const note = await page.textContent("#send-note-side");
-  assert.match(note, /\$145 \+ Initials \(\+\$10\) = \$155|\$155 with initials/);
-  // With no initials-price link configured yet, the $145 Buy button must not be offered.
-  const shown = await page.$$eval("a[data-buy]", (as) => as.filter((a) => a.getClientRects().length).map((a) => a.textContent.trim()));
-  assert.ok(shown.length === 0 || shown.every((t) => t === "Buy — $155"), `buy buttons: ${shown}`);
+  assert.equal((await buy.textContent()).trim(), "Buy \u2014 $155");
+  assert.match(await page.textContent("#send-note-side"), /\$145 \+ Initials \(\+\$10\) = \$155/);
+  await buy.click();
+  await page.waitForTimeout(300);
+  assert.equal(posts.length, 1);
+  assert.equal(posts[0].build.model, "classic");
+  assert.equal(posts[0].build.initials, "ABC");
+  assert.match(posts[0].build.spec, /Initials: ABC/);
+  assert.equal(JSON.stringify(posts[0]).includes("amount"), false, "the request carries no price");
   await page.fill("#monogram", "");
-  assert.equal((await page.locator("a[data-buy]:visible").first().textContent()).trim(), "Buy — $145");
+  assert.equal((await page.locator("a[data-buy]:visible").first().textContent()).trim(), "Buy \u2014 $145");
   assert.deepEqual(errors, []);
   await ctx.close();
 });

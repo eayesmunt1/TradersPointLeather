@@ -76,3 +76,5 @@ serves the home page and the designer but not `/shop` or `/api/*`.
 ### Local testing
 
 Install the Netlify and Stripe CLIs, then `netlify dev` and `stripe listen --forward-to localhost:8888/api/stripe-webhook`. Test card `4242 4242 4242 4242`.
+
+Without the Stripe CLI, set `STRIPE_WEBHOOK_SECRET=whsec_local_dev` in `.env` and, after a paid test order, run `STRIPE_WEBHOOK_SECRET=whsec_local_dev node scripts/replay-webhook.mjs cs_test_...` (the session id is in the thank-you page URL). It sends the signed event the webhook expects, so stock drops and the owner email goes out as in production.

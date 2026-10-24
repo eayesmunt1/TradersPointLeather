@@ -73,6 +73,30 @@ test("every session opts out of Managed Payments unless STRIPE_MANAGED_PAYMENTS=
   }
 });
 
+test("a designer build is one $145 line plus a $10 initials line, priced on the server", async () => {
+  stubStripe();
+  const build = { model: "classic", spec: "TITLE\nClassic Bifold \u2014 x\nExterior: Horween Whiskey\nInitials: ABC\n\nBuild code: TPL-CB", code: "TPL-CB / EXT:whiskey / MON:abc", initials: "abc", amount: 1 };
+  const res = await checkout({ httpMethod: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ build }) });
+  assert.equal(res.statusCode, 200);
+  const s = session();
+  assert.equal(s["line_items[0][price_data][unit_amount]"], "14500");
+  assert.match(s["line_items[0][price_data][product_data][name]"], /Custom wallet/);
+  assert.match(s["line_items[0][price_data][product_data][description]"], /Exterior: Horween Whiskey/);
+  assert.equal(s["line_items[1][price_data][unit_amount]"], "1000");
+  assert.equal(s["line_items[1][price_data][product_data][name]"], "Initials for custom wallet");
+  assert.match(s["metadata[item_1]"], /^designer-classic x1/);
+  assert.equal(s["managed_payments[enabled]"], "false");
+  stubStripe();
+  assert.equal((await checkout({ httpMethod: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ build: { model: "bogus" } }) })).statusCode, 400);
+});
+
+test("an initials line is named Initials, not Monogram", async () => {
+  stubStripe();
+  await order([{ slug: "cygnet", qty: 1, initials: "ey", options: {} }]);
+  assert.equal(session()["line_items[1][price_data][product_data][name]"], "Initials for CygnetV2 Cavalier");
+  assert.equal(session()["line_items[1][price_data][product_data][description]"], undefined);
+});
+
 test("a sold-out piece is refused", async () => {
   stubStripe();
   const res = await order([{ slug: "gone", qty: 1, options: {} }]);

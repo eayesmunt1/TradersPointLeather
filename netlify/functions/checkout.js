@@ -4,6 +4,9 @@ import { json, stripe } from "../lib/stripe.js";
 const MAX_LINES = 20;
 const clean = (v, n = 40) => String(v ?? "").replace(/[\r\n]+/g, " ").trim().slice(0, n);
 
+// The designer's styles and their price. Money is decided here, never read from the request.
+const DESIGNER = { classic: { name: "Classic Bifold", amount: 14500 }, vertical: { name: "Vertical Bifold", amount: 14500 } };
+
 // Builds a Stripe Checkout Session from {slug, qty, options, initials} entries.
 // Prices are looked up here from Stripe; nothing about money is read from the request.
 export async function handler(event) {
@@ -23,18 +26,22 @@ export async function handler(event) {
             body: `<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>Checkout</title><body style="font-family:sans-serif;padding:2rem"><p>${String(body.error).replace(/</g, "&lt;")}</p><p><a href="javascript:history.back()">Go back</a></p>`,
           };
 
-  let items;
+  let items, build = null;
   try {
     if (isForm) {
       const f = Object.fromEntries(new URLSearchParams(event.isBase64Encoded ? Buffer.from(event.body, "base64").toString() : event.body));
       items = [{ slug: f.slug, qty: Number(f.qty || 1), initials: f.initials, options: f }];
     } else {
-      items = JSON.parse(event.body || "{}").items;
+      const body = JSON.parse(event.body || "{}");
+      items = body.items;
+      // The designer posts one custom build instead of cart items.
+      if (body.build) { build = body.build; items = []; }
     }
   } catch {
     return reply(400, { error: "Invalid request." });
   }
-  if (!Array.isArray(items) || !items.length || items.length > MAX_LINES) {
+  if (build && !DESIGNER[build.model]) return reply(400, { error: "That wallet style is not available." });
+  if (!Array.isArray(items) || (!build && !items.length) || items.length > MAX_LINES) {
     return reply(400, { error: "Your cart is empty or too large." });
   }
 
@@ -95,7 +102,7 @@ export async function handler(event) {
 
     const initials = clean(raw.initials, 4).toUpperCase();
     if (initials && (!product.monogram || !/^[A-Z]{1,4}$/.test(initials))) {
-      problems.push(`${product.name}: monogram initials must be 1 to 4 letters.`);
+      problems.push(`${product.name}: initials must be 1 to 4 letters.`);
       return;
     }
 
@@ -125,7 +132,7 @@ export async function handler(event) {
     if (initials) {
       const mono = catalog.get("monogram");
       if (!mono) {
-        problems.push("Monogramming is unavailable right now.");
+        problems.push("Initials are unavailable right now.");
         return;
       }
       lineItems.push({
@@ -133,7 +140,7 @@ export async function handler(event) {
         price_data: {
           currency: mono.currency,
           unit_amount: mono.amount,
-          product_data: { name: `Monogram for ${product.name}`, description: `Initials: ${initials}` },
+          product_data: { name: `Initials for ${product.name}` },
         },
       });
     }
@@ -141,10 +148,34 @@ export async function handler(event) {
     metadata[`item_${i + 1}`] = `${slug} x${qty}${description ? ` | ${description}` : ""}`.slice(0, 500);
   });
 
+  if (build) {
+    const style = DESIGNER[build.model];
+    const initials = clean(build.initials, 8).toUpperCase();
+    if (initials && !/^[A-Z]{1,4}$/.test(initials)) problems.push("Initials must be 1 to 4 letters.");
+    // The spec rows the customer chose, one line, with the title lines dropped.
+    const rows = String(build.spec ?? "").split(/\r?\n/).slice(2).map((r) => clean(r, 120)).filter((r) => r && !/^Build code:/.test(r));
+    const code = clean(build.code, 200);
+    const description = rows.join(" · ").slice(0, 480);
+    lineItems.push({
+      quantity: 1,
+      price_data: {
+        currency: "usd",
+        unit_amount: style.amount,
+        product_data: { name: `Custom wallet \u2014 ${style.name}`, ...(description ? { description } : {}) },
+      },
+    });
+    if (initials) {
+      const mono = catalog.get("monogram");
+      if (!mono) problems.push("Initials are unavailable right now.");
+      else lineItems.push({ quantity: 1, price_data: { currency: mono.currency, unit_amount: mono.amount, product_data: { name: "Initials for custom wallet" } } });
+    }
+    metadata.item_1 = `designer-${build.model} x1 | ${code}${initials ? ` | Initials: ${initials}` : ""}`.slice(0, 500);
+  }
+
   if (problems.length) return reply(400, { error: [...new Set(problems)].join(" ") });
 
   // 1-2 weeks to ship unless every piece is Ready to Ship (section=ready); 5-7 days in transit either way.
-  const ready = items.every((raw) => catalog.get(clean(raw?.slug, 80))?.readyToShip);
+  const ready = !build && items.every((raw) => catalog.get(clean(raw?.slug, 80))?.readyToShip);
   const origin = process.env.SITE_URL || process.env.URL || event.headers.origin;
   const now = Math.floor(Date.now() / 1000);
   try {

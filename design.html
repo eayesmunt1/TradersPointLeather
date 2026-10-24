@@ -664,7 +664,7 @@ body { padding-top: 64px; }
 
     <div class="preview-send">
       <div class="send-actions">
-        <a class="btn-shop" data-buy href="https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00" aria-describedby="send-note-side">Buy — $145</a>
+        <a class="btn-shop" data-buy href="#" aria-describedby="send-note-side">Buy — $145</a>
         <a class="btn-shop btn-ghost" data-send href="#" aria-describedby="send-note-side">Discuss Your Build</a>
       </div>
       <span class="spec-note" id="send-note-side">$145. Initials +$10. Secure checkout by Stripe.</span>
@@ -694,7 +694,7 @@ body { padding-top: 64px; }
 
 <div class="send-bar" id="send-bar">
   <div class="send-actions">
-    <a class="btn-shop" data-buy href="https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00" aria-describedby="send-note-bar">Buy — $145</a>
+    <a class="btn-shop" data-buy href="#" aria-describedby="send-note-bar">Buy — $145</a>
     <a class="btn-shop btn-ghost" data-send href="#" aria-describedby="send-note-bar">Discuss Your Build</a>
   </div>
   <span class="spec-note" id="send-note-bar">$145. Initials +$10. Secure checkout by Stripe.</span>
@@ -1415,8 +1415,6 @@ const MODELS = {
     detail: '4 card slots, 2 pockets',
     code: 'TPL-CB',
     price: 145,
-    buyUrl: 'https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00',
-    buyUrlInitials: '', // Payment Link for this style at price + initials; until it is set, a build with initials goes through Discuss Your Build.
     geo: CLASSIC_GEO,
     offersStash: true,
     closed: walletClosed,
@@ -1427,8 +1425,6 @@ const MODELS = {
     detail: '4 card slots, 2 pockets',
     code: 'TPL-BF',
     price: 145,
-    buyUrl: 'https://buy.stripe.com/6oUeVd6rXf8D7fwdwO5Vu00',
-    buyUrlInitials: '', // Payment Link for this style at price + initials; until it is set, a build with initials goes through Discuss Your Build.
     geo: VERTICAL_GEO,
     closed: walletClosed,
     open: walletOpen,
@@ -1556,16 +1552,13 @@ function render() {
   const href = buildMailtoHref();
   sendBtns.forEach((a) => { a.href = href; });
   // Each style has its own price and Payment Link; a style without a link yet cannot be bought here.
-  // Initials are +$10, so a build with them needs its own Payment Link at the higher price.
+  // Checkout is /api/checkout: $145 for the build and, with initials, a $10 line. The server sets the money.
   const withInitials = !!state.monogram, price = m.price + (withInitials ? INITIALS_PRICE : 0);
-  const buyUrl = withInitials ? m.buyUrlInitials : m.buyUrl;
-  const canBuy = !!buyUrl;
-  const buy = canBuy ? buildBuyHref() : '#';
-  buyBtns.forEach((a) => { a.hidden = !canBuy; a.href = buy; a.textContent = `Buy \u2014 $${price}`; });
+  buyBtns.forEach((a) => { a.hidden = false; a.href = '#'; a.textContent = `Buy \u2014 $${price}`; });
   document.querySelectorAll('[id^="send-note"]').forEach((n) => {
-    n.textContent = canBuy
-      ? (withInitials ? `$${m.price} + Initials (+$${INITIALS_PRICE}) = $${price}. Secure checkout by Stripe.` : `$${m.price}. Initials +$${INITIALS_PRICE}. Secure checkout by Stripe.`)
-      : `$${price}${withInitials ? ` with initials (+$${INITIALS_PRICE})` : ''}. Use Discuss Your Build to order this style.`;
+    n.textContent = withInitials
+      ? `$${m.price} + Initials (+$${INITIALS_PRICE}) = $${price}. Secure checkout by Stripe.`
+      : `$${m.price}. Initials +$${INITIALS_PRICE}. Secure checkout by Stripe.`;
   });
 }
 
@@ -1805,17 +1798,30 @@ function buildMailtoHref() {
        + `&body=${encodeURIComponent(body)}`;
 }
 
-/* One flat price per style, so one Stripe Payment Link per style. The build code
-   rides along as the checkout's client_reference_id, which shows on the
-   payment in the Stripe dashboard. Stripe takes only letters, digits, - and _
-   there, up to 200 characters, so the code's separators are swapped:
-     TPL-CB / EXT:whiskey / MON:abc   ->   TPL-CB__EXT-whiskey__MON-abc */
-function buildBuyHref() {
-  const ref = buildCode().replace(/ \/ /g, '__').replace(/:/g, '-')
-    .replace(/[^A-Za-z0-9_-]/g, '').slice(0, 200);
-  const m = currentModel();
-  return `${state.monogram ? m.buyUrlInitials : m.buyUrl}?client_reference_id=${ref}`;
+/* Buy posts the build to /api/checkout, the same Stripe Checkout the cart uses, so the buyer gives
+   a shipping address and the order carries the full spec. The reply is the Checkout URL. */
+let buying = false;
+async function buyBuild(btn) {
+  if (buying) return;
+  buying = true;
+  const label = btn.textContent;
+  document.querySelectorAll('[data-buy]').forEach((a) => { a.textContent = 'One moment\u2026'; });
+  try {
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ build: { model: state.model, spec: buildSpec(), code: buildCode(), initials: state.monogram } }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.url) { window.location.assign(data.url); return; }
+    throw new Error(data.error || 'Could not start checkout.');
+  } catch (e) {
+    alert(e.message + ' You can use Discuss Your Build to order instead.');
+  }
+  buying = false;
+  render();
 }
+buyBtns.forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); buyBuild(a); }));
 
 /* ── View toggle ────────────────────────────────────────────────────── */
 function setView(open) {
