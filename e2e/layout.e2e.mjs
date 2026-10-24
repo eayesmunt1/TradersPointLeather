@@ -124,3 +124,16 @@ test("the designer has the shared header, one buy block and no page errors", asy
     await ctx.close();
   }
 });
+
+test("every shop card image is square on all three category pages", async () => {
+  for (const vp of [{ width: 1280, height: 800 }, { width: 390, height: 844 }]) {
+    for (const path of ["/shop/made-to-order", "/shop/ready-to-ship", "/shop/belts"]) {
+      const { page, ctx } = await open(path, vp);
+      await page.waitForSelector("#listing .grid");
+      await page.waitForTimeout(800);
+      const sizes = await box(page, ".card-img img");
+      assert.ok(sizes.length > 0 && sizes.every((t) => Math.abs(t.w - t.h) <= 1), `${path} at ${vp.width}: ${JSON.stringify(sizes.filter((t) => Math.abs(t.w - t.h) > 1))}`);
+      await ctx.close();
+    }
+  }
+});

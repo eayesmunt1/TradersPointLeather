@@ -304,7 +304,7 @@
         if (ready && p.stock > 1) badges.push('Only ' + p.stock + ' left');
         var ph = photos(p)[0], tileSrc = TILES.indexOf(p.slug) > -1 ? '/img/' + p.slug + '/tile.jpg' : ph && ph.src;
         // "Model in Leather - Color" reads as Model \u00b7 Color over the leather, so the color is never cut off.
-        var m = /^(.+?) in (.+?) - (.+)$/.exec(p.name || ''), title = m ? m[1] + ' \u00b7 ' + m[3] : p.name;
+        var m = /^(.+?) in (.+?)(?: - (.+))?$/.exec(p.name || ''), title = m ? (m[3] ? m[1] + ' \u00b7 ' + m[3] : m[1]) : p.name;
         return el('li', {}, [el('a', { class: 'card', href: '/shop/' + encodeURIComponent(p.slug) + drafts }, [
           el('div', { class: 'card-img' }, [tileSrc ? el('img', { src: tileSrc, alt: '', loading: 'lazy' }) : el('span', { text: 'Photos coming soon' })]),
           badges.length ? el('div', { class: 'badges' }, badges.map(function (b) { return el('span', { class: 'badge', text: b }); })) : null,
