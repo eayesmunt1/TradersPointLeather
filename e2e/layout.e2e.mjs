@@ -139,3 +139,16 @@ test("every shop card image is square on all three category pages", async () => 
     }
   }
 });
+
+test("the empty cart has a Shop button, the three category tiles and the footer; lines use the card naming", async () => {
+  const { page, ctx } = await open("/cart", { width: 390, height: 844 });
+  await page.waitForSelector(".cart-tiles .card");
+  assert.equal(await page.locator(".cart-tiles .card").count(), 3);
+  assert.equal(await page.locator("#cart-page a.btn", { hasText: "Shop" }).count(), 1);
+  assert.equal(await page.locator("footer.site-footer").isVisible(), true);
+  await page.evaluate(() => localStorage.setItem("tpl-cart-v1", JSON.stringify([{ slug: "cygnet-horween-cavalier-sunflower", qty: 1, options: {}, initials: "" }])));
+  await page.reload({ waitUntil: "networkidle" });
+  assert.equal((await page.textContent(".cart-line h3")).trim(), "CygnetV2 · Sunflower");
+  assert.equal((await page.textContent(".cart-line .leather")).trim(), "Horween Cavalier");
+  await ctx.close();
+});

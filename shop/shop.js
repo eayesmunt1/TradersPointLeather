@@ -111,6 +111,44 @@
   function count() { return readCart().reduce(function (n, i) { return n + i.qty; }, 0); }
 
   /* ── rendering ── */
+  // The three pages under /shop. Belts are made to order too, but have a page of their own.
+  var CATS = [
+    { slug: 'ready-to-ship', title: 'Ready to Ship', lede: 'Finished pieces that leave in 1\u20133 business days.',
+      has: function (p) { return p.section === 'ready' && !p.soldOut && p.type !== 'belt'; }, empty: 'Nothing is ready to ship right now. Everything on the Made to Order page is built for you.' },
+    { slug: 'made-to-order', title: 'Made to Order', lede: 'Built after you order, and shipped in 1\u20132 weeks.',
+      has: function (p) { return p.section === 'made' && p.type !== 'belt'; }, empty: 'Nothing here right now.' },
+    { slug: 'belts', title: 'Belts', lede: 'Made to your length after you order, and shipped in 1\u20132 weeks.',
+      has: function (p) { return p.type === 'belt'; }, empty: 'Nothing here right now.' },
+  ];
+
+  // Square card images cropped from the owner's originals, where the first gallery photo crops badly.
+  var TILES = ['gv1-horween-cypress', 'cygnus-shell-cordovan-marbled', 'belt-newbury-latigo-burgundy', 'belt-horween-cxl-raven'];
+  // "Model in Leather - Color" reads as Model \u00b7 Color over the leather, so the color is never cut off.
+  // When the part after " - " is a product type, not a color, lead with the build color and put the type under the leather.
+  function cardName(p) {
+    var m = /^(.+?) in (.+?)(?: - (.+))?$/.exec(p.name || '');
+    if (!m) return { title: p.name, sub: '' };
+    if (m[3] && p.build && p.build.color && /wallet|sleeve|bifold|belt|collar/i.test(m[3])) {
+      return { title: m[1] + ' \u00b7 ' + p.build.color, sub: m[2] + ' \u00b7 ' + m[3].charAt(0) + m[3].slice(1).toLowerCase() };
+    }
+    return { title: m[3] ? m[1] + ' \u00b7 ' + m[3] : m[1], sub: m[2] };
+  }
+  // A tile for a whole category, on the /shop landing page.
+  function tile(c, items) {
+    // Lead with a wallet where there is one, so Made to Order is not introduced by the collar.
+    var lead = items.filter(function (p) { return p.type === 'wallet'; })[0] || items[0];
+    var ph = lead ? photos(lead)[0] : null;
+    return el('li', {}, [el('a', { class: 'card', href: '/shop/' + c.slug + (DRAFTS ? '?drafts=1' : '') }, [
+      el('div', { class: 'card-img' }, [ph ? el('img', { src: ph.src, alt: '', loading: 'lazy' }) : el('span', { text: 'Coming soon' })]),
+      el('div', { class: 'card-body' }, [
+        el('h2', { text: c.title }),
+        el('p', { class: 'leather', text: c.lede }),
+        el('div', { class: 'price', text: items.length + (items.length === 1 ? ' piece' : ' pieces') }),
+      ]),
+    ])]);
+  }
+
+
   function lineTotal(i, p) { return (p.amount + (i.initials && catalog.monogram ? catalog.monogram.amount : 0)) * i.qty; }
 
   function renderCartInto(box, onCheckout) {
@@ -119,7 +157,12 @@
     if (notice) box.append(el('p', { class: 'notice', role: 'status', text: notice }));
     if (!catalog) { box.append(el('p', { class: 'cart-empty', text: 'Loading your cart…' })); return; }
     if (!items.length) {
-      box.append(el('p', { class: 'cart-empty', text: 'Your cart is empty.' }), el('a', { href: '/shop', text: 'Browse the shop' }));
+      box.append(el('p', { class: 'cart-empty', text: 'Your cart is empty.' }), el('a', { class: 'btn btn-shop', href: '/shop', text: 'Shop' }));
+      // The full page also shows the three shop sections; the drawer stays short.
+      if (box.id === 'cart-page') {
+        var all = catalog.products.filter(function (q) { return q.slug !== 'monogram'; });
+        box.append(el('ul', { class: 'grid cart-tiles' }, CATS.map(function (k) { return tile(k, all.filter(k.has)); })));
+      }
       return;
     }
     var ul = el('ul', { class: 'cart-lines' }), subtotal = 0;
@@ -140,7 +183,8 @@
       ul.append(el('li', { class: 'cart-line' }, [
         thumb,
         el('div', {}, [
-          el('h3', { text: p.name }),
+          el('h3', { text: cardName(p).title }),
+          cardName(p).sub ? el('div', { class: 'leather', text: cardName(p).sub }) : null,
           el('div', { class: 'opts', text: optionText(i) }),
           el('div', { class: 'qty' }, [minus, el('output', { 'aria-label': 'Quantity', text: String(i.qty) }), plus, remove]),
         ]),
@@ -285,30 +329,14 @@
       var box = document.getElementById('listing');
       var path = location.pathname.replace(/\/$/, '');
       var drafts = DRAFTS ? '?drafts=1' : '';
-      // The three pages under /shop. Belts are made to order too, but have a page of their own.
-      var CATS = [
-        { slug: 'ready-to-ship', title: 'Ready to Ship', lede: 'Finished pieces that leave in 1\u20133 business days.',
-          has: function (p) { return p.section === 'ready' && !p.soldOut && p.type !== 'belt'; }, empty: 'Nothing is ready to ship right now. Everything on the Made to Order page is built for you.' },
-        { slug: 'made-to-order', title: 'Made to Order', lede: 'Built after you order, and shipped in 1\u20132 weeks.',
-          has: function (p) { return p.section === 'made' && p.type !== 'belt'; }, empty: 'Nothing here right now.' },
-        { slug: 'belts', title: 'Belts', lede: 'Made to your length after you order, and shipped in 1\u20132 weeks.',
-          has: function (p) { return p.type === 'belt'; }, empty: 'Nothing here right now.' },
-      ];
       var cat = CATS.filter(function (c) { return path === '/shop/' + c.slug; })[0] || null;
 
-      // Square card images cropped from the owner's originals, where the first gallery photo crops badly.
-      var TILES = ['gv1-horween-cypress', 'cygnus-shell-cordovan-marbled', 'belt-newbury-latigo-burgundy', 'belt-horween-cxl-raven'];
       function card(p) {
         var ready = p.section === 'ready', badges = [];
         if (p.needsReview) badges.push('Draft');
         if (ready && p.stock > 1) badges.push('Only ' + p.stock + ' left');
         var ph = photos(p)[0], tileSrc = TILES.indexOf(p.slug) > -1 ? '/img/' + p.slug + '/tile.jpg' : ph && ph.src;
-        // "Model in Leather - Color" reads as Model \u00b7 Color over the leather, so the color is never cut off.
-        var m = /^(.+?) in (.+?)(?: - (.+))?$/.exec(p.name || ''), title = m ? (m[3] ? m[1] + ' \u00b7 ' + m[3] : m[1]) : p.name, sub = m && m[2];
-        // When the part after " - " is a product type, not a color, lead with the build color and move the type under the leather.
-        if (m && m[3] && p.build && p.build.color && /wallet|sleeve|bifold|belt|collar/i.test(m[3])) {
-          title = m[1] + ' \u00b7 ' + p.build.color; sub = m[2] + ' \u00b7 ' + m[3].charAt(0) + m[3].slice(1).toLowerCase();
-        }
+        var nm = cardName(p), title = nm.title, sub = nm.sub;
         return el('li', {}, [el('a', { class: 'card', href: '/shop/' + encodeURIComponent(p.slug) + drafts }, [
           el('div', { class: 'card-img' }, [tileSrc ? el('img', { src: tileSrc, alt: '', loading: 'lazy' }) : el('span', { text: 'Photos coming soon' })]),
           badges.length ? el('div', { class: 'badges' }, badges.map(function (b) { return el('span', { class: 'badge', text: b }); })) : null,
@@ -319,21 +347,6 @@
           ]),
         ])]);
       }
-      // A tile for a whole category, on the /shop landing page.
-      function tile(c, items) {
-        // Lead with a wallet where there is one, so Made to Order is not introduced by the collar.
-        var lead = items.filter(function (p) { return p.type === 'wallet'; })[0] || items[0];
-        var ph = lead ? photos(lead)[0] : null;
-        return el('li', {}, [el('a', { class: 'card', href: '/shop/' + c.slug + drafts }, [
-          el('div', { class: 'card-img' }, [ph ? el('img', { src: ph.src, alt: '', loading: 'lazy' }) : el('span', { text: 'Coming soon' })]),
-          el('div', { class: 'card-body' }, [
-            el('h2', { text: c.title }),
-            el('p', { class: 'leather', text: c.lede }),
-            el('div', { class: 'price', text: items.length + (items.length === 1 ? ' piece' : ' pieces') }),
-          ]),
-        ])]);
-      }
-
       // The same tabs on every shop page, so a visitor can move between the three.
       var tabs = document.getElementById('shop-tabs');
       // The tabs and the intro line belong to the three pages; the /shop landing is just its tiles.
