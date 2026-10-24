@@ -161,7 +161,7 @@
       // The full page also shows the three shop sections; the drawer stays short.
       if (box.id === 'cart-page') {
         var all = catalog.products.filter(function (q) { return q.slug !== 'monogram'; });
-        box.append(el('ul', { class: 'grid cart-tiles' }, CATS.map(function (k) { return tile(k, all.filter(k.has)); })));
+        box.append(el('ul', { class: 'grid tiles cart-tiles' }, CATS.map(function (k) { return tile(k, all.filter(k.has)); })));
       }
       return;
     }
@@ -379,7 +379,7 @@
           if (!items.length) { box.append(el('p', { class: 'muted', text: cat.empty })); return; }
           box.append(el('ul', { class: 'grid' }, items.map(card)));
         } else {
-          box.append(el('ul', { class: 'grid' }, CATS.map(function (k) { return tile(k, all.filter(k.has)); })));
+          box.append(el('ul', { class: 'grid tiles' }, CATS.map(function (k) { return tile(k, all.filter(k.has)); })));
         }
       }).catch(function () { box.textContent = 'The shop is unavailable right now. Please try again shortly.'; });
     },

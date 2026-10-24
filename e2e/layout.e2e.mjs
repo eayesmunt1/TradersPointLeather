@@ -152,3 +152,11 @@ test("the empty cart has a Shop button, the three category tiles and the footer;
   assert.equal((await page.textContent(".cart-line .leather")).trim(), "Horween Cavalier");
   await ctx.close();
 });
+
+test("an odd last tile spans both columns on a phone", async () => {
+  const { page, ctx } = await open("/shop", { width: 390, height: 844 });
+  await page.waitForSelector("#listing .grid .card");
+  const [a, , c] = await page.$$eval("#listing .grid > li", (ls) => ls.map((l) => Math.round(l.getBoundingClientRect().width)));
+  assert.ok(c > a * 1.8, `third tile is ${c}px, first is ${a}px`);
+  await ctx.close();
+});

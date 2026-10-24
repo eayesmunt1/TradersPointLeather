@@ -194,3 +194,7 @@ dialog.drawer::backdrop { background: rgba(0,0,0,0.6); }
 .footer-links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; justify-content: center; margin-bottom: 1.2rem; }
 .footer-links a { color: var(--tan); text-decoration: none; }
 .footer-copy { font-size: 0.75rem; }
+@media (max-width: 599px) {
+  .tiles > li:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .tiles > li:last-child:nth-child(odd) .card-img { aspect-ratio: 2 / 1; }
+}
