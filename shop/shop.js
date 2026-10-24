@@ -304,13 +304,17 @@
         if (ready && p.stock > 1) badges.push('Only ' + p.stock + ' left');
         var ph = photos(p)[0], tileSrc = TILES.indexOf(p.slug) > -1 ? '/img/' + p.slug + '/tile.jpg' : ph && ph.src;
         // "Model in Leather - Color" reads as Model \u00b7 Color over the leather, so the color is never cut off.
-        var m = /^(.+?) in (.+?)(?: - (.+))?$/.exec(p.name || ''), title = m ? (m[3] ? m[1] + ' \u00b7 ' + m[3] : m[1]) : p.name;
+        var m = /^(.+?) in (.+?)(?: - (.+))?$/.exec(p.name || ''), title = m ? (m[3] ? m[1] + ' \u00b7 ' + m[3] : m[1]) : p.name, sub = m && m[2];
+        // When the part after " - " is a product type, not a color, lead with the build color and move the type under the leather.
+        if (m && m[3] && p.build && p.build.color && /wallet|sleeve|bifold|belt|collar/i.test(m[3])) {
+          title = m[1] + ' \u00b7 ' + p.build.color; sub = m[2] + ' \u00b7 ' + m[3].charAt(0) + m[3].slice(1).toLowerCase();
+        }
         return el('li', {}, [el('a', { class: 'card', href: '/shop/' + encodeURIComponent(p.slug) + drafts }, [
           el('div', { class: 'card-img' }, [tileSrc ? el('img', { src: tileSrc, alt: '', loading: 'lazy' }) : el('span', { text: 'Photos coming soon' })]),
           badges.length ? el('div', { class: 'badges' }, badges.map(function (b) { return el('span', { class: 'badge', text: b }); })) : null,
           el('div', { class: 'card-body' }, [
             el('h2', { text: title }),
-            m ? el('div', { class: 'leather', text: m[2] }) : null,
+            sub ? el('div', { class: 'leather', text: sub }) : null,
             el('div', { class: 'price', text: money(p.amount) }),
           ]),
         ])]);

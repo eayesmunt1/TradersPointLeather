@@ -110,6 +110,8 @@ test("shop cards split the color from the leather, and prices line up", async ()
   assert.equal(off.length, 1, `prices sit at different heights in their cards: ${off}`);
   const cygnet = await page.$$eval(".card h2", (hs) => hs.map((h) => h.textContent).filter((t) => /^CygnetV2 \u00b7 /.test(t)));
   assert.ok(cygnet.length >= 2, "Cygnet cards lead with the color");
+  const types = await page.$$eval(".card h2", (hs) => hs.map((h) => h.textContent).filter((t) => /Card Sleeve|Minimalist/.test(t)));
+  assert.deepEqual(types, [], "a product type leads a card title");
   await ctx.close();
 });
 
