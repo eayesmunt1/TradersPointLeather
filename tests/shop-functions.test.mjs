@@ -59,15 +59,15 @@ test("a Ready to Ship piece checks out with its ship time", async () => {
   assert.match(session()["shipping_options[0][shipping_rate_data][display_name]"], /1-3 business days/);
 });
 
-test("Managed Payments is left alone unless STRIPE_MANAGED_PAYMENTS=false", async () => {
+test("every session opts out of Managed Payments unless STRIPE_MANAGED_PAYMENTS=true", async () => {
   stubStripe();
   await order([{ slug: "plum", qty: 1, options: {} }]);
-  assert.equal(session()["managed_payments[enabled]"], undefined);
-  process.env.STRIPE_MANAGED_PAYMENTS = "false";
+  assert.equal(session()["managed_payments[enabled]"], "false");
+  process.env.STRIPE_MANAGED_PAYMENTS = "true";
   try {
     stubStripe();
     await order([{ slug: "plum", qty: 1, options: {} }]);
-    assert.equal(session()["managed_payments[enabled]"], "false");
+    assert.equal(session()["managed_payments[enabled]"], undefined);
   } finally {
     delete process.env.STRIPE_MANAGED_PAYMENTS;
   }

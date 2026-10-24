@@ -7,6 +7,12 @@
 # On-site shop. /shop/<slug> is rendered by shop-page.js from the Stripe catalog (404 if unknown).
 # The old shop.html (an Etsy API check page) would otherwise answer /shop.
 [[redirects]]
+  from = "/shop.html"
+  to = "/shop"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/shop"
   to = "/shop/index.html"
   status = 200
