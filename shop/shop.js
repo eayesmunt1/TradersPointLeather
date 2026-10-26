@@ -119,7 +119,7 @@
       has: function (p) { return p.section === 'ready' && !p.soldOut && !isStrap(p); }, empty: 'Nothing is ready to ship right now. Everything on the Made to Order page is built for you.' },
     { slug: 'made-to-order', title: 'Made to Order', lede: 'Built after you order, and shipped in 1\u20132 weeks.',
       has: function (p) { return p.section === 'made' && !isStrap(p); }, empty: 'Nothing here right now.' },
-    { slug: 'belts', title: 'Belts & Collars', lede: 'Made to your length or size after you order, and shipped in 1\u20132 weeks.',
+    { slug: 'belts', title: 'Belts and Dog Collars', lede: 'Made to your length or size after you order, and shipped in 1\u20132 weeks.',
       has: isStrap, empty: 'Nothing here right now.' },
   ];
 

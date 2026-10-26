@@ -24,7 +24,7 @@ test("/shop is a landing page with one tile for each of the three pages", async 
   const { page, ctx, errors } = await open("/shop");
   const tiles = await cards(page);
   assert.deepEqual(tiles.map((t) => t.href), ["/shop/ready-to-ship", "/shop/made-to-order", "/shop/belts"]);
-  assert.deepEqual(tiles.map((t) => t.name), ["Ready to Ship", "Made to Order", "Belts & Collars"]);
+  assert.deepEqual(tiles.map((t) => t.name), ["Ready to Ship", "Made to Order", "Belts and Dog Collars"]);
   assert.equal(await page.textContent("#shop-title"), "Shop");
   // Just the tiles: no intro line and no tabs on the landing page.
   assert.equal(await page.locator("#shop-lede").isVisible(), false);
@@ -56,9 +56,9 @@ test("Made to Order lists the wallets, and no belts or collar", async () => {
   await ctx.close();
 });
 
-test("Belts & Collars has its own page with the belts and the collar only", async () => {
+test("Belts and Dog Collars has its own page with the belts and the collar only", async () => {
   const { page, ctx } = await open("/shop/belts");
-  assert.equal(await page.textContent("#shop-title"), "Belts & Collars");
+  assert.equal(await page.textContent("#shop-title"), "Belts and Dog Collars");
   const slugs = (await cards(page)).map((c) => c.href.replace("/shop/", ""));
   assert.ok(slugs.length > 0);
   assert.ok(slugs.includes("collar-horween-cxl"), "the collar is missing");
@@ -69,7 +69,7 @@ test("Belts & Collars has its own page with the belts and the collar only", asyn
 test("the tabs and the header move between the pages and mark where you are", async () => {
   const { page, ctx } = await open("/shop/belts");
   const tabs = await page.$$eval("#shop-tabs a", (as) => as.map((a) => `${a.textContent}|${a.getAttribute("href")}|${a.getAttribute("aria-current") || ""}`));
-  assert.deepEqual(tabs, ["All|/shop|", "Ready to Ship|/shop/ready-to-ship|", "Made to Order|/shop/made-to-order|", "Belts & Collars|/shop/belts|page"]);
+  assert.deepEqual(tabs, ["All|/shop|", "Ready to Ship|/shop/ready-to-ship|", "Made to Order|/shop/made-to-order|", "Belts and Dog Collars|/shop/belts|page"]);
   assert.equal(await page.getAttribute('.site-nav a[href="/shop/belts"]', "aria-current"), "page");
   await page.click('#shop-tabs a:has-text("Made to Order")');
   await page.waitForURL(/\/shop\/made-to-order$/);
@@ -81,7 +81,7 @@ test("the tabs and the header move between the pages and mark where you are", as
 });
 
 test("a product page links back to its own category", async () => {
-  for (const [slug, href, name] of [["gv1-horween-cypress", "/shop/made-to-order", "Made to Order"], ["belt-horween-cxl-raven", "/shop/belts", "Belts & Collars"], ["collar-horween-cxl", "/shop/belts", "Belts & Collars"], ["cygnet-newbury-balmoral-sunflower", "/shop/ready-to-ship", "Ready to Ship"]]) {
+  for (const [slug, href, name] of [["gv1-horween-cypress", "/shop/made-to-order", "Made to Order"], ["belt-horween-cxl-raven", "/shop/belts", "Belts and Dog Collars"], ["collar-horween-cxl", "/shop/belts", "Belts and Dog Collars"], ["cygnet-newbury-balmoral-sunflower", "/shop/ready-to-ship", "Ready to Ship"]]) {
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
     await page.goto(`${BASE}/shop/${slug}`, { waitUntil: "networkidle" });
