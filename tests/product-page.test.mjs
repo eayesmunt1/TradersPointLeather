@@ -37,7 +37,9 @@ test("wallet pages show a closed size by model, care on everything, and a leathe
   assert.match(leatherNote(cygnet), /Newbury Balmoral is dual-tanned/);
   const gv1 = shape({ id: "p", lookup_key: "g", unit_amount: 6500, currency: "usd", product: { id: "g", name: "GV1 in Horween Cypress - Minimalist Wallet", active: true, description: "", images: [], metadata: { type: "wallet", leather: "Horween Cypress" } } });
   assert.deepEqual(specRows(gv1), [["Care", CARE]]); // no size for GV1 yet
-  assert.equal(leatherNote(gv1), "");
+  assert.match(leatherNote(gv1), /^Horween Cypress in Chestnut is a limited run/);
+  const threaded = shape({ id: "p", lookup_key: "t", unit_amount: 1, currency: "usd", product: { id: "t", name: "CygnetV2 in X", active: true, description: "", images: [], metadata: { type: "wallet", thread: "Ritza Tiger" } } });
+  assert.ok(!specRows(threaded).some(([k]) => k === "Thread"), "no thread row");
   const own = shape({ id: "p", lookup_key: "s", unit_amount: 1, currency: "usd", product: { id: "s", name: "SparrowV2 in X", active: true, description: "", images: [], metadata: { type: "wallet", size: "4.1 x 3.2 in", leather_note: "Own note." } } });
   assert.deepEqual(specRows(own)[0], ["Closed size", "4.1 x 3.2 in"]);
   assert.equal(leatherNote(own), "Own note.");

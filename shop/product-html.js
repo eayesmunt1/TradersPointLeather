@@ -19,12 +19,15 @@ export const CARE = "Wipe with a dry cloth. Condition lightly once or twice a ye
 // About the leather, from what the owner wrote for the designer. A product's `leather_note` in Stripe wins.
 const LEATHER_NOTES = [
   [/Cavalier/, "Horween Cavalier, a sub-class of Horween's signature CXL, is hot-stuffed over twenty-eight days into a leather with a soft hand and deep, dimensional pull-up. It takes on a patina that is different for every owner. Horween has stopped producing Cavalier, and what remains is limited."],
+  // Owner-provided, reworded by the rater (Oct 26).
+  [/Cypress/, "Horween Cypress in Chestnut is a limited run in this color. Cypress is a dual-tannage leather Horween developed recently. It has the strength of CXL with more body and rigidity, so it holds its form, and it pulls up beautifully."],
   [/Balmoral/, "Tanned on the American East Coast, Newbury Balmoral is dual-tanned to stand beside Horween Cavalier. Its color is struck all the way through the hide, so a burnished edge comes up even and clean. A touch thinner, it lets pockets stack flat without bulk."],
 ];
 
 // The spec rows: what Stripe holds, a closed size for wallets that have none, and care for everything.
 export function specRows(p) {
-  const rows = (p.details || []).map(([k, v]) => [k === "Size" && p.type === "wallet" ? "Closed size" : k, v]);
+  // No thread type on any page: the owner is moving every piece to the same thread (Oct 26).
+  const rows = (p.details || []).filter(([k]) => k !== "Thread").map(([k, v]) => [k === "Size" && p.type === "wallet" ? "Closed size" : k, v]);
   const model = String(p.name || "").split(" ")[0];
   if (p.type === "wallet" && !rows.some(([k]) => k === "Closed size") && CLOSED_SIZE[model]) rows.splice(1, 0, ["Closed size", CLOSED_SIZE[model]]);
   rows.push(["Care", CARE]);
