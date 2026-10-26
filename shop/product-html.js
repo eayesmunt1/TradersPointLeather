@@ -12,15 +12,19 @@ export const shipLine = (ready) =>
   (ready ? "Ships in 1\u20133 business days." : "Ships in 1\u20132 weeks.") +
   (ready ? " Delivery takes 5\u20137 days in the lower 48. 14-day returns if undamaged and without initials; buyer pays return shipping." : " Delivery takes 5\u20137 days in the lower 48. Made for you, so final sale unless it arrives defective or damaged.");
 
-// Closed size by model, until each product carries a `size` in Stripe. Siah and GV1 have none yet.
+// Closed size by model. A product's `size` in Stripe wins if the owner ever sets one. Siah and GV1 have none yet.
 const CLOSED_SIZE = { CygnetV2: "4.25 x 3.25 in", CygnusV2: "4.25 x 3.25 in", SparrowV2: "4 x 3.25 in" };
 // Care, as the owner gives it.
 export const CARE = "Wipe with a dry cloth. Condition lightly once or twice a year with Ashland Leather conditioner. Keep away from prolonged water and heat.";
-// About the leather, from what the owner wrote for the designer. A product's `leather_note` in Stripe wins.
+// About the leather, kept here by leather family. A product's `leather_note` in Stripe wins if the owner ever sets one.
 const LEATHER_NOTES = [
   [/Cavalier/, "Horween Cavalier, a sub-class of Horween's signature CXL, is hot-stuffed over twenty-eight days into a leather with a soft hand and deep, dimensional pull-up. It takes on a patina that is different for every owner. Horween has stopped producing Cavalier, and what remains is limited."],
   // Owner-provided, reworded by the rater (Oct 26).
   [/Cypress/, "Horween Cypress in Chestnut is a limited run in this color. Cypress is a dual-tannage leather Horween developed recently. It has the strength of CXL with more body and rigidity, so it holds its form. It has a fantastic pull-up when folded and creased."],
+  // Owner-approved, verbatim (Oct 26).
+  [/Shell Cordovan/, "Shell cordovan comes from a dense layer of horse hide found only in the rump. The flesh side is sealed down, so it doesn't wrinkle like most other leathers. It rolls into soft waves as it wears and polishes to a deep, glossy shine."],
+  [/Chromexcel/, "Horween Chromexcel is a combination-tanned leather, hot-stuffed with oils and waxes. It's tough and flexible, with a rich pull-up that darkens and develops character as it ages."],
+  [/Latigo/, "Newbury Latigo is a tough, supple leather stuffed with oils and waxes. It's one of the strongest leathers for belts and tack, and softens as you wear it."],
   [/Balmoral/, "Tanned on the American East Coast, Newbury Balmoral is dual-tanned to stand beside Horween Cavalier. Its color is struck all the way through the hide, so a burnished edge comes up even and clean. A touch thinner, it lets pockets stack flat without bulk."],
 ];
 

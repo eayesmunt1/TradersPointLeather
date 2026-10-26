@@ -52,3 +52,12 @@ test("product pages show up to two verbatim reviews picked by the piece, and the
   assert.equal(reviewsFor(belt).length, 2);
   assert.match(productHtml(belt, {}), /Read all reviews on Etsy/);
 });
+
+test("each leather family has its owner-approved note", () => {
+  const note = (leather) => leatherNote({ leather, leatherNote: "" });
+  assert.match(note("Marbled Shell Cordovan"), /^Shell cordovan comes from a dense layer of horse hide/);
+  assert.match(note("Inverse Marbled Shell Cordovan"), /^Shell cordovan comes from/);
+  assert.match(note("Horween Chromexcel No.3 Dark Navy"), /^Horween Chromexcel is a combination-tanned leather/);
+  assert.match(note("Newbury Latigo, Burgundy"), /^Newbury Latigo is a tough, supple leather/);
+  assert.match(note("Horween Chromexcel Cavalier"), /sub-class of Horween's signature CXL/); // Sparrow stays Cavalier
+});
