@@ -80,7 +80,7 @@ test("the tabs and the header move between the pages and mark where you are", as
 });
 
 test("a product page links back to its own category", async () => {
-  for (const [slug, href, name] of [["gv1-horween-cypress", "/shop/made-to-order", "Made to Order"], ["belt-horween-cxl-raven", "/shop/belts", "Belts"], ["cygnus-shell-cordovan-marbled", "/shop/ready-to-ship", "Ready to Ship"]]) {
+  for (const [slug, href, name] of [["gv1-horween-cypress", "/shop/made-to-order", "Made to Order"], ["belt-horween-cxl-raven", "/shop/belts", "Belts"], ["cygnet-newbury-balmoral-sunflower", "/shop/ready-to-ship", "Ready to Ship"]]) {
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
     await page.goto(`${BASE}/shop/${slug}`, { waitUntil: "networkidle" });
@@ -124,4 +124,12 @@ test("pages that fix their thread do not ask for one", async () => {
     assert.equal(await page.locator('#add-form select[name="thread"]').count(), 0, slug);
     await ctx.close();
   }
+});
+
+test("the archived Sparrow address sends buyers to the Made to Order Sparrow", async () => {
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/shop/sparrow-horween-cavalier-two-tone`, { waitUntil: "networkidle" });
+  assert.match(page.url(), /\/shop\/sparrow-horween-cavalier-mto$/);
+  await ctx.close();
 });

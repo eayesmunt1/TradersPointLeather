@@ -80,6 +80,13 @@
   status = 200
   force = true
 
+# Archived Oct 26: Sparrow Whiskey is made to order only.
+[[redirects]]
+  from = "/shop/sparrow-horween-cavalier-two-tone"
+  to = "/shop/sparrow-horween-cavalier-mto"
+  status = 301
+  force = true
+
 # Category pages: the same shell as /shop; shop.js picks what to show from the address.
 [[redirects]]
   from = "/shop/ready-to-ship"
