@@ -4,6 +4,13 @@
 (function () {
   'use strict';
 
+  // Palette trial: ?theme=classic shows the old dark palette, ?theme=warm the new one. Remembered per tab.
+  (function () {
+    var t = new URLSearchParams(location.search).get('theme');
+    try { if (t === 'classic' || t === 'warm') sessionStorage.setItem('tpl-theme', t); t = sessionStorage.getItem('tpl-theme'); } catch (e) {}
+    if (t === 'classic') document.documentElement.setAttribute('data-theme', 'classic');
+  })();
+
   var KEY = 'tpl-cart-v1';
   // Matches shipLine() in product-html.js: 1-2 weeks and final sale unless every piece is Ready to Ship (section=ready).
   function shipText(ready) {

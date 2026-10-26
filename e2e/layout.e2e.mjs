@@ -160,3 +160,13 @@ test("an odd last tile spans both columns on a phone", async () => {
   assert.ok(c > a * 1.8, `third tile is ${c}px, first is ${a}px`);
   await ctx.close();
 });
+
+test("the warm palette is the default and ?theme=classic brings back the old one for the tab", async () => {
+  const { page, ctx } = await open("/shop/ready-to-ship", { width: 390, height: 800 });
+  assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), "rgb(28, 23, 19)");
+  await page.goto(`${BASE}/shop/ready-to-ship?theme=classic`, { waitUntil: "networkidle" });
+  assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), "rgb(15, 13, 11)");
+  await page.goto(`${BASE}/cart`, { waitUntil: "networkidle" }); // sticks for the tab
+  assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), "rgb(15, 13, 11)");
+  await ctx.close();
+});

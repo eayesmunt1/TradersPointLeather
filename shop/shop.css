@@ -1,15 +1,27 @@
 /* Shared by the shop pages: /shop, /shop/<slug>, /cart and /order/thanks.
    Tokens are copied from index.html, per the repo's copy-don't-import habit. */
 :root {
-  --bg: #0f0d0b;
-  --bg-warm: #1a1613;
+  /* Warmer palette (Oct 26 trial). Add ?theme=classic to any shop page to see the old one; it sticks
+     for the tab until ?theme=warm. To make the old palette permanent, copy the classic values here. */
+  --bg: #1c1713;
+  --bg-header: #0f0d0b; /* the header stays as dark as the home page's */
+  --bg-warm: #261f19;
+  --panel: #261f19; /* cards, photo panel, thumbnails: one step up so dark leathers read */
+  --edge: rgba(196,168,130,0.22); /* the 1px border on cards and panels */
   --tan: #c4a882;
   --tan-light: #d4bc9e;
   --cream: #e8ddd0;
   --white: #f5f0ea;
   --accent: #b8860b;
-  --text-muted: #b5aa9d;
+  --text-muted: #cfc4b6;
   --error: #e0866f;
+}
+:root[data-theme="classic"] {
+  --bg: #0f0d0b;
+  --bg-warm: #1a1613;
+  --panel: #14110e;
+  --edge: rgba(196,168,130,0.08);
+  --text-muted: #b5aa9d;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-padding-top: 72px; }
@@ -22,7 +34,7 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
   position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 64px;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 max(1.25rem, env(safe-area-inset-right)) 0 max(1.25rem, env(safe-area-inset-left));
-  background: var(--bg); border-bottom: 1px solid rgba(196,168,130,0.12);
+  background: var(--bg-header); border-bottom: 1px solid rgba(196,168,130,0.12);
 }
 .site-header-logo { display: flex; align-items: center; min-height: 44px; }
 .site-header-logo img { height: 44px; width: auto; display: block; }
@@ -40,7 +52,7 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 .nav-toggle span::after { position: absolute; top: 7px; left: 0; }
 @media (max-width: 899px) {
   .nav-toggle { display: block; }
-  .site-nav { display: none; position: absolute; top: 64px; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0; padding: 0.5rem 1.25rem 1rem; background: var(--bg); border-bottom: 1px solid rgba(196,168,130,0.12); }
+  .site-nav { display: none; position: absolute; top: 64px; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0; padding: 0.5rem 1.25rem 1rem; background: var(--bg-header); border-bottom: 1px solid rgba(196,168,130,0.12); }
   .site-nav.open { display: flex; }
   .site-nav a { padding: 0 0.25rem; font-size: 0.85rem; }
 }
@@ -71,9 +83,9 @@ h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 0.5rem; }
 
 /* Listing */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; list-style: none; }
-.card { display: flex; flex-direction: column; text-decoration: none; color: inherit; background: var(--bg-warm); border: 1px solid rgba(196,168,130,0.08); height: 100%; }
+.card { display: flex; flex-direction: column; text-decoration: none; color: inherit; background: var(--bg-warm); border: 1px solid var(--edge); height: 100%; }
 .card:hover { border-color: rgba(196,168,130,0.25); }
-.card-img { aspect-ratio: 1/1; overflow: hidden; flex: none; min-height: 0; background: #14110e; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.8rem; }
+.card-img { aspect-ratio: 1/1; overflow: hidden; flex: none; min-height: 0; background: var(--panel); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.8rem; }
 .card-img img { width: 100%; height: 100%; min-height: 0; object-fit: cover; object-position: 50% 50%; display: block; }
 .card-body { padding: 1.25rem 1.5rem 1.5rem; flex: 1; display: flex; flex-direction: column; }
 .card-body .price { margin-top: auto; }
@@ -103,7 +115,7 @@ h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 0.5rem; }
 /* Whole photos, never cropped, in one 4:5 frame for every album (portrait or landscape), sized so the
    frame and its thumbnails fit the screen height. */
 .gallery { width: min(100%, calc((100vh - 160px) * 4 / 5)); margin: 0 auto; }
-.slides { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; aspect-ratio: 4/5; max-height: calc(100vh - 160px); background: #14110e; scrollbar-width: none; }
+.slides { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; aspect-ratio: 4/5; max-height: calc(100vh - 160px); background: var(--panel); scrollbar-width: none; }
 .slides::-webkit-scrollbar { display: none; }
 .slide { flex: 0 0 100%; scroll-snap-align: start; margin: 0; display: flex; align-items: center; justify-content: center; }
 .slide img { width: 100%; height: 100%; object-fit: contain; display: block; }
@@ -116,7 +128,7 @@ h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 0.5rem; }
 .gallery-nav button { width: 44px; height: 44px; background: transparent; border: 1px solid rgba(196,168,130,0.3); color: var(--tan); font-size: 1.4rem; cursor: pointer; }
 .gallery-nav .count { font-size: 0.8rem; color: var(--text-muted); letter-spacing: 0.1em; }
 .thumbs { display: flex; gap: 0.4rem; margin-top: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem; }
-.thumbs button { flex: 0 0 auto; width: 72px; height: 72px; padding: 0; border: 2px solid transparent; background: #14110e; cursor: pointer; opacity: 0.65; }
+.thumbs button { flex: 0 0 auto; width: 72px; height: 72px; padding: 0; border: 2px solid transparent; background: var(--panel); cursor: pointer; opacity: 0.65; }
 .thumbs button[aria-current="true"] { border-color: var(--accent); opacity: 1; }
 /* Dots stand in for the thumbnails on a phone. */
 .dots { display: none; }
@@ -146,7 +158,7 @@ h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 0.5rem; }
 /* Cart (drawer and page share these) */
 .cart-lines { list-style: none; }
 .cart-line { display: grid; grid-template-columns: 72px 1fr auto; gap: 0.9rem; padding: 1rem 0; border-bottom: 1px solid rgba(196,168,130,0.12); }
-.cart-line img, .cart-line .ph { width: 72px; height: 72px; object-fit: cover; background: #14110e; display: block; }
+.cart-line img, .cart-line .ph { width: 72px; height: 72px; object-fit: cover; background: var(--panel); display: block; }
 .cart-line h3 { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--white); margin-bottom: 0.25rem; }
 .cart-line .opts { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
 .cart-line .qty { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem; margin-top: 0.4rem; }
