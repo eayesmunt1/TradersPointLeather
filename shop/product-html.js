@@ -20,7 +20,7 @@ export const CARE = "Wipe with a dry cloth. Condition lightly once or twice a ye
 const LEATHER_NOTES = [
   [/Cavalier/, "Horween Cavalier, a sub-class of Horween's signature CXL, is hot-stuffed over twenty-eight days into a leather with a soft hand and deep, dimensional pull-up. It takes on a patina that is different for every owner. Horween has stopped producing Cavalier, and what remains is limited."],
   // Owner-provided, reworded by the rater (Oct 26).
-  [/Cypress/, "Horween Cypress in Chestnut is a limited run in this color. Cypress is a dual-tannage leather Horween developed recently. It has the strength of CXL with more body and rigidity, so it holds its form, and it pulls up beautifully."],
+  [/Cypress/, "Horween Cypress in Chestnut is a limited run in this color. Cypress is a dual-tannage leather Horween developed recently. It has the strength of CXL with more body and rigidity, so it holds its form. It has a fantastic pull-up when folded and creased."],
   [/Balmoral/, "Tanned on the American East Coast, Newbury Balmoral is dual-tanned to stand beside Horween Cavalier. Its color is struck all the way through the hide, so a burnished edge comes up even and clean. A touch thinner, it lets pockets stack flat without bulk."],
 ];
 
