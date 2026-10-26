@@ -368,7 +368,7 @@
       if (cur) cur.setAttribute('aria-current', 'page');
 
       if (cat) {
-        document.title = cat.title + ' \u2014 Traders Point Leather';
+        document.title = cat.title + ' \u2014 Handmade in Indiana | Traders Point Leather';
         document.getElementById('shop-title').textContent = cat.title;
         document.getElementById('shop-lede').textContent = cat.lede;
         document.getElementById('shop-lede').hidden = false;
@@ -399,7 +399,7 @@
         }
         return import('/shop/product-html.js').then(function (m) {
           box.innerHTML = m.productHtml(p, { photos: photos(p), monogram: c.monogram });
-          document.title = p.name + ' \u2014 Traders Point Leather';
+          document.title = p.name + ' \u2014 Handmade in Indiana | Traders Point Leather';
         });
       });
       ready.then(function () { return catalogPromise.catch(function () {}); }).then(function () { hydrate(box, slug); }, function () {});

@@ -11,7 +11,7 @@ export async function handler(event) {
   const config = await fetch(`${origin}/shop-config.js`).then((r) => r.text()).catch(() => "");
   const isPublic = /SHOP_PUBLIC\s*=\s*true/.test(config);
 
-  const urls = [url("/", "1.0"), url("/design.html", "0.8")];
+  const urls = [url("/", "1.0"), url("/design.html", "0.8"), ...["shipping", "returns", "privacy", "terms"].map((p) => url(`/${p}`, "0.3"))];
   if (isPublic) {
     urls.push(url("/shop", "0.9"));
     for (const page of ["ready-to-ship", "made-to-order", "belts"]) urls.push(url(`/shop/${page}`, "0.8"));

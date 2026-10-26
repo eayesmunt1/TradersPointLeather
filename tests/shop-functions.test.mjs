@@ -334,3 +334,44 @@ test("the owner email carries the shipping address and the oversold line", async
   assert.match(sent[0].text, /123 Test Street/);
   assert.match(sent[0].text, /Indianapolis IN 46201/);
 });
+
+// --- page heads ---
+const { handler: shopPage } = await import("../netlify/functions/shop-page.js");
+const SHELL = `<html><head><title>Product — Traders Point Leather</title>\n<meta name="description" content="Traders Point Leather shop"></head><body><div id="product"></div></body></html>`;
+function stubShop() {
+  stubStripe();
+  const inner = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    const u = String(url);
+    if (u.endsWith("/shop/product.html") || u.endsWith("/shop/index.html")) return { ok: true, text: async () => SHELL };
+    if (u.endsWith("/img/manifest.json")) return { ok: true, json: async () => ({ plum: [{ src: "/img/plum/01.jpg" }] }) };
+    return inner(url, init);
+  };
+}
+
+test("a product page has its own title, description, canonical, image and Product data", async () => {
+  stubShop();
+  const res = await shopPage({ rawUrl: "https://shop.test/shop/plum" });
+  assert.equal(res.statusCode, 200);
+  assert.match(res.body, /<title>CygnetV2 Plum — Handmade in Indiana \| Traders Point Leather<\/title>/);
+  assert.match(res.body, /<link rel="canonical" href="https:\/\/traderspointleather\.com\/shop\/plum">/);
+  assert.match(res.body, /og:image" content="https:\/\/traderspointleather\.com\/img\/plum\/01\.jpg"/);
+  const ld = JSON.parse(/<script type="application\/ld\+json">(.*?)<\/script>/s.exec(res.body)[1]);
+  assert.equal(ld["@type"], "Product");
+  assert.equal(ld.offers.price, "145.00");
+  assert.equal(ld.offers.availability, "https://schema.org/InStock");
+});
+
+test("a sold piece is OutOfStock, and each section page has its own title", async () => {
+  stubShop();
+  const gone = await shopPage({ rawUrl: "https://shop.test/shop/gone" });
+  assert.match(gone.body, /schema\.org\/OutOfStock/);
+  const titles = new Set();
+  for (const path of ["/shop", "/shop/ready-to-ship", "/shop/made-to-order", "/shop/belts"]) {
+    const res = await shopPage({ rawUrl: `https://shop.test${path}` });
+    assert.equal(res.statusCode, 200, path);
+    titles.add(/<title>(.*?)<\/title>/.exec(res.body)[1]);
+    assert.match(res.body, new RegExp(`canonical" href="https://traderspointleather\\.com${path}"`));
+  }
+  assert.equal(titles.size, 4);
+});

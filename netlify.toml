@@ -76,7 +76,7 @@
 
 [[redirects]]
   from = "/shop"
-  to = "/shop/index.html"
+  to = "/.netlify/functions/shop-page"
   status = 200
   force = true
 
@@ -108,22 +108,23 @@
   status = 301
   force = true
 
-# Category pages: the same shell as /shop; shop.js picks what to show from the address.
+# /shop and its section pages: shop-page.js serves the listing shell with each page's own title,
+# description and canonical, and shop.js picks what to show from the address.
 [[redirects]]
   from = "/shop/ready-to-ship"
-  to = "/shop/index.html"
+  to = "/.netlify/functions/shop-page"
   status = 200
   force = true
 
 [[redirects]]
   from = "/shop/made-to-order"
-  to = "/shop/index.html"
+  to = "/.netlify/functions/shop-page"
   status = 200
   force = true
 
 [[redirects]]
   from = "/shop/belts"
-  to = "/shop/index.html"
+  to = "/.netlify/functions/shop-page"
   status = 200
   force = true
 
