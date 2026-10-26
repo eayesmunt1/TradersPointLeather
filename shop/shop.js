@@ -126,7 +126,7 @@
       has: function (p) { return p.section === 'ready' && !p.soldOut && !isStrap(p); }, empty: 'Nothing is ready to ship right now. Everything on the Made to Order page is built for you.' },
     { slug: 'made-to-order', title: 'Made to Order', lede: 'Built after you order, and shipped in 1\u20132 weeks.',
       has: function (p) { return p.section === 'made' && !isStrap(p); }, empty: 'Nothing here right now.' },
-    { slug: 'belts', title: 'Belts and Dog Collars', lede: 'Made to your length or size after you order, and shipped in 1\u20132 weeks.',
+    { slug: 'belts', title: 'Belts and Dog Collars', lead: 'belt-newbury-latigo-burgundy', lede: 'Made to your length or size after you order, and shipped in 1\u20132 weeks.',
       has: isStrap, empty: 'Nothing here right now.' },
   ];
 
@@ -144,9 +144,13 @@
   }
   // A tile for a whole category, on the /shop landing page.
   function tile(c, items) {
-    // Lead with a wallet where there is one, so a section is introduced by a wallet when it has any.
-    var lead = items.filter(function (p) { return p.type === 'wallet'; })[0] || items[0];
-    var ph = lead ? photos(lead)[0] : null;
+    // The section's chosen lead if it is there; else a wallet, so a section is introduced by a wallet when it has any;
+    // else a belt (never the dog collar); else the first piece.
+    var lead = items.filter(function (p) { return p.slug === c.lead; })[0]
+      || items.filter(function (p) { return p.type === 'wallet'; })[0]
+      || items.filter(function (p) { return p.type === 'belt'; })[0]
+      || items[0];
+    var ph = lead ? (TILES.indexOf(lead.slug) > -1 ? { src: '/img/' + lead.slug + '/tile.jpg' } : photos(lead)[0]) : null;
     return el('li', {}, [el('a', { class: 'card', href: '/shop/' + c.slug + (DRAFTS ? '?drafts=1' : '') }, [
       el('div', { class: 'card-img' }, [ph ? el('img', { src: ph.src, alt: '', loading: 'lazy' }) : el('span', { text: 'Coming soon' })]),
       el('div', { class: 'card-body' }, [

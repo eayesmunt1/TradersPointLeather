@@ -150,3 +150,10 @@ test("the four policy pages load, and the footer and cart link to them", async (
   assert.deepEqual(await page.$$eval(".footer-policy a", (as) => as.map((a) => a.getAttribute("href"))), ["/shipping", "/returns", "/privacy", "/terms"]);
   await ctx.close();
 });
+
+test("the Belts and Dog Collars tile on /shop shows the burgundy Latigo belt, not the collar", async () => {
+  const { page, ctx } = await open("/shop");
+  const src = await page.$eval('#listing a.card[href="/shop/belts"] img', (i) => i.getAttribute("src"));
+  assert.match(src, /belt-newbury-latigo-burgundy/);
+  await ctx.close();
+});
