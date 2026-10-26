@@ -28,7 +28,29 @@ product names on display, since every piece is made to order by default. The `mo
 product is the $10 add-on. Stripe sandbox and live are separate catalogs: use the sandbox key
 until launch, then recreate the catalog in live mode.
 
-**Launch checklist:** in the live Stripe dashboard register the webhook (endpoint `https://<site>/api/stripe-webhook`, event `checkout.session.completed`) and put its `whsec_...` in Netlify as `STRIPE_WEBHOOK_SECRET`. Without it, stock never drops in production.
+### Deploy checklist
+
+Netlify deploys `main`. Nothing here changes Stripe.
+
+**Before merging**
+1. In Netlify (Site configuration > Environment variables), for the Production context:
+   - `STRIPE_SECRET_KEY`: the live restricted key (Checkout Sessions write, Products write, Prices read).
+   - `STRIPE_WEBHOOK_SECRET`: the signing secret of the live endpoint `https://traderspointleather.com/api/stripe-webhook` (event `checkout.session.completed`). Never `whsec_local_dev`.
+   - `RESEND_API_KEY` and `ORDER_EMAIL_FROM` for the owner's order email (optional; without them orders still work).
+   - `STRIPE_MANAGED_PAYMENTS` unset.
+2. In live Stripe: every active product has `metadata.slug` and exactly one active price (`node scripts/set-lookup-keys.mjs` with a live key prints any that don't), the `monogram` product exists at $10, and customer receipts are on.
+3. Note the current production deploy in Netlify (Deploys): it is the rollback point.
+
+**Deploy**
+4. Merge `site-fix-plan` into `main` and push. Wait for the deploy to show Published.
+
+**Right after**
+5. `node scripts/smoke-prod.mjs`. It is read-only and checks every page, the live catalog, each product page, that the webhook holds its secret (400 to an unsigned request; 503 means the secret is missing), the sitemap, the security headers and the blocked files. All must pass.
+6. In Stripe > Developers > Webhooks, the endpoint shows no failed deliveries once the first order comes in.
+
+**Roll back**
+- Fast: in Netlify > Deploys, open the deploy from step 3 and choose "Publish deploy". The site returns to it in seconds; the env vars are untouched.
+- Shop only: set `window.SHOP_PUBLIC = false` in `shop-config.js` and push. The home page links go back to Etsy and the Shop link hides.
 
 ### Photos
 

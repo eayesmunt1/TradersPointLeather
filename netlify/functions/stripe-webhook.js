@@ -70,6 +70,9 @@ async function emailOwner(session, items, oversold = "") {
 
 export async function handler(event) {
   if (event.httpMethod !== "POST") return json(405, { error: "POST only" });
+  // A missing secret is a deploy mistake, not a bad request: 503 so the smoke test can tell the two
+  // apart and Stripe keeps retrying until it is set.
+  if (!process.env.STRIPE_WEBHOOK_SECRET) return json(503, { error: "Not configured" });
   const raw = event.isBase64Encoded ? Buffer.from(event.body, "base64").toString("utf8") : event.body;
   try {
     verifySignature(raw, event.headers["stripe-signature"], process.env.STRIPE_WEBHOOK_SECRET);
