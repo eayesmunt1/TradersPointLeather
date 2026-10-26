@@ -122,7 +122,7 @@
   ];
 
   // Square card images cropped from the owner's originals, where the first gallery photo crops badly.
-  var TILES = ['gv1-horween-cypress', 'cygnus-shell-cordovan-marbled', 'belt-newbury-latigo-burgundy', 'belt-horween-cxl-raven'];
+  var TILES = ['gv1-horween-cypress', 'cygnus-shell-cordovan-marbled', 'cygnus-shell-cordovan-inverse-marbled', 'belt-newbury-latigo-burgundy', 'belt-horween-cxl-raven'];
   // "Model in Leather - Color" reads as Model \u00b7 Color over the leather, so the color is never cut off.
   // When the part after " - " is a product type, not a color, lead with the build color and put the type under the leather.
   function cardName(p) {

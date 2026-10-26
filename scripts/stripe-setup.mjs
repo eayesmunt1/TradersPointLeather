@@ -65,6 +65,7 @@ const PLAN = {
   "cygnet-horween-cavalier-sunflower": { section: "ready", stock: 1 },
   "cygnet-newbury-balmoral-navy": { section: "ready", stock: 1, desc: "cygnetNewbury" },
   "cygnet-newbury-balmoral-sunflower": { section: "ready", stock: 1, desc: "cygnetNewbury", meta: { one_of_a_kind: "true" } },
+  "cygnus-shell-cordovan-inverse-marbled": { section: "ready", stock: 1, meta: { one_of_a_kind: "true", monogram: "true", type: "wallet" } },
   // Made to Order: one pre-built page each
   "cygnet-horween-cavalier-mto": { section: "made", desc: "cygnetCavalier", meta: { capacity: "8-12 cards, 4 slots, cash pocket" } },
   "cygnet-newbury-balmoral-mto": { section: "made", desc: "cygnetNewbury" },
