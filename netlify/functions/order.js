@@ -14,10 +14,13 @@ export async function handler(event) {
       {
         paid: true,
         email: s.customer_details?.email || "",
+        // Each line with its choices (color, thread, initials, or a designer build's spec) as the
+        // product description carries them.
         items: s.line_items.data.map((l) => ({
           name: l.description,
           quantity: l.quantity,
           total: l.amount_total,
+          choices: l.price?.product?.description || "",
         })),
         // One readable line per item: the name, then its choices and initials from the product description.
         details: s.line_items.data.map((l) => {

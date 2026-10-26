@@ -218,3 +218,9 @@ dialog.drawer::backdrop { background: rgba(0,0,0,0.6); }
 .product-reviews blockquote p { font-style: italic; line-height: 1.7; color: var(--cream); }
 .product-reviews blockquote footer { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem; }
 .product-reviews .all-reviews { font-size: 0.85rem; }
+.order-lines { list-style: none; margin: 0 0 1rem; padding: 0; }
+.order-lines li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid rgba(196,168,130,0.12); }
+.order-name { color: var(--white); }
+.order-choices { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; line-height: 1.5; }
+.thanks h2 { font-size: 1.2rem; margin: 2rem 0 0.75rem; }
+.thanks #thanks > p { margin-bottom: 0.9rem; line-height: 1.6; }

@@ -301,6 +301,7 @@ test("the order summary reads the shipping address and shows names with choices"
   assert.equal(o.paid, true);
   assert.deepEqual(o.shipTo, { name: "Test Buyer", lines: ["123 Test Street", "Indianapolis IN 46201"] });
   assert.deepEqual(o.details, ["GV1 — Snap: Double Snap · Initials: EY"]);
+  assert.deepEqual(o.items, [{ name: "GV1", quantity: 1, total: 6500, choices: "Snap: Double Snap · Initials: EY" }]);
 });
 
 test("the order summary says whether everything was Ready to Ship", async () => {

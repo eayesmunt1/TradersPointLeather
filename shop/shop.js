@@ -417,13 +417,32 @@
           box.replaceChildren();
           if (!o.paid) { box.append(el('p', { text: 'Your payment has not completed yet. If you were charged, email customer-support@traderspointleather.com.' })); return; }
           writeCart([]);
-          var ul = el('ul', {});
-          (o.details.length ? o.details : o.items.map(function (i) { return i.name + ' x' + i.quantity; })).forEach(function (t) { ul.append(el('li', { text: t })); });
+          var MAIL = 'customer-support@traderspointleather.com';
+          // One row per line: the name, its choices (or a designer build's spec) under it, and its price.
+          var ul = el('ul', { class: 'order-lines' });
+          o.items.forEach(function (i) {
+            ul.append(el('li', {}, [
+              el('div', {}, [
+                el('div', { class: 'order-name', text: i.name + (i.quantity > 1 ? ' \u00d7 ' + i.quantity : '') }),
+                i.choices ? el('div', { class: 'order-choices', text: i.choices }) : null,
+              ]),
+              el('div', { class: 'price', text: money(i.total) }),
+            ]));
+          });
           box.append.apply(box, [
-            el('p', { class: 'lede', text: 'A receipt is on its way to ' + (o.email || 'your email') + (o.readyToShip ? '. Your order ships in 1\u20133 business days.' : '. Your order ships in 1\u20132 weeks.') }),
+            el('p', { class: 'lede', text: 'Your order is in. A receipt from Stripe is on its way to ' + (o.email || 'your email') + '.' }),
+            el('h2', { text: 'Your order' }),
             ul,
-            el('p', { class: 'cart-summary subtotal', text: 'Total: ' + money(o.total) }),
-            o.shipTo ? el('p', { class: 'muted', text: 'Shipping to ' + o.shipTo.name + ', ' + o.shipTo.lines.join(', ') }) : null,
+            el('div', { class: 'cart-summary' }, [
+              el('div', { class: 'row muted' }, [el('span', { text: 'Shipping' }), el('span', { text: 'Free' })]),
+              el('div', { class: 'row subtotal' }, [el('span', { text: 'Total' }), el('span', { text: money(o.total) })]),
+            ]),
+            el('h2', { text: 'What happens next' }),
+            el('p', { text: o.readyToShip
+              ? 'Your order is finished and leaves the shop in 1\u20133 business days. Delivery takes 5\u20137 days in the lower 48.'
+              : 'We make your order by hand now. It ships in 1\u20132 weeks, and delivery takes 5\u20137 days in the lower 48.' }),
+            o.shipTo ? el('p', { class: 'muted', text: 'Shipping to ' + o.shipTo.name + ', ' + o.shipTo.lines.join(', ') + '.' }) : null,
+            el('p', {}, [document.createTextNode('Questions about your order? Email '), el('a', { href: 'mailto:' + MAIL, text: MAIL }), document.createTextNode('.')]),
             el('p', {}, [el('a', { href: '/shop', text: 'Back to the shop' })])
           ].filter(Boolean));
         })
