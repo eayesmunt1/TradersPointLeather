@@ -40,7 +40,7 @@ export async function handler(event) {
   } catch {
     return reply(400, { error: "Invalid request." });
   }
-  if (build && !DESIGNER[build.model]) return reply(400, { error: "That wallet style is not available." });
+  if (build && !Object.hasOwn(DESIGNER, String(build.model))) return reply(400, { error: "That wallet style is not available." });
   if (!Array.isArray(items) || (!build && !items.length) || items.length > MAX_LINES) {
     return reply(400, { error: "Your cart is empty or too large." });
   }

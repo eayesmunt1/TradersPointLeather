@@ -4,8 +4,70 @@
 [functions]
   node_bundler = "esbuild"
 
+# Security headers on every response. frame-ancestors (and X-Frame-Options for older browsers)
+# stop other sites framing the shop; a full content policy is left out because GA, Crisp, Clarity
+# and Stripe each load their own scripts.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+
+# The repo root is the published folder, so repo-only files would otherwise be served.
+[[redirects]]
+  from = "/CLAUDE.md"
+  to = "/404"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/README.md"
+  to = "/404"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/netlify.toml"
+  to = "/404"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/.gitignore"
+  to = "/404"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/scripts/*"
+  to = "/404"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/tests/*"
+  to = "/404"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/e2e/*"
+  to = "/404"
+  status = 404
+  force = true
+
 # On-site shop. /shop/<slug> is rendered by shop-page.js from the Stripe catalog (404 if unknown).
-# The old shop.html (an Etsy API check page) would otherwise answer /shop.
+# Old links to /shop.html (a retired page) land on the shop.
 [[redirects]]
   from = "/shop.html"
   to = "/shop"

@@ -5,8 +5,9 @@ self-contained `.html` file with its CSS in a `<style>` block and its JS in a `<
 block at the bottom. Netlify serves the repo root as-is, so what is committed is what
 ships. To see a change, `python3 -m http.server 8000` and open the page.
 
-Pages: `index.html` (home), `design.html` (the wallet configurator), `shop.html`.
-The one piece of server code is `netlify/functions/listings.js`.
+Pages: `index.html` (home), `design.html` (the wallet configurator), the shop under `shop/`,
+`cart.html` and `order-thanks.html`. Server code is in `netlify/functions/` (Stripe catalog,
+checkout, webhook, order summary, product pages, sitemap) with shared helpers in `netlify/lib/`.
 
 Because there is no module system, the same tokens and footer markup are duplicated
 between pages by hand. Copying is the convention here — when you change a shared idiom,

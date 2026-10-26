@@ -87,7 +87,9 @@ test("a designer build is one $145 line plus a $10 initials line, priced on the 
   assert.match(s["metadata[item_1]"], /^designer-classic x1/);
   assert.equal(s["managed_payments[enabled]"], "false");
   stubStripe();
-  assert.equal((await checkout({ httpMethod: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ build: { model: "bogus" } }) })).statusCode, 400);
+  for (const model of ["bogus", "constructor", "__proto__", "toString"]) {
+    assert.equal((await checkout({ httpMethod: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ build: { model } }) })).statusCode, 400, model);
+  }
 });
 
 test("an initials line is named Initials, not Monogram", async () => {
