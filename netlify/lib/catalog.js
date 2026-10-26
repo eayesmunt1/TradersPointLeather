@@ -56,6 +56,8 @@ export function shape(price) {
       .map(([k, v]) => [k, String(v ?? "").trim()])
       .filter(([, v]) => v), // a blank spec value never makes a row
     leather: m.leather || "",
+    // A sentence or two about the leather; the product page falls back to its own notes for Cavalier and Balmoral.
+    leatherNote: m.leather_note || "",
     etsyListing: m.etsy_listing || "",
     oneOfAKind: m.one_of_a_kind === "true",
     section,

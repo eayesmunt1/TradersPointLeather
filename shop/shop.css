@@ -208,3 +208,6 @@ dialog.drawer::backdrop { background: rgba(0,0,0,0.6); }
 .footer-policy { font-size: 0.8rem; }
 .cart-policy { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem; }
 .cart-policy a { color: var(--tan); }
+
+.leather-note { font-size: 0.9rem; line-height: 1.7; color: var(--text-muted); margin: 0 0 1.5rem; }
+.leather-note strong { color: var(--cream); font-weight: 500; }

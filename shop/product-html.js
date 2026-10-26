@@ -12,6 +12,30 @@ export const shipLine = (ready) =>
   (ready ? "Ships in 1\u20133 business days." : "Ships in 1\u20132 weeks.") +
   (ready ? " Delivery takes 5\u20137 days in the lower 48. 14-day returns if undamaged and without initials; buyer pays return shipping." : " Delivery takes 5\u20137 days in the lower 48. Made for you, so final sale unless it arrives defective or damaged.");
 
+// Closed size by model, until each product carries a `size` in Stripe. Siah and GV1 have none yet.
+const CLOSED_SIZE = { CygnetV2: "4.25 x 3.25 in", CygnusV2: "4.25 x 3.25 in", SparrowV2: "4 x 3.25 in" };
+// Care, as the owner gives it.
+export const CARE = "Wipe with a dry cloth. Condition lightly once or twice a year with Ashland Leather conditioner. Keep away from prolonged water and heat.";
+// About the leather, from what the owner wrote for the designer. A product's `leather_note` in Stripe wins.
+const LEATHER_NOTES = [
+  [/Cavalier/, "Horween Cavalier, a sub-class of Horween's signature CXL, is hot-stuffed over twenty-eight days into a leather with a soft hand and deep, dimensional pull-up. It takes on a patina that is different for every owner. Horween has stopped producing Cavalier, and what remains is limited."],
+  [/Balmoral/, "Tanned on the American East Coast, Newbury Balmoral is dual-tanned to stand beside Horween Cavalier. Its color is struck all the way through the hide, so a burnished edge comes up even and clean. A touch thinner, it lets pockets stack flat without bulk."],
+];
+
+// The spec rows: what Stripe holds, a closed size for wallets that have none, and care for everything.
+export function specRows(p) {
+  const rows = (p.details || []).map(([k, v]) => [k === "Size" && p.type === "wallet" ? "Closed size" : k, v]);
+  const model = String(p.name || "").split(" ")[0];
+  if (p.type === "wallet" && !rows.some(([k]) => k === "Closed size") && CLOSED_SIZE[model]) rows.splice(1, 0, ["Closed size", CLOSED_SIZE[model]]);
+  rows.push(["Care", CARE]);
+  return rows;
+}
+export function leatherNote(p) {
+  if (p.leatherNote) return p.leatherNote;
+  const hit = LEATHER_NOTES.find(([re]) => re.test(p.leather || ""));
+  return hit ? hit[1] : "";
+}
+
 function select(id, label, list) {
   return `<div class="field"><label for="${id}">${esc(label)}</label>
     <select id="${id}" name="${id.replace("opt-", "")}" required><option value="">Choose…</option>${list
@@ -70,7 +94,8 @@ export function productHtml(p, { photos: allPhotos = [], monogram = null } = {})
     ${[p.build.color && `Color: ${p.build.color}`, p.build.thread && `Thread: ${p.build.thread}`].filter(Boolean).length ? `<p class="leather">${esc([p.build.color && `Color: ${p.build.color}`, p.build.thread && `Thread: ${p.build.thread}`].filter(Boolean).join(" \u00b7 "))}</p>` : ""}
     <div class="price">${money(p.amount)}</div>
     ${p.description ? `<p class="desc">${esc(p.description)}</p>` : ""}
-    ${(p.details || []).length ? `<dl class="specs">${p.details.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>` : ""}
+    <dl class="specs">${specRows(p).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
+    ${leatherNote(p) ? `<p class="leather-note"><strong>${esc(p.leather)}.</strong> ${esc(leatherNote(p))}</p>` : ""}
     ${p.needsReview ? `<p class="notice">Draft preview: this piece is not visible to the public yet.</p>` : ""}
     ${
       p.soldOut

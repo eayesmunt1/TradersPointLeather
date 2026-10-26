@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { shape } from "../netlify/lib/catalog.js";
-import { productHtml, shipLine } from "../shop/product-html.js";
+import { productHtml, shipLine, specRows, leatherNote, CARE } from "../shop/product-html.js";
 
 const make = (metadata) =>
   shape({ id: "p", lookup_key: "x", unit_amount: 9500, currency: "usd", product: { id: "x", name: "Thing", active: true, description: "d", images: [], metadata } });
@@ -29,4 +29,16 @@ test("a blank spec value never makes a row", () => {
   const html = productHtml(make({ section: "made", type: "belt", hardware: "Brass buckle", capacity: "  ", size: "", features: "" }), {});
   assert.match(html, /<dt>Hardware<\/dt>/);
   assert.doesNotMatch(html, /<dt>(Capacity|Size|Features|Thread)<\/dt>/);
+});
+
+test("wallet pages show a closed size by model, care on everything, and a leather note where one is known", () => {
+  const cygnet = { ...shape({ id: "p", lookup_key: "c", unit_amount: 14500, currency: "usd", product: { id: "c", name: "CygnetV2 in Newbury Balmoral - Navy", active: true, description: "", images: [], metadata: { type: "wallet", leather: "Newbury Balmoral" } } }) };
+  assert.deepEqual(specRows(cygnet), [["Closed size", "4.25 x 3.25 in"], ["Care", CARE]]);
+  assert.match(leatherNote(cygnet), /Newbury Balmoral is dual-tanned/);
+  const gv1 = shape({ id: "p", lookup_key: "g", unit_amount: 6500, currency: "usd", product: { id: "g", name: "GV1 in Horween Cypress - Minimalist Wallet", active: true, description: "", images: [], metadata: { type: "wallet", leather: "Horween Cypress" } } });
+  assert.deepEqual(specRows(gv1), [["Care", CARE]]); // no size for GV1 yet
+  assert.equal(leatherNote(gv1), "");
+  const own = shape({ id: "p", lookup_key: "s", unit_amount: 1, currency: "usd", product: { id: "s", name: "SparrowV2 in X", active: true, description: "", images: [], metadata: { type: "wallet", size: "4.1 x 3.2 in", leather_note: "Own note." } } });
+  assert.deepEqual(specRows(own)[0], ["Closed size", "4.1 x 3.2 in"]);
+  assert.equal(leatherNote(own), "Own note.");
 });
