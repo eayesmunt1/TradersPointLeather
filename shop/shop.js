@@ -111,14 +111,16 @@
   function count() { return readCart().reduce(function (n, i) { return n + i.qty; }, 0); }
 
   /* ── rendering ── */
+  // Belts and the dog collar share a page: both are cut to a length or size after the order.
+  function isStrap(p) { return p.type === 'belt' || p.type === 'collar'; }
   // The three pages under /shop. Belts are made to order too, but have a page of their own.
   var CATS = [
     { slug: 'ready-to-ship', title: 'Ready to Ship', lede: 'Finished pieces that leave in 1\u20133 business days.',
-      has: function (p) { return p.section === 'ready' && !p.soldOut && p.type !== 'belt'; }, empty: 'Nothing is ready to ship right now. Everything on the Made to Order page is built for you.' },
+      has: function (p) { return p.section === 'ready' && !p.soldOut && !isStrap(p); }, empty: 'Nothing is ready to ship right now. Everything on the Made to Order page is built for you.' },
     { slug: 'made-to-order', title: 'Made to Order', lede: 'Built after you order, and shipped in 1\u20132 weeks.',
-      has: function (p) { return p.section === 'made' && p.type !== 'belt'; }, empty: 'Nothing here right now.' },
-    { slug: 'belts', title: 'Belts', lede: 'Made to your length after you order, and shipped in 1\u20132 weeks.',
-      has: function (p) { return p.type === 'belt'; }, empty: 'Nothing here right now.' },
+      has: function (p) { return p.section === 'made' && !isStrap(p); }, empty: 'Nothing here right now.' },
+    { slug: 'belts', title: 'Belts & Collars', lede: 'Made to your length or size after you order, and shipped in 1\u20132 weeks.',
+      has: isStrap, empty: 'Nothing here right now.' },
   ];
 
   // Square card images cropped from the owner's originals, where the first gallery photo crops badly.
@@ -135,7 +137,7 @@
   }
   // A tile for a whole category, on the /shop landing page.
   function tile(c, items) {
-    // Lead with a wallet where there is one, so Made to Order is not introduced by the collar.
+    // Lead with a wallet where there is one, so a section is introduced by a wallet when it has any.
     var lead = items.filter(function (p) { return p.type === 'wallet'; })[0] || items[0];
     var ph = lead ? photos(lead)[0] : null;
     return el('li', {}, [el('a', { class: 'card', href: '/shop/' + c.slug + (DRAFTS ? '?drafts=1' : '') }, [

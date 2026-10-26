@@ -47,7 +47,7 @@ export function productHtml(p, { photos: allPhotos = [], monogram = null } = {})
   </div>`;
   const ready = p.section === "ready";
   // Its own category page: belts have one, and so do Ready to Ship and Made to Order.
-  const [catHref, catName] = p.type === "belt" ? ["/shop/belts", "Belts"] : ready ? ["/shop/ready-to-ship", "Ready to Ship"] : ["/shop/made-to-order", "Made to Order"];
+  const [catHref, catName] = p.type === "belt" || p.type === "collar" ? ["/shop/belts", "Belts & Collars"] : ready ? ["/shop/ready-to-ship", "Ready to Ship"] : ["/shop/made-to-order", "Made to Order"];
   const crumbs = `<nav class="crumbs" aria-label="Breadcrumb"><a href="/shop">\u2190 Shop</a> <span aria-hidden="true">/</span> <a href="${catHref}">${catName}</a></nav>`;
   const fields = [
     ...Object.keys(p.options)
