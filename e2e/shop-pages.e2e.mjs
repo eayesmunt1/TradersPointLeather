@@ -134,3 +134,19 @@ test("the archived Sparrow address sends buyers to the Made to Order Sparrow", a
   assert.match(page.url(), /\/shop\/sparrow-horween-cavalier-mto$/);
   await ctx.close();
 });
+
+test("the four policy pages load, and the footer and cart link to them", async () => {
+  for (const path of ["/shipping", "/returns", "/privacy", "/terms"]) {
+    const ctx = await browser.newContext();
+    const page = await ctx.newPage();
+    const res = await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
+    assert.equal(res.status(), 200, path);
+    assert.ok((await page.textContent("h1")).length > 3, path);
+    await ctx.close();
+  }
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+  assert.deepEqual(await page.$$eval(".footer-policy a", (as) => as.map((a) => a.getAttribute("href"))), ["/shipping", "/returns", "/privacy", "/terms"]);
+  await ctx.close();
+});

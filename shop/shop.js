@@ -5,10 +5,10 @@
   'use strict';
 
   var KEY = 'tpl-cart-v1';
-  // Matches shipLine() in product-html.js: 1-2 weeks unless every piece is Ready to Ship (section=ready).
+  // Matches shipLine() in product-html.js: 1-2 weeks and final sale unless every piece is Ready to Ship (section=ready).
   function shipText(ready) {
     return 'Free shipping (US). ' + (ready ? 'Ships in 1\u20133 business days.' : 'Ships in 1\u20132 weeks.') +
-      ' Delivery takes 5\u20137 days in the lower 48. 14-day returns if undamaged. Buyer pays return shipping.';
+      (ready ? ' Delivery takes 5\u20137 days in the lower 48. 14-day returns if undamaged and without initials; buyer pays return shipping.' : ' Delivery takes 5\u20137 days in the lower 48. Made for you, so final sale unless it arrives defective or damaged.');
   }
   var memory = null; // used when localStorage is unavailable
   var catalog = null;
@@ -200,6 +200,7 @@
       el('div', { class: 'row subtotal' }, [el('span', { text: 'Subtotal' }), el('span', { text: money(subtotal) })]),
       el('div', { class: 'row muted' }, [el('span', { text: 'Shipping' }), el('span', { text: 'Free' })]),
       el('p', { class: 'terms', text: shipText(items.every(function (i) { var p = product(i.slug); return p && p.readyToShip; })) }),
+      el('p', { class: 'cart-policy' }, [el('a', { href: '/shipping', text: 'Shipping' }), document.createTextNode(' \u00b7 '), el('a', { href: '/returns', text: 'Returns' }), document.createTextNode(' \u00b7 '), el('a', { href: '/terms', text: 'Terms' }), document.createTextNode(' \u00b7 '), el('a', { href: '/privacy', text: 'Privacy' })]),
       btn, err,
     ]));
   }

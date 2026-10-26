@@ -200,6 +200,9 @@ export async function handler(event) {
       expires_at: now + 31 * 60,
       success_url: `${origin}/order/thanks?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: build ? `${origin}/design.html` : `${origin}/cart`,
+      // Shown above the Pay button. Stripe's own consent checkbox needs the terms URL set in the
+      // dashboard (Settings > Public details) first, so the links are given as text here.
+      custom_text: { submit: { message: `By paying you agree to our terms and returns policy: ${origin}/terms and ${origin}/returns. Made to Order, monogrammed and sized pieces are final sale.` } },
       ...(process.env.STRIPE_TAX === "true" ? { automatic_tax: { enabled: true } } : {}),
       // Managed Payments is off for this shop: accounts with it on by default reject our shipping
       // address collection and line items with no product tax code. Set STRIPE_MANAGED_PAYMENTS=true

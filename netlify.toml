@@ -80,6 +80,27 @@
   status = 200
   force = true
 
+# Policy pages.
+[[redirects]]
+  from = "/shipping"
+  to = "/shipping.html"
+  status = 200
+
+[[redirects]]
+  from = "/returns"
+  to = "/returns.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
+
 # Archived Oct 26: Sparrow Whiskey is made to order only.
 [[redirects]]
   from = "/shop/sparrow-horween-cavalier-two-tone"

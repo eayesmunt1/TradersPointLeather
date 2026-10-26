@@ -198,3 +198,13 @@ dialog.drawer::backdrop { background: rgba(0,0,0,0.6); }
   .tiles > li:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .tiles > li:last-child:nth-child(odd) .card-img { aspect-ratio: 2 / 1; }
 }
+
+.policy { max-width: 720px; }
+.policy h2 { font-size: 1.25rem; margin: 2rem 0 0.6rem; }
+.policy p, .policy li { line-height: 1.7; color: var(--cream); }
+.policy ul { padding-left: 1.2rem; margin: 0.4rem 0 1rem; }
+.policy a { color: var(--tan); }
+.placeholder { background: #f3d36b; color: #111; padding: 0 0.25rem; }
+.footer-policy { font-size: 0.8rem; }
+.cart-policy { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem; }
+.cart-policy a { color: var(--tan); }

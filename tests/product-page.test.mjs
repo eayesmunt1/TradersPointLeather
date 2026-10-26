@@ -7,8 +7,9 @@ import { productHtml, shipLine } from "../shop/product-html.js";
 const make = (metadata) =>
   shape({ id: "p", lookup_key: "x", unit_amount: 9500, currency: "usd", product: { id: "x", name: "Thing", active: true, description: "d", images: [], metadata } });
 
-test("the policy line reads the same way for both kinds of piece", () => {
-  assert.equal(shipLine(false), "Free shipping (US). Ships in 1\u20132 weeks. Delivery takes 5\u20137 days in the lower 48. 14-day returns if undamaged. Buyer pays return shipping.");
+test("the policy line gives each kind of piece its ship time and return rule", () => {
+  assert.equal(shipLine(false), "Free shipping (US). Ships in 1\u20132 weeks. Delivery takes 5\u20137 days in the lower 48. Made for you, so final sale unless it arrives defective or damaged.");
+  assert.match(shipLine(true), /14-day returns if undamaged and without initials/);
   assert.match(shipLine(true), /^Free shipping \(US\)\. Ships in 1\u20133 business days\. Delivery takes 5\u20137 days in the lower 48\./);
 });
 
