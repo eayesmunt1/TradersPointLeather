@@ -36,6 +36,26 @@ export function leatherNote(p) {
   return hit ? hit[1] : "";
 }
 
+// Verbatim Etsy reviews, copied from the review-data block in index.html (keep the two the same).
+// Never edit the text. Each page shows up to two, picked by what the piece is.
+const REVIEWS = {
+  custom: { text: "Absolutely fantastic custom craftsmanship \u2014 it was a pleasure working with the creator. I'd happily buy from again.", name: "J.", date: "Jan 4, 2025" },
+  second: { text: "Good quality wallet. The color is amazing. Great size as well. Just got my second one.", name: "J.", date: "Nov 12, 2025" },
+  horween: { text: "This is an incredible wallet for the price. The leather quality is excellent, which I'd expect from Horween, but it's very well put together and the design itself is lovely.", name: "S.", date: "Apr 22, 2026" },
+  general: { text: "Traders Point Leather makes superior, high-quality leather products \u2014 you will not be disappointed!", name: "T.", date: "Jun 17, 2026" },
+};
+const ETSY_REVIEWS = "https://www.etsy.com/shop/TradersPointLeather/reviews";
+export function reviewsFor(p) {
+  const wallet = p.type === "wallet";
+  const picks = [
+    wallet && /Horween/.test(p.leather || p.name) && "horween",
+    p.section === "made" && "custom",
+    wallet && "second",
+    "general",
+  ].filter(Boolean);
+  return [...new Set(picks)].slice(0, 2).map((k) => REVIEWS[k]);
+}
+
 function select(id, label, list) {
   return `<div class="field"><label for="${id}">${esc(label)}</label>
     <select id="${id}" name="${id.replace("opt-", "")}" required><option value="">Choose…</option>${list
@@ -112,6 +132,11 @@ export function productHtml(p, { photos: allPhotos = [], monogram = null } = {})
     }
     ${ready || p.type !== "wallet" ? "" : `<p class="hint">Want something different? <a href="/design">Open the designer</a>.</p>`}
     <p class="terms">${esc(shipLine(ready))}</p>
+    <section class="product-reviews" aria-label="Reviews">
+      <p class="proof-line"><a href="${ETSY_REVIEWS}" target="_blank" rel="noopener">\u2605 Etsy Star Seller \u00b7 4.9 from 34 reviews</a></p>
+      ${reviewsFor(p).map((r) => `<blockquote><p>\u201c${esc(r.text)}\u201d</p><footer>${esc(r.name)} \u00b7 ${esc(r.date)}</footer></blockquote>`).join("")}
+      <a class="all-reviews" href="${ETSY_REVIEWS}" target="_blank" rel="noopener">Read all reviews on Etsy \u2192</a>
+    </section>
   </div>
 </div>`;
 }

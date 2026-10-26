@@ -2,7 +2,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { shape } from "../netlify/lib/catalog.js";
-import { productHtml, shipLine, specRows, leatherNote, CARE } from "../shop/product-html.js";
+import { productHtml, shipLine, specRows, leatherNote, reviewsFor, CARE } from "../shop/product-html.js";
 
 const make = (metadata) =>
   shape({ id: "p", lookup_key: "x", unit_amount: 9500, currency: "usd", product: { id: "x", name: "Thing", active: true, description: "d", images: [], metadata } });
@@ -41,4 +41,12 @@ test("wallet pages show a closed size by model, care on everything, and a leathe
   const own = shape({ id: "p", lookup_key: "s", unit_amount: 1, currency: "usd", product: { id: "s", name: "SparrowV2 in X", active: true, description: "", images: [], metadata: { type: "wallet", size: "4.1 x 3.2 in", leather_note: "Own note." } } });
   assert.deepEqual(specRows(own)[0], ["Closed size", "4.1 x 3.2 in"]);
   assert.equal(leatherNote(own), "Own note.");
+});
+
+test("product pages show up to two verbatim reviews picked by the piece, and the Etsy link", () => {
+  const horweenMto = shape({ id: "p", lookup_key: "h", unit_amount: 1, currency: "usd", product: { id: "h", name: "SiahV2", active: true, description: "", images: [], metadata: { type: "wallet", section: "made", leather: "Horween Cavalier" } } });
+  assert.deepEqual(reviewsFor(horweenMto).map((r) => r.name + r.date), ["S.Apr 22, 2026", "J.Jan 4, 2025"]);
+  const belt = shape({ id: "p", lookup_key: "b", unit_amount: 1, currency: "usd", product: { id: "b", name: "Belt", active: true, description: "", images: [], metadata: { type: "belt", section: "made" } } });
+  assert.equal(reviewsFor(belt).length, 2);
+  assert.match(productHtml(belt, {}), /Read all reviews on Etsy/);
 });

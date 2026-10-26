@@ -211,3 +211,10 @@ dialog.drawer::backdrop { background: rgba(0,0,0,0.6); }
 
 .leather-note { font-size: 0.9rem; line-height: 1.7; color: var(--text-muted); margin: 0 0 1.5rem; }
 .leather-note strong { color: var(--cream); font-weight: 500; }
+.product-reviews { margin-top: 2.5rem; padding-top: 1.75rem; border-top: 1px solid rgba(196,168,130,0.15); }
+.product-reviews .proof-line { font-size: 0.8rem; letter-spacing: 0.08em; margin-bottom: 1rem; }
+.product-reviews .proof-line a, .product-reviews .all-reviews { color: var(--tan); text-decoration: none; }
+.product-reviews blockquote { margin: 0 0 1.25rem; }
+.product-reviews blockquote p { font-style: italic; line-height: 1.7; color: var(--cream); }
+.product-reviews blockquote footer { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem; }
+.product-reviews .all-reviews { font-size: 0.85rem; }
