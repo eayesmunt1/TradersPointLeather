@@ -271,7 +271,8 @@ test("the sitemap lists only the static pages while the shop is hidden", async (
 
 test("the sitemap lists the shop and every published product, sold ones included", async () => {
   const xml = await sitemapFor(true);
-  assert.match(xml, /traderspointleather\.com\/shop<\/loc>/);
+  assert.doesNotMatch(xml, /traderspointleather\.com\/shop<\/loc>/);
+  assert.match(xml, /traderspointleather\.com\/shop\/ready-to-ship<\/loc>/);
   for (const page of ["ready-to-ship", "made-to-order", "belts"]) assert.match(xml, new RegExp(`/shop/${page}</loc>`));
   assert.match(xml, /\/shop\/plum</);
   assert.match(xml, /\/shop\/gone</); // sold out, page stays up
@@ -368,11 +369,11 @@ test("a sold piece is OutOfStock, and each section page has its own title", asyn
   const gone = await shopPage({ rawUrl: "https://shop.test/shop/gone" });
   assert.match(gone.body, /schema\.org\/OutOfStock/);
   const titles = new Set();
-  for (const path of ["/shop", "/shop/ready-to-ship", "/shop/made-to-order", "/shop/belts"]) {
+  for (const path of ["/shop/ready-to-ship", "/shop/made-to-order", "/shop/belts"]) {
     const res = await shopPage({ rawUrl: `https://shop.test${path}` });
     assert.equal(res.statusCode, 200, path);
     titles.add(/<title>(.*?)<\/title>/.exec(res.body)[1]);
     assert.match(res.body, new RegExp(`canonical" href="https://traderspointleather\\.com${path}"`));
   }
-  assert.equal(titles.size, 4);
+  assert.equal(titles.size, 3);
 });

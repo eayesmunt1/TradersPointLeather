@@ -13,7 +13,6 @@ export async function handler(event) {
 
   const urls = [url("/", "1.0"), url("/design.html", "0.8"), ...["shipping", "returns", "privacy", "terms"].map((p) => url(`/${p}`, "0.3"))];
   if (isPublic) {
-    urls.push(url("/shop", "0.9"));
     for (const page of ["ready-to-ship", "made-to-order", "belts"]) urls.push(url(`/shop/${page}`, "0.8"));
     const catalog = await loadCatalog().catch(() => new Map());
     for (const slug of [...catalog.keys()].filter((s) => s !== "monogram").sort()) {

@@ -12,7 +12,7 @@ const html = (statusCode, body, drafts = false) => ({
 const NOINDEX = '<meta name="robots" content="noindex, nofollow">';
 const withDraftTag = (page, drafts) => (drafts && !page.includes(NOINDEX) ? page.replace("</head>", `${NOINDEX}</head>`) : page);
 
-// Serves /shop, its three section pages and /shop/<slug>: the product page rendered into the
+// Serves its three section pages and /shop/<slug>: the product page rendered into the
 // shell, or a real 404 for anything not in the catalog. A sold-out Ready to Ship piece keeps its page.
 export async function handler(event) {
   const url = new URL(event.rawUrl);
@@ -23,7 +23,7 @@ export async function handler(event) {
   if (Object.hasOwn(SECTIONS, slug)) {
     const s = SECTIONS[slug];
     const shell = await fetch(`${url.origin}/shop/index.html`).then((r) => r.text());
-    const page = withHead(shell, { title: `${s.title} \u2014 ${SUFFIX}`, description: s.description, path: slug ? `/shop/${slug}` : "/shop" });
+    const page = withHead(shell, { title: `${s.title} \u2014 ${SUFFIX}`, description: s.description, path: `/shop/${slug}` });
     return html(200, withDraftTag(page, drafts), drafts);
   }
 
@@ -42,7 +42,7 @@ export async function handler(event) {
       shell
         .replace("<title>Product — Traders Point Leather</title>", "<title>Not found — Traders Point Leather</title>")
         .replace("</head>", `${NOINDEX}</head>`)
-        .replace(SLOT, () => `<div id="product" data-missing><h1>Not available</h1><p class="lede">This piece is no longer listed.</p><a href="/shop">Back to the shop</a></div>`)
+        .replace(SLOT, () => `<div id="product" data-missing><h1>Not available</h1><p class="lede">This piece is no longer listed.</p><a href="/shop/ready-to-ship">Back to the shop</a></div>`)
     );
   }
   const photos = manifest[slug] || p.images.map((src) => ({ src }));

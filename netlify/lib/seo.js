@@ -13,9 +13,8 @@ export function summary(s, max = 155) {
   return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:.\s]+$/, "") + "\u2026";
 }
 
-// The section pages under /shop, keyed by the path after /shop/ ("" is /shop itself).
+// The section pages under /shop, keyed by the path after /shop/.
 export const SECTIONS = {
-  "": { title: "Shop", description: "Handmade leather wallets, belts and dog collars from Traders Point Leather in Indiana. Ready to Ship pieces, Made to Order builds, and belts cut to your length." },
   "ready-to-ship": { title: "Ready to Ship", description: "Finished handmade leather wallets that leave the shop in 1\u20133 business days. Free US shipping from Traders Point Leather in Indiana." },
   "made-to-order": { title: "Made to Order", description: "Handmade leather wallets built for you after you order and shipped in 1\u20132 weeks. Horween, Newbury and shell cordovan, saddle-stitched by hand in Indiana." },
   belts: { title: "Belts and Dog Collars", description: "Full-grain leather belts and dog collars made to your length or size in Indiana, shipped in 1\u20132 weeks. Free US shipping." },

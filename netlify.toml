@@ -70,14 +70,21 @@
 # Old links to /shop.html (a retired page) land on the shop.
 [[redirects]]
   from = "/shop.html"
-  to = "/shop"
+  to = "/shop/ready-to-ship"
+  status = 301
+  force = true
+
+# The shop has no landing page: /shop goes straight to Ready to Ship.
+[[redirects]]
+  from = "/shop"
+  to = "/shop/ready-to-ship"
   status = 301
   force = true
 
 [[redirects]]
-  from = "/shop"
-  to = "/.netlify/functions/shop-page"
-  status = 200
+  from = "/shop/"
+  to = "/shop/ready-to-ship"
+  status = 301
   force = true
 
 # Policy pages.

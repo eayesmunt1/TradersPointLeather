@@ -170,7 +170,7 @@
     if (notice) box.append(el('p', { class: 'notice', role: 'status', text: notice }));
     if (!catalog) { box.append(el('p', { class: 'cart-empty', text: 'Loading your cart…' })); return; }
     if (!items.length) {
-      box.append(el('p', { class: 'cart-empty', text: 'Your cart is empty.' }), el('a', { class: 'btn btn-shop', href: '/shop', text: 'Shop' }));
+      box.append(el('p', { class: 'cart-empty', text: 'Your cart is empty.' }), el('a', { class: 'btn btn-shop', href: '/shop/ready-to-ship', text: 'Shop' }));
       // The full page also shows the three shop sections; the drawer stays short.
       if (box.id === 'cart-page') {
         var all = catalog.products.filter(function (q) { return q.slug !== 'monogram'; });
@@ -363,17 +363,17 @@
       }
       // The same tabs on every shop page, so a visitor can move between the three.
       var tabs = document.getElementById('shop-tabs');
-      // The tabs and the intro line belong to the three pages; the /shop landing is just its tiles.
-      if (cat) [{ slug: '', title: 'All' }].concat(CATS).forEach(function (c) {
-        var href = '/shop' + (c.slug ? '/' + c.slug : '');
+      // /shop itself redirects to Ready to Ship, so the tabs are just the three sections.
+      if (cat) CATS.forEach(function (c) {
+        var href = '/shop/' + c.slug;
         var a = el('a', { href: href + drafts, text: c.title });
         if (path === href) a.setAttribute('aria-current', 'page');
         tabs.append(a);
       });
       tabs.hidden = !cat;
 
-      // The header link for this page: Belts for Belts, Shop for everything else.
-      var navHref = cat && cat.slug === 'belts' ? '/shop/belts' : '/shop';
+      // The header link for this page: its own section, else Shop (Ready to Ship).
+      var navHref = cat ? '/shop/' + cat.slug : '/shop/ready-to-ship';
       document.querySelectorAll('.site-nav a').forEach(function (a) { a.removeAttribute('aria-current'); });
       var cur = [].filter.call(document.querySelectorAll('.site-nav a'), function (a) { return a.getAttribute('href') === navHref; })[0];
       if (cur) cur.setAttribute('aria-current', 'page');
@@ -405,7 +405,7 @@
       var ready = box.hasAttribute('data-ssr') ? Promise.resolve() : catalogPromise.then(function (c) {
         var p = product(slug);
         if (!p || !visible(p)) {
-          box.innerHTML = '<h1>Not available</h1><p class="lede">This piece is sold out or no longer listed.</p><a href="/shop">Back to the shop</a>';
+          box.innerHTML = '<h1>Not available</h1><p class="lede">This piece is sold out or no longer listed.</p><a href="/shop/ready-to-ship">Back to the shop</a>';
           return Promise.reject('missing');
         }
         return import('/shop/product-html.js').then(function (m) {
@@ -454,7 +454,7 @@
               : 'We make your order by hand now. It ships in 1\u20132 weeks, and delivery takes 5\u20137 days in the lower 48.' }),
             o.shipTo ? el('p', { class: 'muted', text: 'Shipping to ' + o.shipTo.name + ', ' + o.shipTo.lines.join(', ') + '.' }) : null,
             el('p', {}, [document.createTextNode('Questions about your order? Email '), el('a', { href: 'mailto:' + MAIL, text: MAIL }), document.createTextNode('.')]),
-            el('p', {}, [el('a', { href: '/shop', text: 'Back to the shop' })])
+            el('p', {}, [el('a', { href: '/shop/ready-to-ship', text: 'Back to the shop' })])
           ].filter(Boolean));
         })
         .catch(function () { box.textContent = 'We could not load that order. Your payment receipt is in your email.'; });

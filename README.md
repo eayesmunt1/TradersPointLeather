@@ -78,7 +78,7 @@ Without JavaScript a product page's button posts straight to checkout for that o
 - The home page's Shop link shows, and every buy link points at the shop. Each link keeps its old Etsy
   URL in `data-etsy`, so setting the flag to `false` swaps them back to Etsy and hides the Shop link: a
   one-line rollback.
-- `/sitemap.xml` (a function, built from the Stripe catalog) lists `/shop` and every published product
+- `/sitemap.xml` (a function, built from the Stripe catalog) lists the three section pages and every published product
   page, sold Ready to Ship pieces included. With the flag `false` it lists only the home page and the designer.
 - The shop pages have no `noindex` tag. `cart.html` and `order-thanks.html` keep theirs, and a `?drafts=1`
   preview of unapproved products is added `noindex` by the page itself.

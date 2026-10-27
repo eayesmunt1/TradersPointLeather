@@ -11,7 +11,7 @@ const ok = (name, pass, detail = "") => {
 const get = (path, init) => fetch(`${BASE}${path}`, { redirect: "manual", ...init });
 
 // Pages
-for (const path of ["/", "/shop", "/shop/ready-to-ship", "/shop/made-to-order", "/shop/belts", "/design.html", "/cart", "/shipping", "/returns", "/privacy", "/terms"]) {
+for (const path of ["/", "/shop/ready-to-ship", "/shop/made-to-order", "/shop/belts", "/design.html", "/cart", "/shipping", "/returns", "/privacy", "/terms"]) {
   const r = await get(path);
   ok(`GET ${path}`, r.status === 200, String(r.status));
 }

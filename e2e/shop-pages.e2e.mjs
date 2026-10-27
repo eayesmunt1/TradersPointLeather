@@ -1,4 +1,4 @@
-// The shop's own pages: the /shop landing, Ready to Ship, Made to Order and Belts.
+// The shop's own pages: Ready to Ship, Made to Order and Belts.
 //   BASE_URL=http://localhost:8888 node --test e2e/shop-pages.e2e.mjs
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -20,17 +20,12 @@ async function open(path, viewport = { width: 1280, height: 900 }) {
 }
 const cards = (page) => page.$$eval("#listing a.card", (cs) => cs.map((c) => ({ href: c.getAttribute("href"), name: c.querySelector("h2").textContent })));
 
-test("/shop is a landing page with one tile for each of the three pages", async () => {
-  const { page, ctx, errors } = await open("/shop");
-  const tiles = await cards(page);
-  assert.deepEqual(tiles.map((t) => t.href), ["/shop/ready-to-ship", "/shop/made-to-order", "/shop/belts"]);
-  assert.deepEqual(tiles.map((t) => t.name), ["Ready to Ship", "Made to Order", "Belts and Dog Collars"]);
-  assert.equal(await page.textContent("#shop-title"), "Shop");
-  // Just the tiles: no intro line and no tabs on the landing page.
-  assert.equal(await page.locator("#shop-lede").isVisible(), false);
-  assert.equal(await page.locator("#shop-tabs").isVisible(), false);
-  assert.deepEqual(errors, []);
-  await ctx.close();
+test("/shop has no landing page: it redirects permanently to Ready to Ship", async () => {
+  for (const path of ["/shop", "/shop/"]) {
+    const res = await fetch(`${BASE}${path}`, { redirect: "manual" });
+    assert.equal(res.status, 301, path);
+    assert.equal(new URL(res.headers.get("location"), BASE).pathname, "/shop/ready-to-ship", path);
+  }
 });
 
 test("Ready to Ship lists only finished pieces that are in stock, and no belts", async () => {
@@ -69,14 +64,14 @@ test("Belts and Dog Collars has its own page with the belts and the collar only"
 test("the tabs and the header move between the pages and mark where you are", async () => {
   const { page, ctx } = await open("/shop/belts");
   const tabs = await page.$$eval("#shop-tabs a", (as) => as.map((a) => `${a.textContent}|${a.getAttribute("href")}|${a.getAttribute("aria-current") || ""}`));
-  assert.deepEqual(tabs, ["All|/shop|", "Ready to Ship|/shop/ready-to-ship|", "Made to Order|/shop/made-to-order|", "Belts and Dog Collars|/shop/belts|page"]);
+  assert.deepEqual(tabs, ["Ready to Ship|/shop/ready-to-ship|", "Made to Order|/shop/made-to-order|", "Belts and Dog Collars|/shop/belts|page"]);
   assert.equal(await page.getAttribute('.site-nav a[href="/shop/belts"]', "aria-current"), "page");
   await page.click('#shop-tabs a:has-text("Made to Order")');
   await page.waitForURL(/\/shop\/made-to-order$/);
   await page.waitForSelector("#listing .grid");
-  // Made to Order highlights Shop, not Wallets.
-  assert.equal(await page.getAttribute('.site-nav a[href="/shop"]', "aria-current"), "page");
-  assert.equal(await page.getAttribute('.site-nav a[href="/shop/made-to-order"]', "aria-current"), null);
+  // Made to Order highlights Wallets; Shop is Ready to Ship.
+  assert.equal(await page.getAttribute('.site-nav a[href="/shop/made-to-order"]', "aria-current"), "page");
+  assert.equal(await page.getAttribute('.site-nav a[href="/shop/ready-to-ship"]', "aria-current"), null);
   await ctx.close();
 });
 
@@ -86,13 +81,13 @@ test("a product page links back to its own category", async () => {
     const page = await ctx.newPage();
     await page.goto(`${BASE}/shop/${slug}`, { waitUntil: "networkidle" });
     const crumbs = await page.$$eval(".crumbs a", (as) => as.map((a) => `${a.textContent}|${a.getAttribute("href")}`));
-    assert.deepEqual(crumbs, ["\u2190 Shop|/shop", `${name}|${href}`], slug);
+    assert.deepEqual(crumbs, [`\u2190 ${name}|${href}`], slug);
     await ctx.close();
   }
 });
 
 test("the shop pages fit a phone", async () => {
-  for (const path of ["/shop", "/shop/ready-to-ship", "/shop/made-to-order", "/shop/belts"]) {
+  for (const path of ["/shop/ready-to-ship", "/shop/made-to-order", "/shop/belts"]) {
     const { page, ctx, errors } = await open(path, { width: 390, height: 800 });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${path}: sideways scroll`);
     assert.deepEqual(errors, [], path);
@@ -151,9 +146,12 @@ test("the four policy pages load, and the footer and cart link to them", async (
   await ctx.close();
 });
 
-test("the Belts and Dog Collars tile on /shop shows the burgundy Latigo belt, not the collar", async () => {
-  const { page, ctx } = await open("/shop");
-  const src = await page.$eval('#listing a.card[href="/shop/belts"] img', (i) => i.getAttribute("src"));
+test("the Belts and Dog Collars tile (empty cart) shows the burgundy Latigo belt, not the collar", async () => {
+  const ctx = await browser.newContext();
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/cart`, { waitUntil: "networkidle" });
+  await page.waitForSelector('.cart-tiles a.card[href="/shop/belts"] img');
+  const src = await page.$eval('.cart-tiles a.card[href="/shop/belts"] img', (i) => i.getAttribute("src"));
   assert.match(src, /belt-newbury-latigo-burgundy/);
   await ctx.close();
 });

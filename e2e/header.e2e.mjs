@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { chromium } from "playwright";
 
 const BASE = process.env.BASE_URL || "http://localhost:8888";
-const PAGES = ["/", "/shop", "/shop/gv1-horween-cypress", "/cart"];
+const PAGES = ["/", "/shop/ready-to-ship", "/shop/gv1-horween-cypress", "/cart"];
 
 let browser;
 test.before(async () => { browser = await chromium.launch(); });
@@ -44,13 +44,13 @@ test("home, shop, product and cart carry the same header", async () => {
     assert.deepEqual(s.links, seen[0].links, `${s.path} menu differs from the home page`);
   }
   assert.deepEqual(seen[0].links, [
-    "Process -> /#craft", "Details -> /#details", "Shop -> /shop", "Wallets -> /shop/made-to-order",
+    "Process -> /#craft", "Details -> /#details", "Shop -> /shop/ready-to-ship", "Wallets -> /shop/made-to-order",
     "Belts -> /shop/belts", "Design Your Wallet -> /design.html", "Contact -> /#contact",
   ]);
 });
 
 test("a link from the shop lands on the right section of the home page", async () => {
-  const { page, ctx } = await open("/shop");
+  const { page, ctx } = await open("/shop/ready-to-ship");
   await page.locator('.site-nav a:has-text("Process")').click();
   await page.waitForURL(/\/#craft$/);
   assert.ok(await page.locator("#craft").isVisible());
@@ -58,7 +58,7 @@ test("a link from the shop lands on the right section of the home page", async (
 });
 
 test("the phone menu opens and closes on every page", async () => {
-  for (const path of ["/", "/shop", "/shop/gv1-horween-cypress"]) {
+  for (const path of ["/", "/shop/ready-to-ship", "/shop/gv1-horween-cypress"]) {
     const { page, ctx } = await open(path, { width: 390, height: 800 });
     const nav = page.locator("#site-nav");
     assert.equal(await nav.isVisible(), false, `${path}: menu should start closed`);
