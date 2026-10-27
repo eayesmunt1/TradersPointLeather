@@ -20,6 +20,12 @@ async function open(path, viewport = { width: 1280, height: 900 }) {
 }
 const cards = (page) => page.$$eval("#listing a.card", (cs) => cs.map((c) => ({ href: c.getAttribute("href"), name: c.querySelector("h2").textContent })));
 
+test("the archived Plum page sends visitors to Ready to Ship with a temporary redirect", async () => {
+  const res = await fetch(`${BASE}/shop/cygnet-horween-cavalier-plum`, { redirect: "manual" });
+  assert.equal(res.status, 302);
+  assert.equal(new URL(res.headers.get("location"), BASE).pathname, "/shop/ready-to-ship");
+});
+
 test("/shop has no landing page: it redirects permanently to Ready to Ship", async () => {
   for (const path of ["/shop", "/shop/"]) {
     const res = await fetch(`${BASE}${path}`, { redirect: "manual" });

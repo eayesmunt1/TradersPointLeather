@@ -115,6 +115,14 @@
   status = 301
   force = true
 
+# Plum & London Bus Red is archived for now (new photos to come), so its page sends people to
+# Ready to Ship. Temporary, since it may come back.
+[[redirects]]
+  from = "/shop/cygnet-horween-cavalier-plum"
+  to = "/shop/ready-to-ship"
+  status = 302
+  force = true
+
 # /shop and its section pages: shop-page.js serves the listing shell with each page's own title,
 # description and canonical, and shop.js picks what to show from the address.
 [[redirects]]

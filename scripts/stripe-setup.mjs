@@ -60,8 +60,8 @@ const OLD_CYGNET =
 // of "" removes that key. `stock` applies to Ready to Ship pieces only.
 const PLAN = {
   // Ready to Ship
-  "cygnet-horween-cavalier-plum": { section: "ready", stock: 2, desc: "cygnetCavalier", meta: { one_of_a_kind: "false" } },
-  "cygnet-horween-cavalier-rts": { archive: "duplicate of cygnet-horween-cavalier-plum (the two Plum pieces are one listing, stock 2)" },
+  "cygnet-horween-cavalier-plum": { archive: "Plum & London Bus Red: archived Oct 27 by the owner; new photos to come (img/cygnet-horween-cavalier-plum/ is kept)" },
+  "cygnet-horween-cavalier-rts": { archive: "duplicate of the archived cygnet-horween-cavalier-plum" },
   "cygnet-horween-cavalier-sunflower": { section: "ready", stock: 1 },
   "cygnet-newbury-balmoral-navy": { section: "ready", stock: 1, desc: "cygnetNewbury" },
   "cygnet-newbury-balmoral-sunflower": { section: "ready", stock: 1, desc: "cygnetNewbury", meta: { one_of_a_kind: "true" } },
