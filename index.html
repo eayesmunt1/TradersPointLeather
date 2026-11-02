@@ -247,6 +247,8 @@ body {
   content: '';
   position: absolute;
   inset: 0;
+  /* Decoration only: without this it sits over the Shop button and the scroll cue and eats their clicks. */
+  pointer-events: none;
   background:
     radial-gradient(ellipse 60% 50% at 50% 40%, rgba(196,168,130,0.06) 0%, transparent 70%),
     radial-gradient(circle at 20% 80%, rgba(139,111,78,0.04) 0%, transparent 50%);
