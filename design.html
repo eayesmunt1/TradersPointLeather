@@ -295,13 +295,6 @@ body {
 }
 .btn-shop:hover { background: var(--tan-light); transform: translateY(-2px); }
 .btn-shop:focus-visible { outline: 2px solid var(--tan-light); outline-offset: 3px; }
-/* Send sits beside Buy as the quieter of the two: outlined, not filled. */
-.btn-shop.btn-ghost {
-  background: transparent;
-  color: var(--tan-light);
-  box-shadow: inset 0 0 0 1px var(--tan);
-}
-.btn-shop.btn-ghost:hover { background: rgba(196,168,130,0.12); }
 .spec-note {
   display: block;
   margin-top: 1.1rem;
@@ -673,7 +666,6 @@ body { padding-top: 64px; }
     <div class="preview-send">
       <div class="send-actions">
         <a class="btn-shop" data-buy href="#" aria-describedby="send-note-side">Buy — $145</a>
-        <a class="btn-shop btn-ghost" data-send href="#" aria-describedby="send-note-side">Discuss Your Build</a>
       </div>
       <span class="spec-note" id="send-note-side">$145. Initials +$10. Secure checkout by Stripe.</span>
     </div>
@@ -703,7 +695,6 @@ body { padding-top: 64px; }
 <div class="send-bar" id="send-bar">
   <div class="send-actions">
     <a class="btn-shop" data-buy href="#" aria-describedby="send-note-bar">Buy — $145</a>
-    <a class="btn-shop btn-ghost" data-send href="#" aria-describedby="send-note-bar">Discuss Your Build</a>
   </div>
   <span class="spec-note" id="send-note-bar">$145. Initials +$10. Secure checkout by Stripe.</span>
 </div>
@@ -1468,7 +1459,6 @@ state.family = LEATHER_LINES[0].id;
 const byId = (list, id) => list.find((x) => x.id === id) || list[0];
 
 const svg = document.getElementById('wallet');
-const sendBtns = document.querySelectorAll('[data-send]');
 const buyBtns = document.querySelectorAll('[data-buy]');
 
 /* ── Build the SVG ──────────────────────────────────────────────────── */
@@ -1563,8 +1553,6 @@ function render() {
       : '';
   stashNote.hidden = !stashNote.textContent;
 
-  const href = buildMailtoHref();
-  sendBtns.forEach((a) => { a.href = href; });
   // Each style has its own price and Payment Link; a style without a link yet cannot be bought here.
   // Checkout is /api/checkout: $145 for the build and, with initials, a $10 line. The server sets the money.
   const withInitials = !!state.monogram, price = m.price + (withInitials ? INITIALS_PRICE : 0);
@@ -1794,24 +1782,6 @@ function buildSpec() {
   ].join('\n');
 }
 
-/* ── Send ───────────────────────────────────────────────────────────── */
-const CONTACT = 'customer-support@traderspointleather.com';
-
-/* The button is an anchor, so the browser opens the draft natively — the href
-   is just kept in step with the current build by render(). */
-function buildMailtoHref() {
-  const subject = `Custom wallet spec — ${currentModel().name}`;
-  const body = [
-    buildSpec(),
-    '',
-    '—',
-    "Anything else you'd like us to know:",
-    '',
-  ].join('\n');
-  return `mailto:${CONTACT}?subject=${encodeURIComponent(subject)}`
-       + `&body=${encodeURIComponent(body)}`;
-}
-
 /* Buy posts the build to /api/checkout, the same Stripe Checkout the cart uses, so the buyer gives
    a shipping address and the order carries the full spec. The reply is the Checkout URL. */
 let buying = false;
@@ -1830,7 +1800,7 @@ async function buyBuild(btn) {
     if (res.ok && data.url) { window.location.assign(data.url); return; }
     throw new Error(data.error || 'Could not start checkout.');
   } catch (e) {
-    alert(e.message + ' You can use Discuss Your Build to order instead.');
+    alert(e.message + ' Please try again, or email customer-support@traderspointleather.com.');
   }
   buying = false;
   render();
@@ -1880,33 +1850,14 @@ new IntersectionObserver(([e]) => {
   sendBar.classList.toggle('is-away', e.isIntersecting || e.boundingClientRect.top < 0);
 }).observe(document.querySelector('.real-pieces'));
 
-/* ── Send, by chat ──────────────────────────────────────────────────
-   Discuss Your Build opens Crisp and sends the spec as the visitor's first
-   message, so it reaches the shop's phone in full and the visitor can carry
-   on the conversation under it. The build code is attached to the session as
-   well. If Crisp never loaded (no ID, or a blocker stopped it), the click is
-   left alone and the button's mailto href opens an email draft instead.
-
-   Crisp's own launcher floats bottom-right. On a wide screen it has that
-   corner to itself; on a narrow one the send bar is there, so the launcher is
-   hidden and Discuss Your Build opens the window instead, which hides again when closed. */
+/* Crisp's own launcher floats bottom-right. On a wide screen it has that
+   corner to itself; on a narrow one the send bar is there, so it stays hidden. */
 if (window.CRISP_WEBSITE_ID) {
   const narrow = window.matchMedia('(max-width: 1024px)');
   const tuck = () => { if (narrow.matches) $crisp.push(['do', 'chat:hide']); };
   $crisp.push(['safe', true]);
   tuck();
   $crisp.push(['on', 'chat:closed', tuck]);
-
-  sendBtns.forEach((btn) => btn.addEventListener('click', (e) => {
-    // Until Crisp has loaded, $crisp is still the plain queue array.
-    if (typeof $crisp.is !== 'function') return;
-    e.preventDefault();
-    const spec = buildSpec();
-    $crisp.push(['set', 'session:data', [[['build_code', buildCode()]]]]);
-    $crisp.push(['do', 'chat:show']);
-    $crisp.push(['do', 'chat:open']);
-    $crisp.push(['do', 'message:send', ['text', spec]]);
-  }));
 }
 
 // Reveal on scroll
